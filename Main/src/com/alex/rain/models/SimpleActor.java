@@ -26,14 +26,16 @@ public abstract class SimpleActor extends Actor {
 
     public abstract void createPhysicsActor(World physicsWorld);
 
+    public void prepareActor() {
+
+    }
+
     public void setPosition(Vector2 vec) {
         body.setTransform(vec, body.getAngle());
         pos.set(vec);
     }
 
-    public static int counter = 0;
     public Vector2 getPosition() {
-        counter++;
         return pos;
     }
 

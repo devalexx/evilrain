@@ -49,6 +49,7 @@ public class GameWorld extends Stage {
 
     public void add(SimpleActor actor) {
         actor.createPhysicsActor(physicsWorld);
+        actor.prepareActor();
         actorList.add(actor);
         addActor(actor);
         if(actor.getType() == SimpleActor.TYPE.DROP)
@@ -70,8 +71,6 @@ public class GameWorld extends Stage {
         LuaValue luaDrop = CoerceJavaToLua.coerce(dropList);
         LuaValue retvals = luaOnCheckFunc.call(luaDrop);
         //System.out.println(retvals.tojstring(1));
-        System.out.println(SimpleActor.counter);
-        SimpleActor.counter = 0;
     }
 
     public World getPhysicsWorld() {

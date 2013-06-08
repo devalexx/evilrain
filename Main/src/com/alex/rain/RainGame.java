@@ -28,14 +28,14 @@ public class RainGame extends Game {
 
     @Override
     public void create() {
-        /*GameWorld gameWorld = new GameWorld();
+        GameWorld gameWorld = new GameWorld("level1");
         gameWorld.createWorld();
         stage = gameWorld;
         Gdx.input.setInputProcessor(stage);
 
         screen = new GameScreen(gameWorld);
-        setScreen(screen);*/
-        setScreen(new MainMenuScreen());
+        setScreen(screen);
+        //setScreen(new MainMenuScreen());
     }
 
     @Override
