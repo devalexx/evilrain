@@ -26,14 +26,14 @@ public class GameWorld extends Stage {
     LuaFunction luaOnCreateFunc;
     LuaFunction luaOnCheckFunc;
 
-    public GameWorld() {
+    public GameWorld(String name) {
         liquidHelper = new LiquidHelper(dropList);
 
         ScriptEngineManager sem     = new ScriptEngineManager();
         ScriptEngine        engine  = sem.getEngineByExtension(".lua");
         ScriptEngineFactory factory = engine.getFactory();
         CompiledScript cs;
-        String filename = "data/level1.lua";
+        String filename = "data/" + name + ".lua";
         try {
             Reader reader = new FileReader(filename);
             cs = ((Compilable)engine).compile(reader);
@@ -62,7 +62,7 @@ public class GameWorld extends Stage {
 
     @Override
     public void act(float delta) {
-        liquidHelper.applyLiquidConstraint(delta*3);
+        liquidHelper.applyLiquidConstraint(/*delta*3*/1/60f); // TODO: wrong?
         physicsWorld.step(delta*3, 8, 3);
         for(SimpleActor actor : actorList)
             actor.act(delta);

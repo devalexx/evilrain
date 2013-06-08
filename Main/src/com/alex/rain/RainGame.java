@@ -14,6 +14,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 public class RainGame extends Game {
     Screen screen;
     Stage stage;
+    static RainGame instance;
+
+    private RainGame() {
+
+    }
+
+    public static RainGame getInstance() {
+        if(instance == null)
+            instance = new RainGame();
+        return instance;
+    }
 
     @Override
     public void create() {
@@ -24,7 +35,7 @@ public class RainGame extends Game {
 
         screen = new GameScreen(gameWorld);
         setScreen(screen);*/
-        setScreen(new MainMenuScreen(this));
+        setScreen(new MainMenuScreen());
     }
 
     @Override
@@ -37,7 +48,13 @@ public class RainGame extends Game {
         }
     }
 
-    public void setLevel() {
+    public void setLevel(String name) {
+        GameWorld gameWorld = new GameWorld(name);
+        gameWorld.createWorld();
+        stage = gameWorld;
+        Gdx.input.setInputProcessor(stage);
 
+        screen = new GameScreen(gameWorld);
+        setScreen(screen);
     }
 }

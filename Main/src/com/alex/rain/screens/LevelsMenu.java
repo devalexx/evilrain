@@ -10,7 +10,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 /**
@@ -18,11 +20,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
  * @since: 08.06.13
  */
 
-public class MainMenuScreen implements Screen {
+public class LevelsMenu implements Screen {
     private Stage stage;
-
-    public MainMenuScreen() {
-    }
 
     @Override
     public void render(float delta) {
@@ -65,40 +64,38 @@ public class MainMenuScreen implements Screen {
 
         table.row().width(400).padTop(10);
 
-        final TextButton button = new TextButton("Play", skin);
+        final TextButton button = new TextButton("Level 1", skin);
         table.add(button);
         button.setPosition(0, -100);
 
         table.row().width(400).padTop(10);
 
-        final TextButton button2 = new TextButton("Options", skin);
+        final TextButton button2 = new TextButton("Level 2", skin);
         table.add(button2);
         button2.setPosition(0, 0);
 
         table.row().width(400).padTop(10);
 
-        final TextButton button3 = new TextButton("Exit", skin);
+        final TextButton button3 = new TextButton("Back", skin);
         table.add(button3);
         button3.setPosition(0, 100);
 
         button.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                RainGame.getInstance().setScreen(new LevelsMenu());
+                RainGame.getInstance().setLevel("level1");
             }
         });
-
         button2.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                //RainGame.getInstance().setScreen(new LevelsMenu());
+                RainGame.getInstance().setLevel("level2");
             }
         });
-
         button3.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                Gdx.app.exit();
+                RainGame.getInstance().setScreen(new MainMenuScreen());
             }
         });
     }

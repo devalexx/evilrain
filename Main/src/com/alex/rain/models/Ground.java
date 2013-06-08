@@ -1,6 +1,8 @@
 package com.alex.rain.models;
 
 import com.alex.rain.helpers.Box2DSeparatorHelper;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -58,5 +60,16 @@ public class Ground extends SimpleActor {
 
     public void addVertex(float x, float y) {
         vertices.add(new Vector2(x, y));
+    }
+
+    @Override
+    public void draw(SpriteBatch batch, float parentAlpha) {
+        /*if(texture != null)
+            batch.draw(texture, getPosition().x-RADIUS/2-TEXTURE_SCALE/2, getPosition().y-RADIUS/2-TEXTURE_SCALE/2,
+                    TEXTURE_SCALE, TEXTURE_SCALE);*/
+
+        batch.setColor(0, 1.0f, 0, 1.0f);
+        ShapeRenderer shapeRenderer = new ShapeRenderer();
+        shapeRenderer.circle(10, 10, 10);
     }
 }

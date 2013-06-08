@@ -42,7 +42,7 @@ public class DesktopStarter {
         cfg.useGL20 = true;
         cfg.width = 800;
         cfg.height = 480;
-        new LwjglApplication(new RainGame(), cfg);
+        new LwjglApplication(RainGame.getInstance(), cfg);
 
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
     }

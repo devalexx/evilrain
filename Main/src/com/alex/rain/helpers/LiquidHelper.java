@@ -122,7 +122,7 @@ public class LiquidHelper {
             _delta[i].add(change);
         }
 
-        moveParticles(/*deltaT*/1/60f); // TODO: wrong?
+        moveParticles(deltaT);
 
     }
 
