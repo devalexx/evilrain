@@ -1,6 +1,7 @@
 package com.alex.rain;
 
 import com.alex.rain.screens.GameScreen;
+import com.alex.rain.screens.MainMenuScreen;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,20 +17,27 @@ public class RainGame extends Game {
 
     @Override
     public void create() {
-        GameWorld gameWorld = new GameWorld();
+        /*GameWorld gameWorld = new GameWorld();
         gameWorld.createWorld();
         stage = gameWorld;
         Gdx.input.setInputProcessor(stage);
 
         screen = new GameScreen(gameWorld);
-        setScreen(screen);
+        setScreen(screen);*/
+        setScreen(new MainMenuScreen(this));
     }
 
     @Override
     public void render() {
         super.render();
-        stage.draw();
-        stage.act(Gdx.graphics.getDeltaTime());
-        //screen.render(1);
+
+        if(stage != null) {
+            stage.draw();
+            stage.act(Gdx.graphics.getDeltaTime());
+        }
+    }
+
+    public void setLevel() {
+
     }
 }
