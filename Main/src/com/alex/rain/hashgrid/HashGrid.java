@@ -144,8 +144,9 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
 
         for (E obj : origCollection)
         {
-            double distSq = (location.x-obj.getPosition().x)*(location.x-obj.getPosition().x) +
-                    (location.y-obj.getPosition().y)*(location.y-obj.getPosition().y);
+            Vector2 objLoc = obj.getPosition();
+            double distSq = (location.x-objLoc.x)*(location.x-objLoc.x) +
+                    (location.y-objLoc.y)*(location.y-objLoc.y);
             if (distSq <= maxDistSq)
             {
                 newCollection.add(obj);
@@ -206,20 +207,21 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
 
         for (E obj : set)
         {
-            addToGrid(obj,obj.getPosition());
+            Vector2 objPos = obj.getPosition();
+            addToGrid(obj,objPos);
 
             // Put the same object in the centre and up to 3 of the 8 adjacent grid cells to
             // avoid boundary problems.
-            addToGrid(obj,new Vector2(obj.getPosition().x-halfGridX,obj.getPosition().y-halfGridY));
-            addToGrid(obj,new Vector2(obj.getPosition().x,          obj.getPosition().y-halfGridY));
-            addToGrid(obj,new Vector2(obj.getPosition().x+halfGridX,obj.getPosition().y-halfGridY));
+            addToGrid(obj,new Vector2(objPos.x-halfGridX,objPos.y-halfGridY));
+            addToGrid(obj,new Vector2(objPos.x,          objPos.y-halfGridY));
+            addToGrid(obj,new Vector2(objPos.x+halfGridX,objPos.y-halfGridY));
 
-            addToGrid(obj,new Vector2(obj.getPosition().x-halfGridX,obj.getPosition().y));
-            addToGrid(obj,new Vector2(obj.getPosition().x+halfGridX,obj.getPosition().y));
+            addToGrid(obj,new Vector2(objPos.x-halfGridX,objPos.y));
+            addToGrid(obj,new Vector2(objPos.x+halfGridX,objPos.y));
 
-            addToGrid(obj,new Vector2(obj.getPosition().x-halfGridX,obj.getPosition().y+halfGridY));
-            addToGrid(obj,new Vector2(obj.getPosition().x,          obj.getPosition().y+halfGridY));
-            addToGrid(obj,new Vector2(obj.getPosition().x+halfGridX,obj.getPosition().y+halfGridY));
+            addToGrid(obj,new Vector2(objPos.x-halfGridX,objPos.y+halfGridY));
+            addToGrid(obj,new Vector2(objPos.x,          objPos.y+halfGridY));
+            addToGrid(obj,new Vector2(objPos.x+halfGridX,objPos.y+halfGridY));
         }
     }
 
@@ -261,23 +263,24 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
     public boolean add(E obj, SimpleActor loc)
     {
         // Put the object in the grid cell in which it lies (no duplications in neighbouring cells)
-        boolean isItemAdded = addToGrid(obj,loc.getPosition());
+        Vector2 locPos = loc.getPosition();
+        boolean isItemAdded = addToGrid(obj,locPos);
 
         // Put the same object in the centre and up to 3 of the 8 adjacent grid cells to
         // avoid boundary problems.
         float halfGridX = (maxX-minX)/(numCols*2);
         float halfGridY = (maxY-minY)/(numRows*2);
 
-        addToGrid(obj,new Vector2(loc.getPosition().x-halfGridX,loc.getPosition().y-halfGridY));
-        addToGrid(obj,new Vector2(loc.getPosition().x,          loc.getPosition().y-halfGridY));
-        addToGrid(obj,new Vector2(loc.getPosition().x+halfGridX,loc.getPosition().y-halfGridY));
+        addToGrid(obj,new Vector2(locPos.x-halfGridX,locPos.y-halfGridY));
+        addToGrid(obj,new Vector2(locPos.x,          locPos.y-halfGridY));
+        addToGrid(obj,new Vector2(locPos.x+halfGridX,locPos.y-halfGridY));
 
-        addToGrid(obj,new Vector2(loc.getPosition().x-halfGridX,loc.getPosition().y));
-        addToGrid(obj,new Vector2(loc.getPosition().x+halfGridX,loc.getPosition().y));
+        addToGrid(obj,new Vector2(locPos.x-halfGridX,locPos.y));
+        addToGrid(obj,new Vector2(locPos.x+halfGridX,locPos.y));
 
-        addToGrid(obj,new Vector2(loc.getPosition().x-halfGridX,loc.getPosition().y+halfGridY));
-        addToGrid(obj,new Vector2(loc.getPosition().x,          loc.getPosition().y+halfGridY));
-        addToGrid(obj,new Vector2(loc.getPosition().x+halfGridX,loc.getPosition().y+halfGridY));
+        addToGrid(obj,new Vector2(locPos.x-halfGridX,locPos.y+halfGridY));
+        addToGrid(obj,new Vector2(locPos.x,          locPos.y+halfGridY));
+        addToGrid(obj,new Vector2(locPos.x+halfGridX,locPos.y+halfGridY));
 
         // Also add the same object to the set to allow 1-dimensional retrieval of all added objects.
         if (isItemAdded)

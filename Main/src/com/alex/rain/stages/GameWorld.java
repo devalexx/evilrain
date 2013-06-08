@@ -20,7 +20,7 @@ import java.util.*;
 
 public class GameWorld extends Stage {
     World physicsWorld = new World(new Vector2(0, -9.8f), true);
-    List<Actor> actorList = new ArrayList<Actor>();
+    List<SimpleActor> actorList = new ArrayList<SimpleActor>();
     List<Drop> dropList = new ArrayList<Drop>();
     LiquidHelper liquidHelper;
     LuaFunction luaOnCreateFunc;
@@ -71,12 +71,16 @@ public class GameWorld extends Stage {
 
     @Override
     public void act(float delta) {
-        physicsWorld.step(delta*3, 8, 3);
         liquidHelper.applyLiquidConstraint(delta*3);
+        physicsWorld.step(delta*3, 8, 3);
+        for(SimpleActor actor : actorList)
+            actor.act(delta);
 
         LuaValue luaDrop = CoerceJavaToLua.coerce(dropList);
         LuaValue retvals = luaOnCheckFunc.call(luaDrop);
-        System.out.println(retvals.tojstring(1));
+        //System.out.println(retvals.tojstring(1));
+        System.out.println(SimpleActor.counter);
+        SimpleActor.counter = 0;
     }
 
     public World getPhysicsWorld() {

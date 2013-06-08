@@ -30,13 +30,15 @@ public class LiquidHelper {
     public LiquidHelper(List<Drop> dropList) {
         this.dropList = dropList;
         dropIndexMap = new HashMap<Drop, Integer>();
+        grid = new HashGrid<Drop>(800, 480, 25);
     }
 
     private HashGrid<Drop> createHashGrid() {
-        grid = new HashGrid<Drop>(800, 480, 25);
-        for(Drop d1 : dropList) {
-            grid.add(d1);
-        }
+        grid.updateAll();
+
+        if(grid.size() != dropList.size())
+            for(int i = grid.size(); i < dropList.size(); i++)
+                grid.add(dropList.get(i));
 
         return grid;
     }
@@ -53,8 +55,8 @@ public class LiquidHelper {
     private void prepareSimulation() {
         for (int i = 0; i < dropList.size(); i++) {
             Drop particle = dropList.get(i);
-            _scaledPositions[i] = particle.getPosition().mul(MULTIPLIER);
-            _scaledVelocities[i] = particle.getLinearVelocity().mul(MULTIPLIER);
+            _scaledPositions[i] = particle.getPosition().cpy().mul(MULTIPLIER);
+            _scaledVelocities[i] = particle.getLinearVelocity().cpy().mul(MULTIPLIER);
             _delta[i] = new Vector2();
             if(_delta.length != dropIndexMap.size()) {
                 dropIndexMap.put(particle, i);
@@ -123,11 +125,15 @@ public class LiquidHelper {
     }
 
     private void moveParticles(float deltaT) {
+        Vector2 pos = new Vector2();
+        Vector2 vel = new Vector2();
         for (int i = 0; i < dropList.size(); i++) {
             Drop particle = dropList.get(i);
 
-            particle.setPosition(particle.getPosition().add(_delta[i].div(MULTIPLIER)));
-            particle.setLinearVelocity(particle.getLinearVelocity().add(_delta[i].div((MULTIPLIER * deltaT))));
+            pos.set(particle.getPosition());
+            vel.set(particle.getLinearVelocity());
+            particle.setPosition(pos.add(_delta[i].div(MULTIPLIER)));
+            particle.setLinearVelocity(vel.add(_delta[i].div((MULTIPLIER * deltaT))));
         }
     }
 }

@@ -15,6 +15,7 @@ public abstract class SimpleActor extends Actor {
     protected Body body;
     protected Texture texture;
     protected TYPE type = TYPE.NONE;
+    protected Vector2 pos = new Vector2();
 
     public enum TYPE {
         NONE,
@@ -26,10 +27,13 @@ public abstract class SimpleActor extends Actor {
 
     public void setPosition(Vector2 vec) {
         body.setTransform(vec, body.getAngle());
+        pos.set(vec);
     }
 
+    public static int counter = 0;
     public Vector2 getPosition() {
-        return new Vector2(body.getPosition());
+        counter++;
+        return pos;
     }
 
     public void setLinearVelocity(Vector2 vec) {
@@ -37,12 +41,12 @@ public abstract class SimpleActor extends Actor {
     }
 
     public Vector2 getLinearVelocity() {
-        return new Vector2(body.getLinearVelocity());
+        return body.getLinearVelocity();
     }
 
     @Override
     public void act(float delta) {
-        setPosition(body.getPosition().x, body.getPosition().y);
+        pos = body.getPosition();
     }
 
     public void applyForceToCenter(Vector2 vec) {
