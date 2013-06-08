@@ -26,6 +26,8 @@ public class LiquidHelper {
     private Vector2[] _delta;
     private Vector2[] _scaledPositions;
     private Vector2[] _scaledVelocities;
+    private Vector2 change = new Vector2();
+    private Vector2 relativePosition = new Vector2();
 
     public LiquidHelper(List<Drop> dropList) {
         this.dropList = dropList;
@@ -81,7 +83,7 @@ public class LiquidHelper {
             float[] distances = new float[neighbors.length];
             for (int a = 0; a < neighbors.length; a++) {
                 int i2 = dropIndexMap.get(neighbors[a]);
-                Vector2 relativePosition = new Vector2(_scaledPositions[i2]).sub(_scaledPositions[i]);
+                relativePosition.set(_scaledPositions[i2]).sub(_scaledPositions[i]);
                 float distanceSq = relativePosition.len2();
 
                 //within idealRad check
@@ -100,16 +102,16 @@ public class LiquidHelper {
             // Apply forces
             pressure = (p - 5f) / 2.0f; //normal pressure term
             presnear = pnear / 2.0f; //near particles term
-            Vector2 change = new Vector2();
+            change.set(0, 0);
             for (int a = 0; a < neighbors.length; a++) {
                 int i2 = dropIndexMap.get(neighbors[a]);
-                Vector2 relativePosition = new Vector2(_scaledPositions[i2]).sub(_scaledPositions[i]);
+                relativePosition.set(_scaledPositions[i2]).sub(_scaledPositions[i]);
 
                 if (distances[a] < IDEAL_RADIUS) {
                     float oneminusq = 1.0f - distances[a] / IDEAL_RADIUS;
                     float factor = oneminusq * (pressure + presnear * oneminusq) / (2.0F * distances[a]);
                     Vector2 d = relativePosition.mul(factor);
-                    Vector2 relativeVelocity = new Vector2(_scaledVelocities[i2]).sub(_scaledVelocities[i]);
+                    Vector2 relativeVelocity = _scaledVelocities[i2].tmp().sub(_scaledVelocities[i]);
 
                     factor = VISCOSITY * oneminusq * deltaT;
                     d.sub(relativeVelocity.mul(factor));
@@ -125,15 +127,11 @@ public class LiquidHelper {
     }
 
     private void moveParticles(float deltaT) {
-        Vector2 pos = new Vector2();
-        Vector2 vel = new Vector2();
         for (int i = 0; i < dropList.size(); i++) {
             Drop particle = dropList.get(i);
 
-            pos.set(particle.getPosition());
-            vel.set(particle.getLinearVelocity());
-            particle.setPosition(pos.add(_delta[i].div(MULTIPLIER)));
-            particle.setLinearVelocity(vel.add(_delta[i].div((MULTIPLIER * deltaT))));
+            particle.setPosition(particle.getPosition().tmp().add(_delta[i].div(MULTIPLIER)));
+            particle.setLinearVelocity(particle.getLinearVelocity().tmp().add(_delta[i].div((MULTIPLIER * deltaT))));
         }
     }
 }

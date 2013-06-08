@@ -56,15 +56,6 @@ public class GameWorld extends Stage {
     }
 
     public void createWorld() {
-        /*for(int i = 0; i < 10; i++) {
-            for(int j = 0; j < 10; j++) {
-                Drop drop = new Drop(physicsWorld);
-                drop.setPosition(new Vector2(i * 15 + 130, j * 15 + 140));
-                add(drop);
-            }
-        }
-        add(new Ground(physicsWorld));*/
-
         LuaValue luaWorld = CoerceJavaToLua.coerce(this);
         luaOnCreateFunc.call(luaWorld);
     }

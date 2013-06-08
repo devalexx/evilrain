@@ -120,6 +120,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
 
     // --------------------------------- Methods ---------------------------------
 
+    private Set<E> newCollection = new HashSet<E>();
     /** Returns a collection of the locatable objects that are within the <code>radius</code> of
      *  the given location. <code>radius</code> is that defined in the constructor or by the most
      *  recent call to <code>updateAll(radius)</code>.
@@ -132,7 +133,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
     {
         int coordHash = getCoordHash(location);
         Collection<E> origCollection = hashMap.get(coordHash);
-        Set<E> newCollection = new HashSet<E>();
+        newCollection.clear();
 
         if (origCollection == null)
         {
@@ -140,7 +141,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
             return newCollection;
         }
 
-        double maxDistSq = radius*radius;
+        float maxDistSq = radius*radius;
 
         for (E obj : origCollection)
         {
