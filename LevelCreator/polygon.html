@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> - jsFiddle demo</title>
+  
+  <script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
+  
+  
+  
+  <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+  
+  <style type='text/css'>
+    #myTable td {
+    border: solid 1px black;
+    width: 5px;
+    height: 5px;
+}
+
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+var arrOfArr = new Array();
+var multiplier = 8;
+var maxX = 50, maxY = 100;
+
+function onClickCell(i, j) {
+	arrOfArr[i][j] = !arrOfArr[i][j];
+	if(arrOfArr[i][j])
+		$("#td"+i+"_"+j).css("background-color", "red");
+	else
+		$("#td"+i+"_"+j).css("background-color", "white");
+		
+	$("#coords").append("ground:addVertex("+j*multiplier+", "+(maxX-1-i)*multiplier+")<br/>");
+}
+
+function onHoverCell(i, j) {
+	$("#hoverCoords").text(j*multiplier+", "+(maxX-1-i)*multiplier);
+}
+
+$(window).load(function(){
+var tableStr = "";
+
+for(var i = 0; i < maxX; i++) {
+    arrOfArr.push(new Array());
+	arrOfArr[i][j] = false;
+    tableStr += "<tr>";
+    for(var j = 0; j < maxY; j++) {
+        tableStr += "<td id='td"+i+"_"+j+"' onclick='onClickCell("+i+","+j+")' onMouseover='onHoverCell("+i+","+j+")'></td>";
+    }
+    tableStr += "</tr>";
+}
+        
+$('#myTable').append(tableStr);
+});//]]>  
+
+</script>
+
+
+</head>
+<body>
+	<span id="hoverCoords" style="float:right">qwe</span>
+	<table id="myTable">
+	</table>
+	<span id="coords"></span>
+  
+</body>
+
+
+</html>
+
