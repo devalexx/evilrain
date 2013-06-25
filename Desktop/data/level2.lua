@@ -55,10 +55,10 @@ function onCheck(mArray)
     for i = 0, mArray:size() - 1 do
         if mArray:get(i):getStringType() == "DROP" then
             if mArray:get(i):getPosition().x < 100 then
-                return 1
+                return true
             end
         end
     end
 
-    return 0
+    return false
 end

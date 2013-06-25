@@ -28,14 +28,13 @@ function onCreate(world)
 end
 
 function onCheck(mArray)
-    mArray:size()
     for i = 0, mArray:size() - 1 do
         if mArray:get(i):getStringType() == "DROP" then
-            if mArray:get(i):getPosition().x < 100 then
-                return 1
+            if mArray:get(i):getPosition().x < 50 then
+                return true
             end
         end
     end
 
-    return 0
+    return false
 end

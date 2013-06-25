@@ -49,6 +49,8 @@ public class RainGame extends Game {
     }
 
     public void setLevel(String name) {
+        if(stage != null)
+            stage.dispose();
         GameWorld gameWorld = new GameWorld(name);
         gameWorld.createWorld();
         stage = gameWorld;
@@ -56,5 +58,11 @@ public class RainGame extends Game {
 
         screen = new GameScreen(gameWorld);
         setScreen(screen);
+    }
+
+    public void setMenu(Screen screen) {
+        setScreen(screen);
+        stage.dispose();
+        stage = null;
     }
 }
