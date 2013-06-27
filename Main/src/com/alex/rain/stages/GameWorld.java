@@ -6,7 +6,7 @@ import com.alex.rain.models.*;
 import com.alex.rain.screens.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.*;
@@ -61,9 +61,12 @@ public class GameWorld extends Stage {
         actor.createPhysicsActor(physicsWorld);
         actor.prepareActor();
         actorList.add(actor);
-        addActor(actor);
-        if(actor.getType() == SimpleActor.TYPE.DROP)
+        if(actor.getType() == SimpleActor.TYPE.DROP) {
+            getRoot().addActorAt(0, actor);
             dropList.add((Drop)actor);
+        } else {
+            addActor(actor);
+        }
     }
 
     public void addUI(Actor actor) {

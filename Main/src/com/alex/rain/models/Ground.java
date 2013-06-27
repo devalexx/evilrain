@@ -87,29 +87,10 @@ public class Ground extends SimpleActor {
 
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
-        //batch.enableBlending();
+        batch.end();
         polyBatch.begin();
-        //polyBatch.enableBlending();
         poly.draw(polyBatch);
         polyBatch.end();
-        /*if(texture != null)
-            batch.draw(texture, getPosition().x-RADIUS/2-TEXTURE_SCALE/2, getPosition().y-RADIUS/2-TEXTURE_SCALE/2,
-                    TEXTURE_SCALE, TEXTURE_SCALE);*/
-
-        //batch.setColor(0, 1.0f, 0, 1.0f);
-        //batch.begin();
-        //shapeRenderer.begin();
-        /*shapeRenderer.setColor(0, 1.0f, 0, 1.0f);
-        shapeRenderer.setProjectionMatrix(getStage().getCamera().combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.FilledTriangle);
-        for(int i = 0; i < vertices.size()-2; i++) {
-            Vector2 vertex1 = vertices.get(i);
-            Vector2 vertex2 = vertices.get(i+1);
-            Vector2 vertex3 = vertices.get(i+2);
-            shapeRenderer.filledTriangle(vertex1.x, vertex1.y, vertex2.x, vertex2.y, vertex3.x, vertex3.y);
-        }
-        shapeRenderer.end();*/
-        //shapeRenderer.end();
-        //batch.end();
+        batch.begin();
     }
 }

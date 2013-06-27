@@ -74,12 +74,8 @@ public class Drop extends SimpleActor {
 
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
-        batch.end();
-        batch.begin();
         if(texture != null)
             batch.draw(texture, getPosition().x-RADIUS/2-TEXTURE_SCALE/2, getPosition().y-RADIUS/2-TEXTURE_SCALE/2,
                     TEXTURE_SCALE, TEXTURE_SCALE);
-        batch.end();
-        batch.begin();
     }
 }
