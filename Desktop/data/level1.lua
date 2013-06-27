@@ -25,15 +25,15 @@ function onCreate(world)
     ground:addVertex(32, 360)
     ground:addVertex(32, 32)
     world:add(ground)
+
+    dynamicActor = luajava.newInstance(DynamicActor)
+    world:add(dynamicActor)
+    dynamicActor:setPosition(luajava.newInstance(Vector2, 650, 300))
 end
 
 function onCheck(mArray)
-    for i = 0, mArray:size() - 1 do
-        if mArray:get(i):getStringType() == "DROP" then
-            if mArray:get(i):getPosition().x < 50 then
-                return true
-            end
-        end
+    if dynamicActor:getRotation() < -10 then
+        return true
     end
 
     return false

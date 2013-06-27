@@ -16,6 +16,7 @@ public abstract class SimpleActor extends Actor {
     protected Texture texture;
     protected TYPE type = TYPE.NONE;
     protected Vector2 pos = new Vector2();
+    protected float rot;
     protected Vector2 linVel = new Vector2();
 
     public enum TYPE {
@@ -28,6 +29,15 @@ public abstract class SimpleActor extends Actor {
 
     public void prepareActor() {
 
+    }
+
+    public void setRotation(float a) {
+        body.setTransform(getPosition(), (float)Math.toRadians(a));
+        rot = a;
+    }
+
+    public float getRotation() {
+        return rot;
     }
 
     public void setPosition(Vector2 vec) {
@@ -51,6 +61,7 @@ public abstract class SimpleActor extends Actor {
     @Override
     public void act(float delta) {
         pos = body.getPosition();
+        rot = (float)Math.toDegrees(body.getAngle());
         linVel = body.getLinearVelocity();
     }
 
