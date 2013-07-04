@@ -4,9 +4,10 @@ import com.alex.rain.RainGame;
 import com.alex.rain.helpers.LiquidHelper;
 import com.alex.rain.models.*;
 import com.alex.rain.screens.*;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.*;
@@ -35,6 +36,15 @@ public class GameWorld extends Stage {
     private LuaFunction luaOnCheckFunc;
     private boolean wonGame;
     private Table table;
+    private ShaderProgram shader;
+    private Texture textureDrop;
+    private final Box2DDebugRenderer debugRenderer;
+    private boolean debugRendererEnabled;
+    private final SpriteBatch sbS;
+    private final FrameBuffer m_fbo;
+    private final TextureRegion m_fboRegion;
+    private final float m_fboScaler = 1.5f;
+    private float time;
 
     public GameWorld(String name) {
         liquidHelper = new LiquidHelper(dropList);
@@ -55,6 +65,24 @@ public class GameWorld extends Stage {
             //LogHandler.log.error(e.getMessage(), e);
             System.out.println("error: " + filename);
         }
+
+        final String VERTEX = Gdx.files.internal("data/drop_shader.vert").readString();
+        final String FRAGMENT = Gdx.files.internal("data/drop_shader.frag").readString();
+
+        shader = new ShaderProgram(VERTEX, FRAGMENT);
+        if(!shader.isCompiled())
+            System.out.println(shader.getLog());
+
+        textureDrop = new Texture(Gdx.files.internal("data/forward.png"));
+
+        sbS = new SpriteBatch();
+        sbS.setShader(shader);
+
+        m_fbo = new FrameBuffer(Pixmap.Format.RGB565, (int)(Gdx.graphics.getWidth() * m_fboScaler), (int)(Gdx.graphics.getHeight() * m_fboScaler), false);
+        m_fboRegion = new TextureRegion(m_fbo.getColorBufferTexture());
+        m_fboRegion.flip(false, true);
+
+        debugRenderer = new Box2DDebugRenderer();
     }
 
     public void add(SimpleActor actor) {
@@ -81,8 +109,9 @@ public class GameWorld extends Stage {
 
     @Override
     public void act(float delta) {
-        liquidHelper.applyLiquidConstraint(/*delta*3*/1/60f); // TODO: wrong?
-        physicsWorld.step(delta*3, 8, 3);
+        time += Gdx.graphics.getDeltaTime();
+        liquidHelper.applyLiquidConstraint(1/60f); // TODO: check this shit?
+        physicsWorld.step(1/15f, 6, 3);
         /*for(SimpleActor actor : actorList)
             actor.act(delta);*/
         super.act(delta);
@@ -151,7 +180,7 @@ public class GameWorld extends Stage {
 
         button3.addListener(new ChangeListener() {
             @Override
-            public void changed (ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event, Actor actor) {
                 RainGame.getInstance().setMenu(new MainMenuScreen());
             }
         });
@@ -174,7 +203,38 @@ public class GameWorld extends Stage {
         return true;
     }
 
+    @Override
+    public boolean keyDown(int keyCode) {
+        if(keyCode == Input.Keys.F4)
+            debugRendererEnabled = !debugRendererEnabled;
+
+        return true;
+    }
+
     public int getDropsNumber() {
         return dropList.size();
+    }
+
+    @Override
+    public void draw() {
+        m_fbo.begin();
+            getSpriteBatch().begin();
+            Gdx.graphics.getGL20().glClear(GL20.GL_COLOR_BUFFER_BIT);
+            for (Drop drop : dropList) {
+                getSpriteBatch().draw(textureDrop,
+                        drop.getPosition().x - textureDrop.getWidth() / 2, drop.getPosition().y - textureDrop.getWidth() / 2);
+            }
+            getSpriteBatch().end();
+        m_fbo.end();
+
+        sbS.begin();
+            shader.setUniformf("u_time", time);
+            sbS.draw(m_fboRegion, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        sbS.end();
+
+        super.draw();
+
+        if(debugRendererEnabled)
+            debugRenderer.render(physicsWorld, getCamera().combined);
     }
 }

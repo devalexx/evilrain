@@ -28,6 +28,9 @@
  */
 package com.alex.rain.models;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.physics.box2d.*;
 
 /**
@@ -36,17 +39,24 @@ import com.badlogic.gdx.physics.box2d.*;
  */
 
 public class DynamicActor extends SimpleActor {
+    private Sprite sprite;
+    private Texture texture;
+
     public DynamicActor() {
+        texture = new Texture(Gdx.files.internal("data/home1.png"));
+        sprite = new Sprite(texture);
+        offset.set(-16, -50);
     }
 
     @Override
     public void createPhysicsActor(World physicsWorld) {
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(10, 50);
+        polygonShape.setAsBox(16, 50);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
         fixtureDef.density = 1;
+        fixtureDef.friction = 10.4f;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -55,5 +65,12 @@ public class DynamicActor extends SimpleActor {
         body.resetMassData();
 
         polygonShape.dispose();
+    }
+
+    @Override
+    public void draw(SpriteBatch batch, float parentAlpha) {
+        sprite.setPosition(pos.x + offset.x, pos.y + offset.y);
+        sprite.setRotation(rot);
+        sprite.draw(batch, parentAlpha);
     }
 }
