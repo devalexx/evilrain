@@ -13,9 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public abstract class SimpleActor extends Actor {
     protected Body body;
-    protected Texture texture;
     protected TYPE type = TYPE.NONE;
     protected Vector2 pos = new Vector2();
+    protected Vector2 offset = new Vector2();
     protected float rot;
     protected Vector2 linVel = new Vector2();
 

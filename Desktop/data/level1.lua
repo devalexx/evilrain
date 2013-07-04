@@ -32,7 +32,7 @@ function onCreate(world)
 end
 
 function onCheck(mArray)
-    if dynamicActor:getRotation() < -10 then
+    if dynamicActor:getRotation() < -30 or dynamicActor:getRotation() > 30 then
         return true
     end
 
