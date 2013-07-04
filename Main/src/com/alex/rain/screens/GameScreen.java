@@ -32,7 +32,6 @@ import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.physics.box2d.*;
 
 /**
  * @author: Alexander Shubenkov
@@ -42,29 +41,21 @@ import com.badlogic.gdx.physics.box2d.*;
 public class GameScreen implements Screen {
     private SpriteBatch spriteBatch;
     private OrthographicCamera camera;
-    private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
-    private World physicsWorld;
     private GameWorld world;
     BitmapFont font = new BitmapFont();
 
     public GameScreen(GameWorld world) {
-        physicsWorld = world.getPhysicsWorld();
         this.world = world;
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        debugRenderer.render(physicsWorld, camera.combined);
-
         camera.update();
 
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-        //spriteBatch.draw(splsh, 0, 0);
-        font.draw(spriteBatch, "fps:"+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
-        font.draw(spriteBatch, "drops:"+world.getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
+            font.draw(spriteBatch, "fps:"+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
+            font.draw(spriteBatch, "drops:"+world.getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
         spriteBatch.end();
     }
 
@@ -96,9 +87,5 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-    }
-
-    public Camera getCamera() {
-        return camera;
     }
 }

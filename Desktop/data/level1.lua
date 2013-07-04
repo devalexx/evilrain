@@ -5,8 +5,8 @@ function onCreate(world)
     world:add(drop)
     drop:setPosition(luajava.newInstance(Vector2, 100, 400))
 
-    for i = 0, 9 do
-        for j = 0, 9 do
+    for i = 0, 19 do
+        for j = 0, 19 do
             drop = luajava.newInstance(Drop)
             world:add(drop)
             drop:setPosition(luajava.newInstance(Vector2, i * 15 + 130, j * 15 + 140))

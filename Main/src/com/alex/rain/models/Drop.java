@@ -28,9 +28,7 @@
  */
 package com.alex.rain.models;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.physics.box2d.*;
 
 import java.net.URL;
@@ -46,7 +44,6 @@ public class Drop extends SimpleActor {
     public Drop() {
         super();
         String workingDir = System.getProperty("user.dir");
-        texture = new Texture(Gdx.files.internal("data/forward.png"));
         type = TYPE.DROP;
     }
 
@@ -70,12 +67,5 @@ public class Drop extends SimpleActor {
         Fixture fixture = body.createFixture(fixtureDef);
 
         circle.dispose();
-    }
-
-    @Override
-    public void draw(SpriteBatch batch, float parentAlpha) {
-        if(texture != null)
-            batch.draw(texture, getPosition().x-RADIUS/2-TEXTURE_SCALE/2, getPosition().y-RADIUS/2-TEXTURE_SCALE/2,
-                    TEXTURE_SCALE, TEXTURE_SCALE);
     }
 }

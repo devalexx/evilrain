@@ -4,6 +4,7 @@ import com.alex.rain.screens.GameScreen;
 import com.alex.rain.screens.MainMenuScreen;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 /**
@@ -36,16 +37,18 @@ public class RainGame extends Game {
         screen = new GameScreen(gameWorld);
         setScreen(screen);
         //setScreen(new MainMenuScreen());
+        Gdx.graphics.getGL20().glClearColor(0, 0, 0, 0);
     }
 
     @Override
     public void render() {
-        super.render();
-
+        Gdx.graphics.getGL20().glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT );
         if(stage != null) {
             stage.draw();
             stage.act(Gdx.graphics.getDeltaTime());
         }
+
+        super.render();
     }
 
     public void setLevel(String name) {
