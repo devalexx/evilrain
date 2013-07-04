@@ -16,6 +16,7 @@ import java.util.Map;
 public class LiquidHelper {
     public final float RADIUS = 35f;
     public final float IDEAL_RADIUS = 200f;
+    public final float IDEAL_RADIUS_A = IDEAL_RADIUS - 0.01f;
     public final float MULTIPLIER = IDEAL_RADIUS / RADIUS;
     public final float IDEAL_RADIUS_SQ = IDEAL_RADIUS * IDEAL_RADIUS;
     public final float VISCOSITY = 0.004f;
@@ -51,15 +52,21 @@ public class LiquidHelper {
             _scaledPositions = new Vector2[dropList.size()];
             _scaledVelocities = new Vector2[dropList.size()];
             dropIndexMap.clear();
+
+            for (int i = 0; i < dropList.size(); i++) {
+                _scaledPositions[i] = new Vector2();
+                _scaledVelocities[i] = new Vector2();
+                _delta[i] = new Vector2();
+            }
         }
     }
 
     private void prepareSimulation() {
         for (int i = 0; i < dropList.size(); i++) {
             Drop particle = dropList.get(i);
-            _scaledPositions[i] = particle.getPosition().cpy().mul(MULTIPLIER);
-            _scaledVelocities[i] = particle.getLinearVelocity().cpy().mul(MULTIPLIER);
-            _delta[i] = new Vector2();
+            _scaledPositions[i].set(particle.getPosition()).mul(MULTIPLIER);
+            _scaledVelocities[i].set(particle.getLinearVelocity()).mul(MULTIPLIER);
+            _delta[i].set(0, 0);
             if(_delta.length != dropIndexMap.size()) {
                 dropIndexMap.put(particle, i);
             }
@@ -90,10 +97,10 @@ public class LiquidHelper {
                 if (distanceSq < IDEAL_RADIUS_SQ) {
                     distances[a] = (float)Math.sqrt(distanceSq);
                     if (distances[a] < EPSILON)
-                        distances[a] = IDEAL_RADIUS - 0.01f;
+                        distances[a] = IDEAL_RADIUS_A;
                     float oneminusq = 1.0f - (distances[a] / IDEAL_RADIUS);
-                    p = (p + oneminusq * oneminusq);
-                    pnear = (pnear + oneminusq * oneminusq * oneminusq);
+                    p += oneminusq * oneminusq;
+                    pnear += oneminusq * oneminusq * oneminusq;
                 } else {
                     distances[a] = Float.MAX_VALUE;
                 }
