@@ -28,45 +28,54 @@
  */
 package com.alex.rain.models;
 
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.alex.rain.managers.TextureManager;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.physics.box2d.*;
-
-import java.net.URL;
 
 /**
  * @author: Alexander Shubenkov
- * @since: 29.05.13
+ * @since: 05.07.13
  */
 
-public class Drop extends SimpleActor {
-    public final float RADIUS = 3f;
-    public final float TEXTURE_SCALE = 20f;
-    public Drop() {
-        super();
-        String workingDir = System.getProperty("user.dir");
-        type = TYPE.DROP;
+public class Cloud extends KinematicActor {
+    private Sprite sprite;
+    private Texture texture;
+
+    public Cloud() {
+        texture = TextureManager.getInstance().getTexture("cloud.png");
+        sprite = new Sprite(texture);
+        offset.set(-100, -50);
+        type = SimpleActor.TYPE.CLOUD;
     }
 
     @Override
     public void createPhysicsActor(World physicsWorld) {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(210, 140);
-
-        body = physicsWorld.createBody(bodyDef);
-
-        CircleShape circle = new CircleShape();
-        circle.setRadius(RADIUS);
+        PolygonShape polygonShape = new PolygonShape();
+        polygonShape.setAsBox(100, 50);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = circle;
-        fixtureDef.density = 1.0f;
-        fixtureDef.friction = 0.0f;
-        fixtureDef.restitution = 0.4f;
-        fixtureDef.filter.categoryBits = CATEGORY_ALL;
+        fixtureDef.shape = polygonShape;
+        fixtureDef.density = 1;
+        fixtureDef.friction = 10.4f;
+        fixtureDef.filter.categoryBits = CATEGORY_CLOUD;
+        fixtureDef.filter.maskBits = MASK_NONE;
 
-        Fixture fixture = body.createFixture(fixtureDef);
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
+        body = physicsWorld.createBody(bodyDef);
+        body.createFixture(fixtureDef);
+        body.resetMassData();
 
-        circle.dispose();
+        polygonShape.dispose();
+
+        setWidth(200);
+    }
+
+    @Override
+    public void draw(SpriteBatch batch, float parentAlpha) {
+        sprite.setPosition(pos.x + offset.x, pos.y + offset.y);
+        sprite.setRotation(rot);
+        sprite.draw(batch, parentAlpha);
     }
 }

@@ -46,6 +46,9 @@ public class GameWorld extends Stage {
     private final TextureRegion m_fboRegion;
     private final float m_fboScaler = 1.5f;
     private float time;
+    private float timeLastDrop;
+    private boolean itRain;
+    private Cloud cloud;
 
     public GameWorld(String name) {
         liquidHelper = new LiquidHelper(dropList);
@@ -90,6 +93,10 @@ public class GameWorld extends Stage {
         actor.createPhysicsActor(physicsWorld);
         actor.prepareActor();
         actorList.add(actor);
+
+        if(actor.getType() == SimpleActor.TYPE.CLOUD)
+            cloud = (Cloud)actor;
+
         if(actor.getType() == SimpleActor.TYPE.DROP) {
             getRoot().addActorAt(0, actor);
             dropList.add((Drop)actor);
@@ -124,6 +131,17 @@ public class GameWorld extends Stage {
             wonGame = true;
             showWinnerMenu();
         }
+
+        if(itRain && !wonGame && cloud != null) {
+            if(time - timeLastDrop > 0.05) {
+                Drop drop = new Drop();
+                Random r = new Random();
+                float offset = r.nextFloat() * cloud.getWidth() * 2/3;
+                add(drop);
+                drop.setPosition(new Vector2(cloud.getPosition().x - cloud.getWidth() / 3 + offset, cloud.getPosition().y));
+                timeLastDrop = time;
+            }
+        }
     }
 
     private void showWinnerMenu() {
@@ -146,6 +164,16 @@ public class GameWorld extends Stage {
         textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
         textButtonStyle.font = skin.getFont("default");
         skin.add("default", textButtonStyle);
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = skin.getFont("default");
+        skin.add("default", labelStyle);
+
+        table.row().width(400).padTop(10);
+
+        final Label label = new Label("VICTORY", skin);
+        table.add(label);
+        label.setPosition(0, -100);
 
         table.row().width(400).padTop(10);
 
@@ -193,7 +221,7 @@ public class GameWorld extends Stage {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if(wonGame)
+        if(wonGame || cloud != null)
             return true;
         Drop drop = new Drop();
         Random r = new Random();
@@ -208,6 +236,28 @@ public class GameWorld extends Stage {
     public boolean keyDown(int keyCode) {
         if(keyCode == Input.Keys.F4)
             debugRendererEnabled = !debugRendererEnabled;
+        else if(keyCode == Input.Keys.LEFT) {
+            if(cloud != null)
+                cloud.setLinearVelocity(new Vector2(-20, 0));
+        } else if(keyCode == Input.Keys.RIGHT) {
+            if(cloud != null)
+                cloud.setLinearVelocity(new Vector2(20, 0));
+        } else if(keyCode == Input.Keys.SPACE)
+            itRain = true;
+
+        return true;
+    }
+
+    @Override
+    public boolean keyUp(int keyCode) {
+        if(keyCode == Input.Keys.LEFT) {
+            if(cloud != null)
+                cloud.setLinearVelocity(new Vector2(0, 0));
+        } else if(keyCode == Input.Keys.RIGHT) {
+            if(cloud != null)
+                cloud.setLinearVelocity(new Vector2(0, 0));
+        } else if(keyCode == Input.Keys.SPACE)
+            itRain = false;
 
         return true;
     }

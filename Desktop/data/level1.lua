@@ -29,6 +29,10 @@ function onCreate(world)
     dynamicActor = luajava.newInstance(DynamicActor)
     world:add(dynamicActor)
     dynamicActor:setPosition(luajava.newInstance(Vector2, 650, 300))
+
+    cloud = luajava.newInstance(Cloud)
+    world:add(cloud)
+    cloud:setPosition(luajava.newInstance(Vector2, 650, 420))
 end
 
 function onCheck(mArray)

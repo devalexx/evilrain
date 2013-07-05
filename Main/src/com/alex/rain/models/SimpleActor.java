@@ -22,8 +22,15 @@ public abstract class SimpleActor extends Actor {
     public enum TYPE {
         NONE,
         DROP,
-        GROUND
+        GROUND,
+        CLOUD
     }
+
+    public final short CATEGORY_ALL = 0x0001;
+    public final short CATEGORY_CLOUD = 0x0002;
+
+    public final short MASK_ALL = -1;
+    public final short MASK_NONE = 0;
 
     public abstract void createPhysicsActor(World physicsWorld);
 
