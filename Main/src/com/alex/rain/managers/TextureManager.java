@@ -26,52 +26,35 @@
  *   penalties, and will be prosecuted to the maximum extent possible under the
  *   law.
  */
-package com.alex.rain.models;
+package com.alex.rain.managers;
 
-import com.alex.rain.managers.TextureManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.physics.box2d.*;
+
+import java.util.*;
 
 /**
  * @author: Alexander Shubenkov
- * @since: 27.06.13
+ * @since: 05.07.13
  */
 
-public class DynamicActor extends SimpleActor {
-    private Sprite sprite;
-    private Texture texture;
+public class TextureManager {
+    private Map<String, Texture> textureMap = new HashMap<String, Texture>();
+    private static TextureManager manager = new TextureManager();
+    
+    private TextureManager() {}
 
-    public DynamicActor() {
-        texture = TextureManager.getInstance().getTexture("home1.png");
-        sprite = new Sprite(texture);
-        offset.set(-16, -50);
+    public static TextureManager getInstance() {
+        return manager;
     }
 
-    @Override
-    public void createPhysicsActor(World physicsWorld) {
-        PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(16, 50);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = polygonShape;
-        fixtureDef.density = 1;
-        fixtureDef.friction = 10.4f;
-
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        body = physicsWorld.createBody(bodyDef);
-        body.createFixture(fixtureDef);
-        body.resetMassData();
-
-        polygonShape.dispose();
-    }
-
-    @Override
-    public void draw(SpriteBatch batch, float parentAlpha) {
-        sprite.setPosition(pos.x + offset.x, pos.y + offset.y);
-        sprite.setRotation(rot);
-        sprite.draw(batch, parentAlpha);
+    public Texture getTexture(String path) {
+        if(textureMap.containsKey(path)) {
+            return textureMap.get(path);
+        } else {
+            Texture texture = new Texture(Gdx.files.internal("data/" + path));
+            textureMap.put(path, texture);
+            return texture;
+        }
     }
 }

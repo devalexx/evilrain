@@ -1,6 +1,7 @@
 package com.alex.rain.models;
 
 import com.alex.rain.helpers.Box2DSeparatorHelper;
+import com.alex.rain.managers.TextureManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -29,7 +30,7 @@ public class Ground extends SimpleActor {
         type = TYPE.GROUND;
 
 
-        textureSolid = new Texture(Gdx.files.internal("data/grass.png"));
+        textureSolid = TextureManager.getInstance().getTexture("grass.png");
         polyBatch = new PolygonSpriteBatch();
     }
 

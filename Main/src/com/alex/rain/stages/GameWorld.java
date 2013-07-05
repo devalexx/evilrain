@@ -2,6 +2,7 @@ package com.alex.rain.stages;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.helpers.LiquidHelper;
+import com.alex.rain.managers.TextureManager;
 import com.alex.rain.models.*;
 import com.alex.rain.screens.*;
 import com.badlogic.gdx.*;
@@ -73,7 +74,7 @@ public class GameWorld extends Stage {
         if(!shader.isCompiled())
             System.out.println(shader.getLog());
 
-        textureDrop = new Texture(Gdx.files.internal("data/forward.png"));
+        textureDrop = TextureManager.getInstance().getTexture("forward.png");
 
         sbS = new SpriteBatch();
         sbS.setShader(shader);
