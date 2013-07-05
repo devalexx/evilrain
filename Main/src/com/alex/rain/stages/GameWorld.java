@@ -171,7 +171,7 @@ public class GameWorld extends Stage {
 
         table.row().width(400).padTop(10);
 
-        final Label label = new Label("VICTORY", skin);
+        final Label label = new Label("Victory!", skin);
         table.add(label);
         label.setPosition(0, -100);
 
@@ -236,6 +236,8 @@ public class GameWorld extends Stage {
     public boolean keyDown(int keyCode) {
         if(keyCode == Input.Keys.F4)
             debugRendererEnabled = !debugRendererEnabled;
+        else if(keyCode == Input.Keys.ESCAPE)
+            showWinnerMenu();
         else if(keyCode == Input.Keys.LEFT) {
             if(cloud != null)
                 cloud.setLinearVelocity(new Vector2(-20, 0));

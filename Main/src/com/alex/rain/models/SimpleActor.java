@@ -1,7 +1,7 @@
 package com.alex.rain.models;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -18,6 +18,8 @@ public abstract class SimpleActor extends Actor {
     protected Vector2 offset = new Vector2();
     protected float rot;
     protected Vector2 linVel = new Vector2();
+    protected Sprite sprite;
+    protected Texture texture;
 
     public enum TYPE {
         NONE,
@@ -86,5 +88,14 @@ public abstract class SimpleActor extends Actor {
 
     public String getStringType() {
         return type.toString();
+    }
+
+    public void setBodyBox(float width, float height) {
+        setWidth(width);
+        setHeight(height);
+    }
+
+    public void setSpriteBox(float width, float height) {
+        sprite.setSize(width, height);
     }
 }

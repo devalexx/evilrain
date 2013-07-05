@@ -39,20 +39,18 @@ import com.badlogic.gdx.physics.box2d.*;
  */
 
 public class Cloud extends KinematicActor {
-    private Sprite sprite;
-    private Texture texture;
-
     public Cloud() {
         texture = TextureManager.getInstance().getTexture("cloud.png");
         sprite = new Sprite(texture);
         offset.set(-100, -50);
         type = SimpleActor.TYPE.CLOUD;
+        setBodyBox(200, 100);
     }
 
     @Override
     public void createPhysicsActor(World physicsWorld) {
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(100, 50);
+        polygonShape.setAsBox(getWidth() / 2, getHeight() / 2);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;

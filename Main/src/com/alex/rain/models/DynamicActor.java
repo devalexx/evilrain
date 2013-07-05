@@ -40,19 +40,18 @@ import com.badlogic.gdx.physics.box2d.*;
  */
 
 public class DynamicActor extends SimpleActor {
-    private Sprite sprite;
-    private Texture texture;
-
     public DynamicActor() {
         texture = TextureManager.getInstance().getTexture("home1.png");
         sprite = new Sprite(texture);
-        offset.set(-16, -50);
+        setBodyBox(32, 100);
     }
 
     @Override
     public void createPhysicsActor(World physicsWorld) {
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(16, 50);
+        polygonShape.setAsBox(getWidth() / 2, getHeight() / 2);
+        offset.set(-getWidth() / 2, -getHeight() / 2);
+        sprite.setOrigin(getWidth() / 2, getHeight() / 2);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
