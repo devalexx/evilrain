@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="libs main">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/Main/libs" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/Main/libs_src/luaj-sources-3.0-alpha2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Main/libs_src/gdx-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Main/libs_src/luaj-sources-3.0-beta1.jar!/" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/Main/libs" recursive="false" />
+  </library>
+</component>

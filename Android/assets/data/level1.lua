@@ -1,5 +1,3 @@
-dofile "data/main.lua"
-
 function onCreate(world)
     drop = luajava.newInstance(Drop)
     world:add(drop)

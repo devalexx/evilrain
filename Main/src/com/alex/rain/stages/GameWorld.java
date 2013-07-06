@@ -15,7 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import org.luaj.vm2.*;
+import org.luaj.vm2.compiler.LuaC;
+import org.luaj.vm2.lib.BaseLib;
 import org.luaj.vm2.lib.jse.*;
+import org.luaj.vm2.script.LuaScriptEngine;
 
 import javax.script.*;
 import java.io.*;
@@ -53,13 +56,15 @@ public class GameWorld extends Stage {
     public GameWorld(String name) {
         liquidHelper = new LiquidHelper(dropList);
 
-        ScriptEngineManager sem     = new ScriptEngineManager();
-        ScriptEngine        engine  = sem.getEngineByExtension(".lua");
+        String filename = "data/" + name + ".lua";
+        String filenameMain = "data/main.lua";
+        ScriptEngine        engine  = new LuaScriptEngine();
         ScriptEngineFactory factory = engine.getFactory();
         CompiledScript cs;
-        String filename = "data/" + name + ".lua";
+
         try {
-            Reader reader = new FileReader(filename);
+            //Reader reader = new FileReader(filename);
+            Reader reader = new StringReader(Gdx.files.internal(filenameMain).readString()  + Gdx.files.internal(filename).readString());
             cs = ((Compilable)engine).compile(reader);
             SimpleBindings sb = new SimpleBindings();
             cs.eval(sb);
@@ -67,8 +72,19 @@ public class GameWorld extends Stage {
             luaOnCreateFunc = (LuaFunction) sb.get("onCreate");
         } catch (Exception e) {
             //LogHandler.log.error(e.getMessage(), e);
-            System.out.println("error: " + filename);
+            System.out.println("error: " + filename + ". " + e);
         }
+
+        /*InputStream input = new ByteArrayInputStream(Gdx.files.internal(filename).readString().getBytes());
+        try {
+            Prototype p = LuaC.compile(input, "script");
+            LuaValue g = JsePlatform.standardGlobals();
+            LuaClosure c = new LuaClosure(p, g);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
 
         final String VERTEX = Gdx.files.internal("data/drop_shader.vert").readString();
         final String FRAGMENT = Gdx.files.internal("data/drop_shader.frag").readString();
