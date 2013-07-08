@@ -52,11 +52,15 @@ public class GameWorld extends Stage {
     private float timeLastDrop;
     private boolean itRain;
     private Cloud cloud;
+    private int levelNumber = -1;
 
     public GameWorld(String name) {
         liquidHelper = new LiquidHelper(dropList);
 
         String filename = "data/" + name + ".lua";
+
+        if(name.replaceAll("[\\D]", "").length() > 0)
+            levelNumber = Integer.parseInt(name.replaceAll("[\\D]", ""));
         String filenameMain = "data/main.lua";
         ScriptEngine engine = new LuaScriptEngine();
         CompiledScript cs;
@@ -211,7 +215,7 @@ public class GameWorld extends Stage {
         button.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                RainGame.getInstance().setLevel("level2");
+                RainGame.getInstance().setLevel("level" + (levelNumber + 1));
             }
         });
 
