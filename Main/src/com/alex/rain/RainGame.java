@@ -16,6 +16,7 @@ public class RainGame extends Game {
     Screen screen;
     Stage stage;
     static RainGame instance;
+    static float time;
 
     private RainGame() {
     }
@@ -48,6 +49,7 @@ public class RainGame extends Game {
         }
 
         super.render();
+        time += Gdx.graphics.getDeltaTime();
     }
 
     public void setLevel(String name) {
@@ -66,5 +68,9 @@ public class RainGame extends Game {
         setScreen(screen);
         stage.dispose();
         stage = null;
+    }
+
+    public static float getTime() {
+        return time;
     }
 }

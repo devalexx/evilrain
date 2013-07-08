@@ -1,16 +1,6 @@
+dynActorArray = {}
+
 function onCreate(world)
-    drop = luajava.newInstance(Drop)
-    world:add(drop)
-    drop:setPosition(luajava.newInstance(Vector2, 100, 400))
-
-    for i = 0, 19 do
-        for j = 0, 9 do
-            drop = luajava.newInstance(Drop)
-            world:add(drop)
-            drop:setPosition(luajava.newInstance(Vector2, i * 15 + 130, j * 15 + 140))
-        end
-    end
-
     ground = luajava.newInstance(Ground)
     ground:addVertex(752, 48)
     ground:addVertex(752, 344)
@@ -26,13 +16,16 @@ function onCreate(world)
     dynamicActor = luajava.newInstance(DynamicActor)
     world:add(dynamicActor)
     dynamicActor:setPosition(luajava.newInstance(Vector2, 650, 300))
+    table.insert(dynActorArray, dynamicActor)
 
     for i = 0, 5 do
         dynamicActorTmp = luajava.newInstance(DynamicActor)
-        dynamicActorTmp:setBodyBox(20, 20 + i * 10)
-        dynamicActorTmp:setSpriteBox(20, 20 + i * 10)
+        dynamicActorTmp:setBodyBox(20, 50 + i * 10)
+        dynamicActorTmp:setSpriteBox(20, 50 + i * 10)
         world:add(dynamicActorTmp)
-        dynamicActorTmp:setPosition(luajava.newInstance(Vector2, 100 + i * 40, 300))
+        dynamicActorTmp:setPosition(luajava.newInstance(Vector2, 150 + i * 50, 200))
+
+        table.insert(dynActorArray, dynamicActorTmp)
     end
 
     cloud = luajava.newInstance(Cloud)
@@ -41,9 +34,11 @@ function onCreate(world)
 end
 
 function onCheck(mArray)
-    if dynamicActor:getRotation() < -30 or dynamicActor:getRotation() > 30 then
-        return true
+    for i = 1, #dynActorArray do
+        if dynActorArray[i]:getRotation() > -30 and dynActorArray[i]:getRotation() < 30 then
+            return false
+        end
     end
 
-    return false
+    return true
 end

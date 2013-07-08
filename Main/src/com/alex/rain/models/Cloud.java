@@ -28,6 +28,7 @@
  */
 package com.alex.rain.models;
 
+import com.alex.rain.RainGame;
 import com.alex.rain.managers.TextureManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -39,8 +40,32 @@ import com.badlogic.gdx.physics.box2d.*;
  */
 
 public class Cloud extends KinematicActor {
+    Animation animation;
+    TextureRegion leftTextureRegion;
+    TextureRegion rightTextureRegion;
+    TextureRegion stayTextureRegion;
+
+    final int FRAME_ROWS = 2;
+    final int FRAME_COLS = 3;
+
+    int direction;
+
     public Cloud() {
         texture = TextureManager.getInstance().getTexture("cloud.png");
+
+        TextureRegion[][] tmp = TextureRegion.split(texture, texture.getWidth() / FRAME_COLS, texture.getHeight() / FRAME_ROWS);
+
+        leftTextureRegion = tmp[0][1];
+        rightTextureRegion = tmp[0][2];
+        stayTextureRegion = tmp[0][0];
+        TextureRegion[] animTextureRegion = new TextureRegion[3];
+        for(int i = 1; i < FRAME_ROWS; i++) {
+            for(int j = 0; j < FRAME_COLS; j++) {
+                animTextureRegion[j] = tmp[i][j];
+            }
+        }
+        animation = new Animation(0.25f, animTextureRegion);
+
         sprite = new Sprite(texture);
         offset.set(-100, -50);
         type = SimpleActor.TYPE.CLOUD;
@@ -72,8 +97,21 @@ public class Cloud extends KinematicActor {
 
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
-        sprite.setPosition(pos.x + offset.x, pos.y + offset.y);
-        sprite.setRotation(rot);
-        sprite.draw(batch, parentAlpha);
+        //sprite.setPosition(pos.x + offset.x, pos.y + offset.y);
+        //sprite.setRotation(rot);
+        //sprite.draw(batch, parentAlpha);
+        if(direction < 0) {
+            batch.draw(animation.getKeyFrame(RainGame.getTime(), true), pos.x + offset.x, pos.y + offset.y);
+        } else if(direction == 1) {
+            batch.draw(leftTextureRegion, pos.x + offset.x, pos.y + offset.y);
+        } else if(direction == 2) {
+            batch.draw(rightTextureRegion, pos.x + offset.x, pos.y + offset.y);
+        } else {
+            batch.draw(stayTextureRegion, pos.x + offset.x, pos.y + offset.y);
+        }
+    }
+
+    public void setDirection(int direction) {
+        this.direction = direction;
     }
 }
