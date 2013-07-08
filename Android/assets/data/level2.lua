@@ -1,5 +1,3 @@
-dofile "data/main.lua"
-
 function onCreate(world)
     ground = luajava.newInstance(Ground)
     ground:addVertex(736, 48)

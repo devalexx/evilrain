@@ -58,8 +58,7 @@ public class GameWorld extends Stage {
 
         String filename = "data/" + name + ".lua";
         String filenameMain = "data/main.lua";
-        ScriptEngine        engine  = new LuaScriptEngine();
-        ScriptEngineFactory factory = engine.getFactory();
+        ScriptEngine engine = new LuaScriptEngine();
         CompiledScript cs;
 
         try {
@@ -255,13 +254,21 @@ public class GameWorld extends Stage {
         else if(keyCode == Input.Keys.ESCAPE)
             showWinnerMenu();
         else if(keyCode == Input.Keys.LEFT) {
-            if(cloud != null)
+            if(cloud != null) {
                 cloud.setLinearVelocity(new Vector2(-20, 0));
+                cloud.setDirection(1);
+            }
         } else if(keyCode == Input.Keys.RIGHT) {
-            if(cloud != null)
+            if(cloud != null) {
                 cloud.setLinearVelocity(new Vector2(20, 0));
-        } else if(keyCode == Input.Keys.SPACE)
+                cloud.setDirection(2);
+            }
+        } else if(keyCode == Input.Keys.SPACE) {
             itRain = true;
+            if(cloud != null) {
+                cloud.setDirection(-1);
+            }
+        }
 
         return true;
     }
@@ -269,13 +276,21 @@ public class GameWorld extends Stage {
     @Override
     public boolean keyUp(int keyCode) {
         if(keyCode == Input.Keys.LEFT) {
-            if(cloud != null)
+            if(cloud != null) {
                 cloud.setLinearVelocity(new Vector2(0, 0));
+                cloud.setDirection(0);
+            }
         } else if(keyCode == Input.Keys.RIGHT) {
-            if(cloud != null)
+            if(cloud != null) {
                 cloud.setLinearVelocity(new Vector2(0, 0));
-        } else if(keyCode == Input.Keys.SPACE)
+                cloud.setDirection(0);
+            }
+        } else if(keyCode == Input.Keys.SPACE) {
             itRain = false;
+            if(cloud != null) {
+                cloud.setDirection(0);
+            }
+        }
 
         return true;
     }
