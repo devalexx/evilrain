@@ -39,10 +39,8 @@ import com.badlogic.gdx.graphics.g2d.*;
  */
 
 public class GameScreen implements Screen {
-    private SpriteBatch spriteBatch;
     private OrthographicCamera camera;
     private GameWorld world;
-    BitmapFont font = new BitmapFont();
 
     public GameScreen(GameWorld world) {
         this.world = world;
@@ -50,13 +48,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        camera.update();
-
-        spriteBatch.setProjectionMatrix(camera.combined);
-        spriteBatch.begin();
-            font.draw(spriteBatch, "fps:"+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
-            font.draw(spriteBatch, "drops:"+world.getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
-        spriteBatch.end();
     }
 
     @Override
@@ -65,7 +56,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        spriteBatch = new SpriteBatch();
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.viewportHeight = Gdx.graphics.getHeight();
         camera.viewportWidth = Gdx.graphics.getWidth();

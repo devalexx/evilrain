@@ -18,7 +18,6 @@ public class RainGame extends Game {
     static RainGame instance;
 
     private RainGame() {
-
     }
 
     public static RainGame getInstance() {
@@ -42,7 +41,7 @@ public class RainGame extends Game {
 
     @Override
     public void render() {
-        Gdx.graphics.getGL20().glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT );
+        Gdx.graphics.getGL20().glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         if(stage != null) {
             stage.draw();
             stage.act(Gdx.graphics.getDeltaTime());

@@ -52,6 +52,7 @@ public class GameWorld extends Stage {
     private float timeLastDrop;
     private boolean itRain;
     private Cloud cloud;
+    private BitmapFont font = new BitmapFont();
 
     public GameWorld(String name) {
         liquidHelper = new LiquidHelper(dropList);
@@ -87,7 +88,9 @@ public class GameWorld extends Stage {
         }*/
 
         final String VERTEX = Gdx.files.internal("data/drop_shader.vert").readString();
-        final String FRAGMENT = Gdx.files.internal("data/drop_shader.frag").readString();
+        final String FRAGMENT = Gdx.app.getType() == Application.ApplicationType.Desktop ?
+                Gdx.files.internal("data/drop_shader.frag").readString() :
+                Gdx.files.internal("data/drop_shader_light.frag").readString();
 
         shader = new ShaderProgram(VERTEX, FRAGMENT);
         if(!shader.isCompiled())
@@ -297,11 +300,18 @@ public class GameWorld extends Stage {
         m_fbo.end();
 
         sbS.begin();
-            shader.setUniformf("u_time", time);
+            if(Gdx.app.getType() == Application.ApplicationType.Desktop)
+                shader.setUniformf("u_time", time);
             sbS.draw(m_fboRegion, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         sbS.end();
 
-        super.draw();
+        getCamera().update();
+        getSpriteBatch().setProjectionMatrix(getCamera().combined);
+        getSpriteBatch().begin();
+            getRoot().draw(getSpriteBatch(), 1);
+            font.draw(getSpriteBatch(), "fps:"+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
+            font.draw(getSpriteBatch(), "drops:"+getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
+        getSpriteBatch().end();
 
         if(debugRendererEnabled)
             debugRenderer.render(physicsWorld, getCamera().combined);
