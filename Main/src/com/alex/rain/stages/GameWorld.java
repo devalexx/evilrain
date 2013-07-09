@@ -15,8 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import org.luaj.vm2.*;
-import org.luaj.vm2.compiler.LuaC;
-import org.luaj.vm2.lib.BaseLib;
 import org.luaj.vm2.lib.jse.*;
 import org.luaj.vm2.script.LuaScriptEngine;
 
@@ -41,7 +39,7 @@ public class GameWorld extends Stage {
     private boolean wonGame;
     private Table table;
     private ShaderProgram shader;
-    private Texture textureDrop;
+    private Texture dropTexture, backgroundTexture;
     private final Box2DDebugRenderer debugRenderer;
     private boolean debugRendererEnabled;
     private final SpriteBatch sbS;
@@ -54,6 +52,7 @@ public class GameWorld extends Stage {
     private Cloud cloud;
     private BitmapFont font = new BitmapFont();
     private int levelNumber = -1;
+    private String winHint;
 
     public GameWorld(String name) {
         liquidHelper = new LiquidHelper(dropList);
@@ -99,7 +98,8 @@ public class GameWorld extends Stage {
         if(!shader.isCompiled())
             System.out.println(shader.getLog());
 
-        textureDrop = TextureManager.getInstance().getTexture("forward.png");
+        dropTexture = TextureManager.getInstance().getTexture("forward.png");
+        backgroundTexture = TextureManager.getInstance().getTexture("background.png");
 
         sbS = new SpriteBatch();
         sbS.setShader(shader);
@@ -308,12 +308,16 @@ public class GameWorld extends Stage {
 
     @Override
     public void draw() {
+        getSpriteBatch().begin();
+            getSpriteBatch().draw(backgroundTexture, 0, 0);
+        getSpriteBatch().end();
+
         m_fbo.begin();
             getSpriteBatch().begin();
             Gdx.graphics.getGL20().glClear(GL20.GL_COLOR_BUFFER_BIT);
             for (Drop drop : dropList) {
-                getSpriteBatch().draw(textureDrop,
-                        drop.getPosition().x - textureDrop.getWidth() / 2, drop.getPosition().y - textureDrop.getWidth() / 2);
+                getSpriteBatch().draw(dropTexture,
+                        drop.getPosition().x - dropTexture.getWidth() / 2, drop.getPosition().y - dropTexture.getWidth() / 2);
             }
             getSpriteBatch().end();
         m_fbo.end();
@@ -328,11 +332,17 @@ public class GameWorld extends Stage {
         getSpriteBatch().setProjectionMatrix(getCamera().combined);
         getSpriteBatch().begin();
             getRoot().draw(getSpriteBatch(), 1);
-            font.draw(getSpriteBatch(), "fps:"+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
-            font.draw(getSpriteBatch(), "drops:"+getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
+            font.draw(getSpriteBatch(), "FPS: "+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
+            font.draw(getSpriteBatch(), "Drops: "+getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
+            if(winHint != null)
+                font.draw(getSpriteBatch(), "Hint: "+winHint, 10, Gdx.graphics.getHeight()-60);
         getSpriteBatch().end();
 
         if(debugRendererEnabled)
             debugRenderer.render(physicsWorld, getCamera().combined);
+    }
+
+    public void setWinHint(String winHint) {
+        this.winHint = winHint;
     }
 }

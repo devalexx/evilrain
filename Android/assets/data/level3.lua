@@ -1,4 +1,6 @@
 function onCreate(world)
+    world:setWinHint('Select top left!!!')
+
     ground = luajava.newInstance(Ground)
     ground:addVertex(528, 336)
     ground:addVertex(200, 336)

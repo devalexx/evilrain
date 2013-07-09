@@ -49,10 +49,12 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
     // ---------------------------- Object variables -----------------------------
 
     private int numRows,numCols;
-    private float minX,minY,maxX,maxY;
+    private int minX,minY,maxX,maxY,maxX1,maxY1;
     private HashMap<Integer, Collection<E>> hashMap;
     private Set<E> set;
     private float radius;
+    private float halfGridY;
+    private float halfGridX;
 
     // ------------------------------- Constructors -------------------------------
 
@@ -67,7 +69,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *                than this, searching will return more neighbours than necessary and impede performance for
      *                dense collections of locatable objects.
      */
-    public HashGrid(float maxX, float maxY, float radius)
+    public HashGrid(int maxX, int maxY, float radius)
     {
         this(0,0,maxX,maxY,radius);
     }
@@ -85,7 +87,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *                than this, searching will return more neighbours than necessary and impede performance for
      *                dense collections of locatable objects.
      */
-    public HashGrid(float minX, float minY, float maxX, float maxY, float radius)
+    public HashGrid(int minX, int minY, int maxX, int maxY, float radius)
     {
         if (maxX-minX <= 0)
         {
@@ -101,6 +103,8 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
         this.minY = minY;
         this.maxX = maxX;
         this.maxY = maxY;
+        this.maxX1 = maxX + 1;
+        this.maxY1 = maxY + 1;
 
         if (radius > 0)
         {
@@ -113,6 +117,9 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
 
         this.numCols = (int)((maxX-minX)/(radius*2));
         this.numRows = (int)((maxY-minY)/(radius*2));
+        this.halfGridX = (maxX-minX)/(numCols*2);
+        this.halfGridY = (maxY-minY)/(numRows*2);
+
         hashMap = new HashMap<Integer,Collection<E>>();
         //set = new HashSet<E>();
         set = new LinkedHashSet<E>();
@@ -200,11 +207,12 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
             this.radius = newRadius;
             this.numCols = (int)((maxX-minX)/(radius*2));
             this.numRows = (int)((maxY-minY)/(radius*2));
+            this.halfGridX = (maxX-minX)/(numCols*2);
+            this.halfGridY = (maxY-minY)/(numRows*2);
         }
 
-        float halfGridX = (maxX-minX)/(numCols*2);
-        float halfGridY = (maxY-minY)/(numRows*2);
-        hashMap.clear();
+        for(Collection<E> col : hashMap.values())
+            col.clear();
 
         for (E obj : set)
         {
@@ -515,12 +523,8 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      */
     private int getCoordHash(Vector2 location)
     {
-        // Bin coordinates into coarse (col,row) grid.
-        int col = (int)(location.x*numCols/(maxX+1));
-        int row = (int)(location.y*numRows/(maxY+1));
-
         // Convert (col,row) coordinate into single unique hash number.
-        return row*numCols + col;
+        return ((int)location.y*numRows/(maxY1))*numCols + ((int)location.x*numCols/(maxX1));
     }
 
     /** Provides the hqshgrid coordinates of the given location. This is not normally needed when using a hashgrid,

@@ -1,4 +1,6 @@
 function onCreate(world)
+    world:setWinHint('Flood house!!')
+
     ground = luajava.newInstance(Ground)
     ground:addVertex(736, 48)
     ground:addVertex(736, 352)
