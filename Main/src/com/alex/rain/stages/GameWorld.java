@@ -205,7 +205,7 @@ public class GameWorld extends Stage {
 
         table.row().width(400).padTop(10);
 
-        final TextButton button2 = new TextButton("Options", skin);
+        final TextButton button2 = new TextButton("Restart", skin);
         table.add(button2);
         button2.setPosition(0, 0);
 
@@ -225,7 +225,7 @@ public class GameWorld extends Stage {
         button2.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                //RainGame.getInstance().setScreen(new LevelsMenu());
+                RainGame.getInstance().setLevel("level" + levelNumber);
             }
         });
 
