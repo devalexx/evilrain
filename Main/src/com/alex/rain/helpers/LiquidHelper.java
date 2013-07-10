@@ -133,7 +133,6 @@ public class LiquidHelper {
         }
 
         moveParticles(deltaT);
-
     }
 
     private void moveParticles(float deltaT) {

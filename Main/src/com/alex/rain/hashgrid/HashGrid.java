@@ -5,13 +5,7 @@ package com.alex.rain.hashgrid;
  * @since: 30.05.13
  */
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 import com.alex.rain.models.SimpleActor;
 import com.badlogic.gdx.math.Vector2;
@@ -44,18 +38,18 @@ import com.badlogic.gdx.math.Vector2;
  * http://www.gnu.org/licenses/.
  */
 
-public class HashGrid<E extends SimpleActor> implements Set<E>
-{
+public class HashGrid<E extends SimpleActor> implements Set<E> {
     // ---------------------------- Object variables -----------------------------
 
-    private int numRows,numCols;
-    private int minX,minY,maxX,maxY,maxX1,maxY1;
-    private HashMap<Integer, Collection<E>> hashMap;
-    private Set<E> set;
-    private float radius;
-    private float maxDistSq;
-    private float halfGridY;
-    private float halfGridX;
+    private final int numRows,numCols;
+    private final int minX,minY,maxX,maxY,maxX1,maxY1;
+    private final HashMap<Integer, Collection<E>> hashMap = new HashMap<Integer,Collection<E>>();
+    private final List<E> set = new LinkedList<E>();
+    private final Set<E> newCollection = new HashSet<E>();
+    private final float radius;
+    private final float maxDistSq;
+    private final float halfGridY;
+    private final float halfGridX;
 
     // ------------------------------- Constructors -------------------------------
 
@@ -70,8 +64,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *                than this, searching will return more neighbours than necessary and impede performance for
      *                dense collections of locatable objects.
      */
-    public HashGrid(int maxX, int maxY, float radius)
-    {
+    public HashGrid(int maxX, int maxY, float radius) {
         this(0,0,maxX,maxY,radius);
     }
 
@@ -88,15 +81,12 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *                than this, searching will return more neighbours than necessary and impede performance for
      *                dense collections of locatable objects.
      */
-    public HashGrid(int minX, int minY, int maxX, int maxY, float radius)
-    {
-        if (maxX-minX <= 0)
-        {
+    public HashGrid(int minX, int minY, int maxX, int maxY, float radius) {
+        if (maxX-minX <= 0) {
             throw new IllegalArgumentException("Minimum x value must be smaller than maximum x value when creating a HashGrid.");
         }
 
-        if (maxY-minY <= 0)
-        {
+        if (maxY-minY <= 0) {
             throw new IllegalArgumentException("Minimum y value must be smaller than maximum x value when creating a HashGrid.");
         }
 
@@ -107,12 +97,9 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
         this.maxX1 = maxX + 1;
         this.maxY1 = maxY + 1;
 
-        if (radius > 0)
-        {
+        if (radius > 0) {
             this.radius = radius;
-        }
-        else
-        {
+        } else {
             this.radius = (maxX-minX)/10f;
         }
 
@@ -121,14 +108,10 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
         this.numRows = (int)((maxY-minY)/(this.radius*2));
         this.halfGridX = (maxX-minX)/(numCols*2);
         this.halfGridY = (maxY-minY)/(numRows*2);
-
-        hashMap = new HashMap<Integer,Collection<E>>();
-        set = new HashSet<E>();
     }
 
     // --------------------------------- Methods ---------------------------------
 
-    private Set<E> newCollection = new HashSet<E>();
     /** Returns a collection of the locatable objects that are within the <code>radius</code> of
      *  the given location. <code>radius</code> is that defined in the constructor or by the most
      *  recent call to <code>updateAll(radius)</code>.
@@ -137,23 +120,18 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *          If no objects found, an empty collection is returned.
      */
     @SuppressWarnings("boxing")
-    public Set<E> get(Vector2 location)
-    {
+    public Set<E> get(Vector2 location) {
         int coordHash = getCoordHash(location);
         Collection<E> origCollection = hashMap.get(coordHash);
         newCollection.clear();
 
-        if (origCollection == null)
-        {
+        if (origCollection == null) {
             // No objects found in the given hash grid.
             return newCollection;
         }
 
-        for (E obj : origCollection)
-        {
-            Vector2 objLoc = obj.getPosition();
-            if (objLoc.dst2(location) <= maxDistSq)
-            {
+        for (E obj : origCollection) {
+            if (obj.getPosition().dst2(location) <= maxDistSq) {
                 newCollection.add(obj);
             }
         }
@@ -166,8 +144,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *  @param location Location to query.
      *  @return True if the hash grid contains the given object within the radius of the given location.
      */
-    public boolean contains(E obj, Vector2 location)
-    {
+    public boolean contains(E obj, Vector2 location) {
         return get(location).contains(obj);
     }
 
@@ -175,8 +152,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *  items returned within this set.
      * @return Set of unique objects stored by the hash grid.
      */
-    public Set<E> getAll()
-    {
+    public List<E> getAll() {
         return set;
     }
 
@@ -185,28 +161,32 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *  is useful if all or many of the objects have changed location since being added to
      *  the hash grid. If only one object has changed consider calling <code>update(E obj)</code>.
      */
-    public void updateAll()
-    {
+    public void updateAll() {
         for(Collection<E> col : hashMap.values())
             col.clear();
 
-        for (E obj : set)
-        {
+        for (E obj : set) {
             Vector2 objPos = obj.getPosition();
-            addToGrid(obj,objPos);
+            addToGrid(obj, objPos);
 
+            float objPosXMinus = objPos.x - halfGridX;
+            float objPosXPlus = objPos.x + halfGridX;
+
+            float objPosYMinus = objPos.y - halfGridY;
+            float objPosYPlus = objPos.y + halfGridY;
+            
             // Put the same object in the centre and up to 3 of the 8 adjacent grid cells to
             // avoid boundary problems.
-            addToGrid(obj,new Vector2(objPos.x-halfGridX,objPos.y-halfGridY));
-            addToGrid(obj,new Vector2(objPos.x,          objPos.y-halfGridY));
-            addToGrid(obj,new Vector2(objPos.x+halfGridX,objPos.y-halfGridY));
+            addToGrid(obj, new Vector2(objPosXMinus, objPosYMinus));
+            addToGrid(obj, new Vector2(objPos.x, objPosYMinus));
+            addToGrid(obj, new Vector2(objPosXPlus, objPosYMinus));
 
-            addToGrid(obj,new Vector2(objPos.x-halfGridX,objPos.y));
-            addToGrid(obj,new Vector2(objPos.x+halfGridX,objPos.y));
+            addToGrid(obj, new Vector2(objPosXMinus, objPos.y));
+            addToGrid(obj, new Vector2(objPosXPlus, objPos.y));
 
-            addToGrid(obj,new Vector2(objPos.x-halfGridX,objPos.y+halfGridY));
-            addToGrid(obj,new Vector2(objPos.x,          objPos.y+halfGridY));
-            addToGrid(obj,new Vector2(objPos.x+halfGridX,objPos.y+halfGridY));
+            addToGrid(obj, new Vector2(objPosXMinus, objPosYPlus));
+            addToGrid(obj, new Vector2(objPos.x, objPosYPlus));
+            addToGrid(obj, new Vector2(objPosXPlus, objPosYPlus));
         }
     }
 
@@ -215,8 +195,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *  changed its position, but most of the other objects in the hash grid have not.
      *  @param obj Locatable object to be updated.
      */
-    public void update(E obj)
-    {
+    public void update(E obj) {
         // TODO: Consider a more efficient update since remove() can be expensive.
         remove(obj);
         add(obj);
@@ -231,45 +210,26 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *  @param obj Locatable object to add to the hash grid.
      *  @return True if the collection has changed as a result of the object being added.
      */
-    public boolean add(E obj)
-    {
-        return add(obj,obj);
-    }
-
-
-    /** Adds a locatable object to the grid. Unlike <code>add(E)</code> this allows a locatable
-     *  object to be added at a location other than it's 'natural' one. Note that the object being
-     *  added must implement the <code>Locatable</code> interface, otherwise a <code>ClassCastException</code>
-     *  will be thrown.
-     *  @param obj Locatable object to add to the hash grid.
-     *  @param loc Location of the object to add to the grid.
-     *  @return True if the collection has changed as a result of the object being added.
-     */
-    public boolean add(E obj, SimpleActor loc)
-    {
+    public boolean add(E obj) {
         // Put the object in the grid cell in which it lies (no duplications in neighbouring cells)
-        Vector2 locPos = loc.getPosition();
+        Vector2 locPos = obj.getPosition();
         boolean isItemAdded = addToGrid(obj,locPos);
 
         // Put the same object in the centre and up to 3 of the 8 adjacent grid cells to
         // avoid boundary problems.
-        float halfGridX = (maxX-minX)/(numCols*2);
-        float halfGridY = (maxY-minY)/(numRows*2);
+        addToGrid(obj, new Vector2(locPos.x-halfGridX, locPos.y-halfGridY));
+        addToGrid(obj, new Vector2(locPos.x, locPos.y-halfGridY));
+        addToGrid(obj, new Vector2(locPos.x+halfGridX, locPos.y-halfGridY));
 
-        addToGrid(obj,new Vector2(locPos.x-halfGridX,locPos.y-halfGridY));
-        addToGrid(obj,new Vector2(locPos.x,          locPos.y-halfGridY));
-        addToGrid(obj,new Vector2(locPos.x+halfGridX,locPos.y-halfGridY));
+        addToGrid(obj, new Vector2(locPos.x-halfGridX, locPos.y));
+        addToGrid(obj, new Vector2(locPos.x+halfGridX, locPos.y));
 
-        addToGrid(obj,new Vector2(locPos.x-halfGridX,locPos.y));
-        addToGrid(obj,new Vector2(locPos.x+halfGridX,locPos.y));
-
-        addToGrid(obj,new Vector2(locPos.x-halfGridX,locPos.y+halfGridY));
-        addToGrid(obj,new Vector2(locPos.x,          locPos.y+halfGridY));
-        addToGrid(obj,new Vector2(locPos.x+halfGridX,locPos.y+halfGridY));
+        addToGrid(obj, new Vector2(locPos.x-halfGridX, locPos.y+halfGridY));
+        addToGrid(obj, new Vector2(locPos.x, locPos.y+halfGridY));
+        addToGrid(obj, new Vector2(locPos.x+halfGridX, locPos.y+halfGridY));
 
         // Also add the same object to the set to allow 1-dimensional retrieval of all added objects.
-        if (isItemAdded)
-        {
+        if (isItemAdded && !set.contains(obj)) {
             set.add(obj);
         }
 
@@ -280,14 +240,11 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      * @param collection Collection of objects to add to the collection.
      * @return Reports whether collection has been changed by the operation.
      */
-    public boolean addAll(Collection<? extends E> collection)
-    {
+    public boolean addAll(Collection<? extends E> collection) {
         boolean hasChanged = false;
 
-        for (E obj : collection)
-        {
-            if (add(obj) == true)
-            {
+        for (E obj : collection) {
+            if (add(obj)) {
                 hasChanged = true;
             }
         }
@@ -296,8 +253,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
 
     /** Clears out the contents of the grid.
      */
-    public void clear()
-    {
+    public void clear() {
         hashMap.clear();
         set.clear();
     }
@@ -308,8 +264,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      * @param obj Object to search for.
      * @return True if collection contains the given object.
      */
-    public boolean contains(Object obj)
-    {
+    public boolean contains(Object obj) {
         return set.contains(obj);
     }
 
@@ -319,8 +274,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      * @param collection Collection of objects to search for.
      * @return True if the hash grid contains all of the items in the given collection.
      */
-    public boolean containsAll(Collection<?> collection)
-    {
+    public boolean containsAll(Collection<?> collection) {
         return set.containsAll(collection);
     }
 
@@ -332,14 +286,11 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      * @return True if the given object contains a set that is equal to the set stored in this hash grid.
      */
     @SuppressWarnings("rawtypes")
-    public boolean equals(Object obj)
-    {
-        if (obj instanceof HashGrid)
-        {
+    public boolean equals(Object obj) {
+        if (obj instanceof HashGrid) {
             return set.equals(((HashGrid)obj).getAll());
         }
-        if (obj instanceof Set)
-        {
+        if (obj instanceof Set) {
             return set.equals(obj);
         }
         return false;
@@ -348,16 +299,14 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
     /** Reports the hash code of the entire collection.
      * @return Hash code of the set of objects stored in this hash grid.
      */
-    public int hashCode()
-    {
+    public int hashCode() {
         return set.hashCode();
     }
 
     /** Reports whether or not this hash grid contains any elements.
      * @return True if this hash grid is empty.
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return set.isEmpty();
     }
 
@@ -366,41 +315,34 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      * in some spatial order and then iterate though the resulting collections.
      * @return Iterator for the objects stored in this hash grid.
      */
-    public Iterator<E> iterator()
-    {
+    public Iterator<E> iterator() {
         return set.iterator();
     }
 
     /** Removes the given object from the hash grid.
      * @param obj Object to remove.
      */
-    public boolean remove(Object obj)
-    {
+    public boolean remove(Object obj) {
         // Check to see if any instance of the object exists.
         boolean isChanged = set.remove(obj);
 
-        if (isChanged == false)
-        {
+        if (!isChanged) {
             return false;
         }
 
         // If object exists remove all instances of it from the hash grid lookup.
         Vector<Integer> hashesToRemove = new Vector<Integer>();
-        for (Integer hashVal : hashMap.keySet())
-        {
+        for (Integer hashVal : hashMap.keySet()) {
             Collection<E> collection = hashMap.get(hashVal);
-            if (collection.remove(obj))
-            {
+            if (collection.remove(obj)) {
                 // If we have removed the last object from a collection, remove the entire lookup.
-                if (collection.size() == 0)
-                {
+                if (collection.size() == 0) {
                     hashesToRemove.add(hashVal);
                 }
             }
         }
 
-        for (Integer hashVal : hashesToRemove)
-        {
+        for (Integer hashVal : hashesToRemove) {
             hashMap.remove(hashVal);
         }
         return true;
@@ -409,13 +351,10 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
     /** Removes the objects in the given collection from the hash grid.
      * @param collection Collection of objects to remove.
      */
-    public boolean removeAll(Collection<?> collection)
-    {
+    public boolean removeAll(Collection<?> collection) {
         boolean isChanged = false;
-        for (Object obj : collection)
-        {
-            if (remove(obj) == true)
-            {
+        for (Object obj : collection) {
+            if (remove(obj)) {
                 isChanged = true;
             }
         }
@@ -426,15 +365,13 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *  is currently not supported by the hash grid. To limit the operation to certain grid
      *  cells, call <code>get(location)</code> and perform the <code>retainsAll()</code> on the returned collection.
      */
-    public boolean retainAll(Collection<?> collection)
-    {
+    public boolean retainAll(Collection<?> collection) {
         throw (new UnsupportedOperationException("Cannot perform a retainsAll() operation on a hash grid."));
     }
 
     /** Reports the number of unique items stored in this hash grid.
      */
-    public int size()
-    {
+    public int size() {
         return set.size();
     }
 
@@ -442,8 +379,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      *  any form of spatial ordering of items.
      *  @return Array of objects.
      */
-    public Object[] toArray()
-    {
+    public Object[] toArray() {
         return set.toArray();
     }
 
@@ -458,8 +394,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      * contain any null elements.)
      * @return Array of objects.
      */
-    public <T> T[] toArray(T[] a)
-    {
+    public <T> T[] toArray(T[] a) {
         return set.toArray(a);
     }
 
@@ -472,18 +407,15 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      * @return True if object was successfully added to the hash grid.
      */
     @SuppressWarnings("boxing")
-    private boolean addToGrid(E obj, Vector2 location)
-    {
-        if ((location.x < 0) || (location.y < 0) || (location.x>maxX) || (location.y > maxY))
-        {
+    private boolean addToGrid(E obj, Vector2 location) {
+        if ((location.x < 0) || (location.y < 0) || (location.x>maxX) || (location.y > maxY)) {
             // Do nothing when out of bounds.
             return false;
         }
 
         int coordHash = getCoordHash(location);
         Collection<E> objects = hashMap.get(coordHash);
-        if (objects == null)
-        {
+        if (objects == null) {
             // Nothing currently stored in this grid cell.
             objects = new HashSet<E>();
         }
@@ -497,8 +429,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      * @param location Location to query.
      * @return Hash representing the given location.
      */
-    private int getCoordHash(Vector2 location)
-    {
+    private int getCoordHash(Vector2 location) {
         // Convert (col,row) coordinate into single unique hash number.
         return ((int)location.y*numRows/(maxY1))*numCols + ((int)location.x*numCols/(maxX1));
     }
@@ -508,8 +439,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      * @param location The location to query.
      * @return Hash grid coordinates in (column, row) order in which the given location sits.
      */
-    public Vector2 getGridCoord(Vector2 location)
-    {
+    public Vector2 getGridCoord(Vector2 location) {
         int col = (int)(location.x*numCols/(maxX+1));
         int row = (int)(location.y*numRows/(maxY+1));
         return new Vector2(col,row);
