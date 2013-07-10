@@ -53,6 +53,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
     private HashMap<Integer, Collection<E>> hashMap;
     private Set<E> set;
     private float radius;
+    private float maxDistSq;
     private float halfGridY;
     private float halfGridX;
 
@@ -115,14 +116,14 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
             this.radius = (maxX-minX)/10f;
         }
 
-        this.numCols = (int)((maxX-minX)/(radius*2));
-        this.numRows = (int)((maxY-minY)/(radius*2));
+        this.maxDistSq = this.radius * this.radius;
+        this.numCols = (int)((maxX-minX)/(this.radius*2));
+        this.numRows = (int)((maxY-minY)/(this.radius*2));
         this.halfGridX = (maxX-minX)/(numCols*2);
         this.halfGridY = (maxY-minY)/(numRows*2);
 
         hashMap = new HashMap<Integer,Collection<E>>();
-        //set = new HashSet<E>();
-        set = new LinkedHashSet<E>();
+        set = new HashSet<E>();
     }
 
     // --------------------------------- Methods ---------------------------------
@@ -148,14 +149,10 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
             return newCollection;
         }
 
-        float maxDistSq = radius*radius;
-
         for (E obj : origCollection)
         {
             Vector2 objLoc = obj.getPosition();
-            double distSq = (location.x-objLoc.x)*(location.x-objLoc.x) +
-                    (location.y-objLoc.y)*(location.y-objLoc.y);
-            if (distSq <= maxDistSq)
+            if (objLoc.dst2(location) <= maxDistSq)
             {
                 newCollection.add(obj);
             }
@@ -190,27 +187,6 @@ public class HashGrid<E extends SimpleActor> implements Set<E>
      */
     public void updateAll()
     {
-        updateAll(0);
-    }
-
-    /** Updates the positions of all items in the hash grid so that their gridded location
-     *  reflects the location stored inside the <code>Locatable</code> objects. This version
-     *  also sets a new grid resolution implied by the <code>newRadius</code> value. This should
-     *  represent the maximum search distance used when calling <code>get(Vector2)</code>.
-     *  @param newRadius New grid cell radius corresponding to maximum search distance. No change
-     *                   to the radius is made if the value is 0 or negative.
-     */
-    public void updateAll(float newRadius)
-    {
-        if (newRadius > 0)
-        {
-            this.radius = newRadius;
-            this.numCols = (int)((maxX-minX)/(radius*2));
-            this.numRows = (int)((maxY-minY)/(radius*2));
-            this.halfGridX = (maxX-minX)/(numCols*2);
-            this.halfGridY = (maxY-minY)/(numRows*2);
-        }
-
         for(Collection<E> col : hashMap.values())
             col.clear();
 

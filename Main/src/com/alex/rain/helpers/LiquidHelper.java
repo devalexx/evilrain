@@ -111,6 +111,9 @@ public class LiquidHelper {
             presnear = pnear / 2.0f; //near particles term
             change.set(0, 0);
             for (int a = 0; a < neighbors.length; a++) {
+                if(distances[a] == Float.MAX_VALUE)
+                    continue;
+
                 int i2 = dropIndexMap.get(neighbors[a]);
                 relativePosition.set(_scaledPositions[i2]).sub(_scaledPositions[i]);
 

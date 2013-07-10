@@ -29,7 +29,7 @@ public class RainGame extends Game {
 
     @Override
     public void create() {
-        GameWorld gameWorld = new GameWorld("level1");
+        GameWorld gameWorld = new GameWorld("test");
         gameWorld.createWorld();
         stage = gameWorld;
         Gdx.input.setInputProcessor(stage);
