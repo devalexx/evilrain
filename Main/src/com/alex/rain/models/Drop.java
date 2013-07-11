@@ -28,7 +28,7 @@
  */
 package com.alex.rain.models;
 
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.alex.rain.RainGame;
 import com.badlogic.gdx.physics.box2d.*;
 
 import java.net.URL;
@@ -39,12 +39,12 @@ import java.net.URL;
  */
 
 public class Drop extends SimpleActor {
-    public final float RADIUS = 3f;
-    public final float TEXTURE_SCALE = 20f;
+    public final float RADIUS;
+
     public Drop() {
         super();
-        String workingDir = System.getProperty("user.dir");
         type = TYPE.DROP;
+        RADIUS = RainGame.isLightVersion() ? 8f : 3f;
     }
 
     @Override

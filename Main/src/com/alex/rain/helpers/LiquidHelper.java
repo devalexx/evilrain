@@ -31,8 +31,8 @@ public class LiquidHelper {
     public LiquidHelper(ArrayList<Drop> dropList, boolean lightVersion) {
         this.dropList = dropList;
         dropIndexMap = new HashMap<Drop, Integer>();
-        grid = new HashGrid<Drop>(800, 480, lightVersion ? 100 : 35);
-        RADIUS = lightVersion ? 100f : 35f;
+        grid = new HashGrid<Drop>(800, 480, lightVersion ? 50 : 18);
+        RADIUS = lightVersion ? 100f : 36f;
         IDEAL_RADIUS = lightVersion ? 400f : 200f;
         IDEAL_RADIUS_A = IDEAL_RADIUS - 0.01f;
         MULTIPLIER = IDEAL_RADIUS / RADIUS;

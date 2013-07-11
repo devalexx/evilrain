@@ -53,13 +53,14 @@ public class GameWorld extends Stage {
     private BitmapFont font = new BitmapFont();
     private int levelNumber = -1;
     private String winHint;
-    private boolean isLightVersion = true;
+    private final boolean lightVersion;
     private int dropsMax;
+    private final float dropTextureRadius;
 
     public GameWorld(String name) {
-        isLightVersion = Gdx.app.getType() != Application.ApplicationType.Desktop;
-        dropsMax = isLightVersion ? 100 : 1000;
-        liquidHelper = new LiquidHelper(dropList, isLightVersion);
+        lightVersion = RainGame.isLightVersion();
+        dropsMax = lightVersion ? 100 : 1000;
+        liquidHelper = new LiquidHelper(dropList, lightVersion);
 
         String filename = "data/" + name + ".lua";
 
@@ -92,6 +93,7 @@ public class GameWorld extends Stage {
             System.out.println(shader.getLog());
 
         dropTexture = TextureManager.getInstance().getTexture("forward.png");
+        dropTextureRadius = lightVersion ? dropTexture.getWidth() * 2.5f : dropTexture.getWidth();
         backgroundTexture = TextureManager.getInstance().getTexture("background.png");
 
         sbS = new SpriteBatch();
@@ -145,7 +147,7 @@ public class GameWorld extends Stage {
         }
 
         if(itRain && !wonGame && cloud != null && dropList.size() < dropsMax) {
-            if(time - timeLastDrop > (isLightVersion ? 0.5 : 0.05)) {
+            if(time - timeLastDrop > (lightVersion ? 0.5 : 0.05)) {
                 Drop drop = new Drop();
                 Random r = new Random();
                 float offset = r.nextFloat() * cloud.getWidth() * 2/3;
@@ -306,8 +308,8 @@ public class GameWorld extends Stage {
             getSpriteBatch().begin();
             Gdx.graphics.getGL20().glClear(GL20.GL_COLOR_BUFFER_BIT);
             for (Drop drop : dropList) {
-                getSpriteBatch().draw(dropTexture,
-                        drop.getPosition().x - dropTexture.getWidth() / 2, drop.getPosition().y - dropTexture.getWidth() / 2);
+                getSpriteBatch().draw(dropTexture, drop.getPosition().x - dropTextureRadius / 2,
+                        drop.getPosition().y - dropTextureRadius / 2, dropTextureRadius, dropTextureRadius);
             }
             getSpriteBatch().end();
         m_fbo.end();

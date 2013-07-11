@@ -17,6 +17,7 @@ public class RainGame extends Game {
     Stage stage;
     static RainGame instance;
     static float time;
+    static boolean lightVersion = true;
 
     private RainGame() {
     }
@@ -29,7 +30,9 @@ public class RainGame extends Game {
 
     @Override
     public void create() {
-        GameWorld gameWorld = new GameWorld("test");
+        lightVersion = Gdx.app.getType() != Application.ApplicationType.Desktop;
+
+        GameWorld gameWorld = new GameWorld("level1");
         gameWorld.createWorld();
         stage = gameWorld;
         Gdx.input.setInputProcessor(stage);
@@ -72,5 +75,9 @@ public class RainGame extends Game {
 
     public static float getTime() {
         return time;
+    }
+
+    public static boolean isLightVersion() {
+        return lightVersion;
     }
 }
