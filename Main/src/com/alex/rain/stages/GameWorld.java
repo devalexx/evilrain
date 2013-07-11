@@ -78,17 +78,6 @@ public class GameWorld extends Stage {
             System.out.println("error: " + filename + ". " + e);
         }
 
-        /*InputStream input = new ByteArrayInputStream(Gdx.files.internal(filename).readString().getBytes());
-        try {
-            Prototype p = LuaC.compile(input, "script");
-            LuaValue g = JsePlatform.standardGlobals();
-            LuaClosure c = new LuaClosure(p, g);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
         final String VERTEX = Gdx.files.internal("data/drop_shader.vert").readString();
         final String FRAGMENT = Gdx.app.getType() == Application.ApplicationType.Desktop ?
                 Gdx.files.internal("data/drop_shader.frag").readString() :
@@ -190,7 +179,7 @@ public class GameWorld extends Stage {
 
         table.row().width(400).padTop(10);
 
-        final Label label = new Label("Victory!", skin);
+        final Label label = new Label(wonGame ? "Victory!" : "Menu", skin);
         table.add(label);
         label.setPosition(0, -100);
 
