@@ -32,7 +32,7 @@ public class GameWorld extends Stage {
     private World physicsWorld = new World(new Vector2(0, -9.8f), true);
     private List<SimpleActor> actorList = new ArrayList<SimpleActor>();
     private List<Actor> uiActorList = new ArrayList<Actor>();
-    private List<Drop> dropList = new ArrayList<Drop>();
+    private ArrayList<Drop> dropList = new ArrayList<Drop>();
     private LiquidHelper liquidHelper;
     private LuaFunction luaOnCreateFunc;
     private LuaFunction luaOnCheckFunc;
@@ -142,10 +142,7 @@ public class GameWorld extends Stage {
         time += Gdx.graphics.getDeltaTime();
         liquidHelper.applyLiquidConstraint(1/60f); // TODO: check this shit?
         physicsWorld.step(1/15f, 6, 3);
-        /*for(SimpleActor actor : actorList)
-            actor.act(delta);*/
         super.act(delta);
-
 
         LuaValue luaDrop = CoerceJavaToLua.coerce(dropList);
         LuaValue retvals = luaOnCheckFunc.call(luaDrop);

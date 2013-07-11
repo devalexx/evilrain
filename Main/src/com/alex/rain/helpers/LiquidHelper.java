@@ -4,9 +4,7 @@ import com.alex.rain.hashgrid.HashGrid;
 import com.alex.rain.models.Drop;
 import com.badlogic.gdx.math.Vector2;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author: Alexander Shubenkov
@@ -22,7 +20,7 @@ public class LiquidHelper {
     public final float VISCOSITY = 0.004f;
     public final float EPSILON = 0.001f;
     private final List<Drop> dropList;
-    private Map<Drop, Integer> dropIndexMap;
+    private HashMap<Drop, Integer> dropIndexMap;
     private HashGrid<Drop> grid;
     private Vector2[] _delta;
     private Vector2[] _scaledPositions;
@@ -30,7 +28,7 @@ public class LiquidHelper {
     private Vector2 change = new Vector2();
     private Vector2 relativePosition = new Vector2();
 
-    public LiquidHelper(List<Drop> dropList) {
+    public LiquidHelper(ArrayList<Drop> dropList) {
         this.dropList = dropList;
         dropIndexMap = new HashMap<Drop, Integer>();
         grid = new HashGrid<Drop>(800, 480, 25);
@@ -62,14 +60,15 @@ public class LiquidHelper {
     }
 
     private void prepareSimulation() {
-        for (int i = 0; i < dropList.size(); i++) {
-            Drop particle = dropList.get(i);
+        int i = 0;
+        for (Drop particle : dropList) {
             _scaledPositions[i].set(particle.getPosition()).mul(MULTIPLIER);
             _scaledVelocities[i].set(particle.getLinearVelocity()).mul(MULTIPLIER);
             _delta[i].set(0, 0);
             if(_delta.length != dropIndexMap.size()) {
                 dropIndexMap.put(particle, i);
             }
+            i++;
         }
     }
 
@@ -80,16 +79,16 @@ public class LiquidHelper {
         prepareSimulation();
 
         float p, pnear, pressure, presnear;
-        for (int i = 0; i < dropList.size(); i++) {
-            Drop particle = dropList.get(i);
-
+        int i = 0, i2, a;
+        for(Drop particle : dropList) {
             // Calculate pressure
             p = 0.0f;
             pnear = 0.0f;
             Object[] neighbors = grid.get(particle.getPosition()).toArray();
             float[] distances = new float[neighbors.length];
-            for (int a = 0; a < neighbors.length; a++) {
-                int i2 = dropIndexMap.get(neighbors[a]);
+            a = 0;
+            for(Object o : neighbors) {
+                i2 = dropIndexMap.get(o);
                 relativePosition.set(_scaledPositions[i2]).sub(_scaledPositions[i]);
                 float distanceSq = relativePosition.len2();
 
@@ -104,17 +103,20 @@ public class LiquidHelper {
                 } else {
                     distances[a] = Float.MAX_VALUE;
                 }
+
+                a++;
             }
 
             // Apply forces
             pressure = (p - 5f) / 2.0f; //normal pressure term
             presnear = pnear / 2.0f; //near particles term
             change.set(0, 0);
-            for (int a = 0; a < neighbors.length; a++) {
+            a = 0;
+            for(Object o : neighbors) {
                 if(distances[a] == Float.MAX_VALUE)
                     continue;
 
-                int i2 = dropIndexMap.get(neighbors[a]);
+                i2 = dropIndexMap.get(o);
                 relativePosition.set(_scaledPositions[i2]).sub(_scaledPositions[i]);
 
                 if (distances[a] < IDEAL_RADIUS) {
@@ -128,19 +130,24 @@ public class LiquidHelper {
                     _delta[i2].add(d);
                     change.sub(d);
                 }
+
+                a++;
             }
             _delta[i].add(change);
+
+            i++;
         }
 
         moveParticles(deltaT);
     }
 
     private void moveParticles(float deltaT) {
-        for (int i = 0; i < dropList.size(); i++) {
-            Drop particle = dropList.get(i);
-
+        int i = 0;
+        for (Drop particle : dropList) {
             particle.setPosition(particle.getPosition().tmp().add(_delta[i].div(MULTIPLIER)));
             particle.setLinearVelocity(particle.getLinearVelocity().tmp().add(_delta[i].div((MULTIPLIER * deltaT))));
+
+            i++;
         }
     }
 }

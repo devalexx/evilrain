@@ -15,7 +15,7 @@ function onCreate(world)
         for j = 0, 29 do
             drop = luajava.newInstance(Drop)
             world:add(drop)
-            drop:setPosition(luajava.newInstance(Vector2, i * 15 + 30, j * 15 + 20))
+            drop:setPosition(luajava.newInstance(Vector2, i * 10 + 30, j * 10 + 20))
         end
     end
 end

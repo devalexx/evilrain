@@ -44,8 +44,8 @@ public class HashGrid<E extends SimpleActor> implements Set<E> {
     private final int numRows,numCols;
     private final int minX,minY,maxX,maxY,maxX1,maxY1;
     private final HashMap<Integer, Collection<E>> hashMap = new HashMap<Integer,Collection<E>>();
-    private final List<E> set = new LinkedList<E>();
-    private final Set<E> newCollection = new HashSet<E>();
+    private final LinkedList<E> set = new LinkedList<E>();
+    private final HashSet<E> newCollection = new HashSet<E>();
     private final float radius;
     private final float maxDistSq;
     private final float halfGridY;
@@ -120,7 +120,7 @@ public class HashGrid<E extends SimpleActor> implements Set<E> {
      *          If no objects found, an empty collection is returned.
      */
     @SuppressWarnings("boxing")
-    public Set<E> get(Vector2 location) {
+    public HashSet<E> get(Vector2 location) {
         int coordHash = getCoordHash(location);
         Collection<E> origCollection = hashMap.get(coordHash);
         newCollection.clear();
