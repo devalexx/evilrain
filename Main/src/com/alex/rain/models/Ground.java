@@ -61,6 +61,7 @@ public class Ground extends SimpleActor {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
+        fixtureDef.friction = 10.4f;
         /*fixtureDef.density = 0.5f;
         fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.6f;*/

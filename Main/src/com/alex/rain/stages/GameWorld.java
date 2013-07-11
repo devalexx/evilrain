@@ -53,9 +53,13 @@ public class GameWorld extends Stage {
     private BitmapFont font = new BitmapFont();
     private int levelNumber = -1;
     private String winHint;
+    private boolean isLightVersion = true;
+    private int dropsMax;
 
     public GameWorld(String name) {
-        liquidHelper = new LiquidHelper(dropList);
+        isLightVersion = Gdx.app.getType() != Application.ApplicationType.Desktop;
+        dropsMax = isLightVersion ? 100 : 1000;
+        liquidHelper = new LiquidHelper(dropList, isLightVersion);
 
         String filename = "data/" + name + ".lua";
 
@@ -140,8 +144,8 @@ public class GameWorld extends Stage {
             showWinnerMenu();
         }
 
-        if(itRain && !wonGame && cloud != null) {
-            if(time - timeLastDrop > 0.05) {
+        if(itRain && !wonGame && cloud != null && dropList.size() < dropsMax) {
+            if(time - timeLastDrop > (isLightVersion ? 0.5 : 0.05)) {
                 Drop drop = new Drop();
                 Random r = new Random();
                 float offset = r.nextFloat() * cloud.getWidth() * 2/3;
@@ -229,7 +233,7 @@ public class GameWorld extends Stage {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if(wonGame || cloud != null)
+        if(wonGame || cloud != null || dropList.size() > dropsMax)
             return true;
         Drop drop = new Drop();
         Random r = new Random();

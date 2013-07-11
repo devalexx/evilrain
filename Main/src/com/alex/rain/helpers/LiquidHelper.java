@@ -12,11 +12,11 @@ import java.util.*;
  */
 
 public class LiquidHelper {
-    public final float RADIUS = 35f;
-    public final float IDEAL_RADIUS = 200f;
-    public final float IDEAL_RADIUS_A = IDEAL_RADIUS - 0.01f;
-    public final float MULTIPLIER = IDEAL_RADIUS / RADIUS;
-    public final float IDEAL_RADIUS_SQ = IDEAL_RADIUS * IDEAL_RADIUS;
+    public final float RADIUS;
+    public final float IDEAL_RADIUS;
+    public final float IDEAL_RADIUS_A;
+    public final float MULTIPLIER;
+    public final float IDEAL_RADIUS_SQ;
     public final float VISCOSITY = 0.004f;
     public final float EPSILON = 0.001f;
     private final List<Drop> dropList;
@@ -28,10 +28,15 @@ public class LiquidHelper {
     private Vector2 change = new Vector2();
     private Vector2 relativePosition = new Vector2();
 
-    public LiquidHelper(ArrayList<Drop> dropList) {
+    public LiquidHelper(ArrayList<Drop> dropList, boolean lightVersion) {
         this.dropList = dropList;
         dropIndexMap = new HashMap<Drop, Integer>();
-        grid = new HashGrid<Drop>(800, 480, 25);
+        grid = new HashGrid<Drop>(800, 480, lightVersion ? 100 : 35);
+        RADIUS = lightVersion ? 100f : 35f;
+        IDEAL_RADIUS = lightVersion ? 400f : 200f;
+        IDEAL_RADIUS_A = IDEAL_RADIUS - 0.01f;
+        MULTIPLIER = IDEAL_RADIUS / RADIUS;
+        IDEAL_RADIUS_SQ = IDEAL_RADIUS * IDEAL_RADIUS;
     }
 
     private HashGrid<Drop> createHashGrid() {
