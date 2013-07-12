@@ -84,16 +84,16 @@ public class GameWorld extends Stage {
         }
 
         final String VERTEX = Gdx.files.internal("data/drop_shader.vert").readString();
-        final String FRAGMENT = Gdx.app.getType() == Application.ApplicationType.Desktop ?
-                Gdx.files.internal("data/drop_shader.frag").readString() :
-                Gdx.files.internal("data/drop_shader_light.frag").readString();
+        final String FRAGMENT = lightVersion ?
+                Gdx.files.internal("data/drop_shader_light.frag").readString() :
+                Gdx.files.internal("data/drop_shader.frag").readString();
 
         shader = new ShaderProgram(VERTEX, FRAGMENT);
         if(!shader.isCompiled())
             System.out.println(shader.getLog());
 
         dropTexture = TextureManager.getInstance().getTexture("forward.png");
-        dropTextureRadius = lightVersion ? dropTexture.getWidth() * 2.5f : dropTexture.getWidth();
+        dropTextureRadius = lightVersion ? dropTexture.getWidth() * 2f : dropTexture.getWidth();
         backgroundTexture = TextureManager.getInstance().getTexture("background.png");
 
         sbS = new SpriteBatch();
@@ -315,7 +315,7 @@ public class GameWorld extends Stage {
         m_fbo.end();
 
         sbS.begin();
-            if(Gdx.app.getType() == Application.ApplicationType.Desktop)
+            if(!lightVersion)
                 shader.setUniformf("u_time", time);
             sbS.draw(m_fboRegion, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         sbS.end();
