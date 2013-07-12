@@ -45,7 +45,6 @@ public class GameWorld extends Stage {
     private final SpriteBatch sbS;
     private final FrameBuffer m_fbo;
     private final TextureRegion m_fboRegion;
-    private final float m_fboScaler = 1.5f;
     private float time;
     private float timeLastDrop;
     private boolean itRain;
@@ -99,7 +98,7 @@ public class GameWorld extends Stage {
         sbS = new SpriteBatch();
         sbS.setShader(shader);
 
-        m_fbo = new FrameBuffer(Pixmap.Format.RGB565, (int)(Gdx.graphics.getWidth() * m_fboScaler), (int)(Gdx.graphics.getHeight() * m_fboScaler), false);
+        m_fbo = new FrameBuffer(Pixmap.Format.RGB565, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
         m_fboRegion = new TextureRegion(m_fbo.getColorBufferTexture());
         m_fboRegion.flip(false, true);
 
@@ -317,7 +316,7 @@ public class GameWorld extends Stage {
         sbS.begin();
             if(!lightVersion)
                 shader.setUniformf("u_time", time);
-            sbS.draw(m_fboRegion, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            sbS.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
         sbS.end();
 
         getCamera().update();
