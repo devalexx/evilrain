@@ -27,6 +27,8 @@ public class LiquidHelper {
     private Vector2[] _scaledVelocities;
     private Vector2 change = new Vector2();
     private Vector2 relativePosition = new Vector2();
+    private float[] distances = new float[60];
+    private float[] oneminusq = new float[60];
 
     public LiquidHelper(ArrayList<Drop> dropList, boolean lightVersion) {
         this.dropList = dropList;
@@ -83,14 +85,13 @@ public class LiquidHelper {
         prepareArrays();
         prepareSimulation();
 
-        float p, pnear, pressure, presnear;
+        float p, pnear, pressure, presnear, factor, oneminusqSq;
         int i = 0, i2, a;
         for(Drop particle : dropList) {
             // Calculate pressure
             p = 0.0f;
             pnear = 0.0f;
             Object[] neighbors = grid.get(particle.getPosition()).toArray();
-            float[] distances = new float[neighbors.length];
             a = 0;
             for(Object o : neighbors) {
                 i2 = dropIndexMap.get(o);
@@ -102,11 +103,10 @@ public class LiquidHelper {
                     distances[a] = (float)Math.sqrt(distanceSq);
                     if (distances[a] < EPSILON)
                         distances[a] = IDEAL_RADIUS_A;
-                    float oneminusq = 1.0f - (distances[a] / IDEAL_RADIUS);
-                    p += oneminusq * oneminusq;
-                    pnear += oneminusq * oneminusq * oneminusq;
-                } else {
-                    distances[a] = Float.MAX_VALUE;
+                    oneminusq[a] = 1.0f - (distances[a] / IDEAL_RADIUS);
+                    oneminusqSq = oneminusq[a] * oneminusq[a];
+                    p += oneminusqSq;
+                    pnear += oneminusqSq * oneminusq[a];
                 }
 
                 a++;
@@ -125,12 +125,11 @@ public class LiquidHelper {
                 relativePosition.set(_scaledPositions[i2]).sub(_scaledPositions[i]);
 
                 if (distances[a] < IDEAL_RADIUS) {
-                    float oneminusq = 1.0f - distances[a] / IDEAL_RADIUS;
-                    float factor = oneminusq * (pressure + presnear * oneminusq) / (2.0F * distances[a]);
+                    factor = oneminusq[a] * (pressure + presnear * oneminusq[a]) / (2.0F * distances[a]);
                     Vector2 d = relativePosition.mul(factor);
                     Vector2 relativeVelocity = _scaledVelocities[i2].tmp().sub(_scaledVelocities[i]);
 
-                    factor = VISCOSITY * oneminusq * deltaT;
+                    factor = VISCOSITY * oneminusq[a] * deltaT;
                     d.sub(relativeVelocity.mul(factor));
                     _delta[i2].add(d);
                     change.sub(d);

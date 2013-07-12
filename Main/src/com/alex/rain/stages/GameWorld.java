@@ -55,6 +55,8 @@ public class GameWorld extends Stage {
     private final boolean lightVersion;
     private int dropsMax;
     private final float dropTextureRadius;
+    private boolean physicsEnabled = true;
+    private boolean liquidForcesEnabled = true;
 
     public GameWorld(String name) {
         lightVersion = RainGame.isLightVersion();
@@ -134,8 +136,10 @@ public class GameWorld extends Stage {
     @Override
     public void act(float delta) {
         time += Gdx.graphics.getDeltaTime();
-        liquidHelper.applyLiquidConstraint(1/60f); // TODO: check this shit?
-        physicsWorld.step(1/15f, 6, 3);
+        if(liquidForcesEnabled)
+            liquidHelper.applyLiquidConstraint(1/60f); // TODO: check this shit?
+        if(physicsEnabled)
+            physicsWorld.step(1/15f, 6, 3);
         super.act(delta);
 
         LuaValue luaDrop = CoerceJavaToLua.coerce(dropList);
@@ -247,9 +251,13 @@ public class GameWorld extends Stage {
 
     @Override
     public boolean keyDown(int keyCode) {
-        if(keyCode == Input.Keys.F4)
+        if(keyCode == Input.Keys.F4 || keyCode == Input.Keys.D)
             debugRendererEnabled = !debugRendererEnabled;
-        else if(keyCode == Input.Keys.ESCAPE)
+        else if(keyCode == Input.Keys.F5 || keyCode == Input.Keys.P)
+            physicsEnabled = !physicsEnabled;
+        else if(keyCode == Input.Keys.F6 || keyCode == Input.Keys.L)
+            liquidForcesEnabled = !liquidForcesEnabled;
+        else if(keyCode == Input.Keys.ESCAPE || keyCode == Input.Keys.Q)
             showWinnerMenu();
         else if(keyCode == Input.Keys.LEFT) {
             if(cloud != null) {
