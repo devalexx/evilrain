@@ -17,7 +17,7 @@ float rand(vec2 co){
 
 void main() {
     vec4 c = v_color * texture2D(u_texture, v_texCoords);
-    if(c.b > 0.5)
+    if(c.b >= 0.5)
         gl_FragColor = vec4(0,0,0.5,1);
     else if(c.b > 0.4 && c.b < 0.5)
         gl_FragColor = vec4(0,0,0.6,1);
