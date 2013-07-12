@@ -19,13 +19,13 @@ void main() {
     vec4 c = v_color * texture2D(u_texture, v_texCoords);
     if(c.b >= 0.5)
         gl_FragColor = vec4(0,0,0.5,1);
-    else if(c.b > 0.4 && c.b < 0.5)
+    else if(c.b >= 0.4 && c.b < 0.5)
         gl_FragColor = vec4(0,0,0.6,1);
-    else if(c.b > 0.3 && c.b < 0.4)
+    else if(c.b >= 0.3 && c.b < 0.4)
         gl_FragColor = vec4(0,0,0.7,1);
-    else if(c.b > 0.2 && c.b < 0.3)
+    else if(c.b >= 0.2 && c.b < 0.3)
         gl_FragColor = vec4(0,0,0.8,1);
-    else if(c.b > 0.1 && c.b < 0.2)
+    else if(c.b >= 0.1 && c.b < 0.2)
         gl_FragColor = vec4(0,0,0.3,1);
     else
         gl_FragColor = vec4(0,0,0,0);
