@@ -305,7 +305,7 @@ public class GameWorld extends Stage {
 
         m_fbo.begin();
             getSpriteBatch().begin();
-            Gdx.graphics.getGL20().glClear(GL20.GL_COLOR_BUFFER_BIT);
+            Gdx.graphics.getGLCommon().glClear(GL10.GL_COLOR_BUFFER_BIT);
             for (Drop drop : dropList) {
                 getSpriteBatch().draw(dropTexture, drop.getPosition().x - dropTextureRadius / 2,
                         drop.getPosition().y - dropTextureRadius / 2, dropTextureRadius, dropTextureRadius);
@@ -320,7 +320,6 @@ public class GameWorld extends Stage {
         sbS.end();
 
         getCamera().update();
-        getSpriteBatch().setProjectionMatrix(getCamera().combined);
         getSpriteBatch().begin();
             getRoot().draw(getSpriteBatch(), 1);
             font.draw(getSpriteBatch(), "FPS: "+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
