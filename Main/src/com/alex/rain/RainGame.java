@@ -1,5 +1,6 @@
 package com.alex.rain;
 
+import com.alex.rain.managers.TextureManager;
 import com.alex.rain.screens.GameScreen;
 import com.alex.rain.screens.MainMenuScreen;
 import com.alex.rain.stages.GameWorld;
@@ -15,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 public class RainGame extends Game {
     Screen screen;
     Stage stage;
-    static RainGame instance;
+    static RainGame instance = new RainGame();
     static float time;
     static boolean lightVersion = true;
 
@@ -23,8 +24,6 @@ public class RainGame extends Game {
     }
 
     public static RainGame getInstance() {
-        if(instance == null)
-            instance = new RainGame();
         return instance;
     }
 
@@ -79,5 +78,11 @@ public class RainGame extends Game {
 
     public static boolean isLightVersion() {
         return lightVersion;
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+        TextureManager.getInstance().reload();
     }
 }
