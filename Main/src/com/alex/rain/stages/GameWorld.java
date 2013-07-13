@@ -50,13 +50,14 @@ public class GameWorld extends Stage {
     private boolean itRain;
     private Cloud cloud;
     private BitmapFont font = new BitmapFont();
-    private int levelNumber = -1;
+    private int levelNumber = 0;
     private String winHint;
     private final boolean lightVersion;
     private int dropsMax;
     private final float dropTextureRadius;
     private boolean physicsEnabled = true;
     private boolean liquidForcesEnabled = true;
+    private boolean useShader = true;
 
     public GameWorld(String name) {
         lightVersion = RainGame.isLightVersion();
@@ -73,7 +74,8 @@ public class GameWorld extends Stage {
 
         try {
             //Reader reader = new FileReader(filename);
-            Reader reader = new StringReader(Gdx.files.internal(filenameMain).readString()  + Gdx.files.internal(filename).readString());
+            Reader reader = new StringReader(
+                    Gdx.files.internal(filenameMain).readString() + Gdx.files.internal(filename).readString());
             cs = ((Compilable)engine).compile(reader);
             SimpleBindings sb = new SimpleBindings();
             cs.eval(sb);
@@ -257,6 +259,8 @@ public class GameWorld extends Stage {
             physicsEnabled = !physicsEnabled;
         else if(keyCode == Input.Keys.F6 || keyCode == Input.Keys.L)
             liquidForcesEnabled = !liquidForcesEnabled;
+        else if(keyCode == Input.Keys.F7 || keyCode == Input.Keys.S)
+            useShader = !useShader;
         else if(keyCode == Input.Keys.ESCAPE || keyCode == Input.Keys.Q)
             showWinnerMenu();
         else if(keyCode == Input.Keys.LEFT) {
@@ -311,21 +315,27 @@ public class GameWorld extends Stage {
             getSpriteBatch().draw(backgroundTexture, 0, 0);
         getSpriteBatch().end();
 
-        m_fbo.begin();
-            getSpriteBatch().begin();
-            Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-            for (Drop drop : dropList) {
-                getSpriteBatch().draw(dropTexture, drop.getPosition().x - dropTextureRadius / 2,
-                        drop.getPosition().y - dropTextureRadius / 2, dropTextureRadius, dropTextureRadius);
-            }
-            getSpriteBatch().end();
-        m_fbo.end();
+        if(useShader) {
+            m_fbo.begin();
+                getSpriteBatch().begin();
+                Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+                for (Drop drop : dropList) {
+                    getSpriteBatch().draw(dropTexture, drop.getPosition().x - dropTextureRadius / 2,
+                            drop.getPosition().y - dropTextureRadius / 2, dropTextureRadius, dropTextureRadius);
+                }
+                getSpriteBatch().end();
+            m_fbo.end();
 
-        sbS.begin();
-            if(!lightVersion)
-                shader.setUniformf("u_time", time);
-            sbS.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
-        sbS.end();
+            sbS.begin();
+                if(!lightVersion)
+                    shader.setUniformf("u_time", time);
+                sbS.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
+            sbS.end();
+        } else {
+            getSpriteBatch().begin();
+                getSpriteBatch().draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
+            getSpriteBatch().end();
+        }
 
         getCamera().update();
         getSpriteBatch().begin();
