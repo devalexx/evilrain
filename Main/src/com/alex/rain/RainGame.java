@@ -39,12 +39,12 @@ public class RainGame extends Game {
         screen = new GameScreen(gameWorld);
         setScreen(screen);
         //setScreen(new MainMenuScreen());
-        Gdx.graphics.getGLCommon().glClearColor(0, 0, 0, 0);
+        Gdx.gl.glClearColor(0, 0, 0, 0);
     }
 
     @Override
     public void render() {
-        Gdx.graphics.getGLCommon().glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
         if(stage != null) {
             stage.draw();
             stage.act(Gdx.graphics.getDeltaTime());

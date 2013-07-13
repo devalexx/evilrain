@@ -313,7 +313,7 @@ public class GameWorld extends Stage {
 
         m_fbo.begin();
             getSpriteBatch().begin();
-            Gdx.graphics.getGLCommon().glClear(GL10.GL_COLOR_BUFFER_BIT);
+            Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
             for (Drop drop : dropList) {
                 getSpriteBatch().draw(dropTexture, drop.getPosition().x - dropTextureRadius / 2,
                         drop.getPosition().y - dropTextureRadius / 2, dropTextureRadius, dropTextureRadius);
