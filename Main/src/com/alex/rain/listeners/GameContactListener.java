@@ -26,24 +26,50 @@
  *   penalties, and will be prosecuted to the maximum extent possible under the
  *   law.
  */
-package com.alex.rain.models;
+package com.alex.rain.listeners;
 
-import com.alex.rain.managers.TextureManager;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import org.luaj.vm2.*;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 /**
  * @author: Alexander Shubenkov
- * @since: 27.06.13
+ * @since: 16.07.13
  */
 
-public abstract class DynamicActor extends SimpleActor {
+public class GameContactListener implements ContactListener {
+    LuaFunction luaOnBeginContactFunc;
+    LuaFunction luaOnEndContactFunc;
+
+    public GameContactListener(LuaFunction luaOnBeginContactFunc, LuaFunction luaOnEndContactFunc) {
+        this.luaOnBeginContactFunc = luaOnBeginContactFunc;
+        this.luaOnEndContactFunc = luaOnEndContactFunc;
+    }
+
     @Override
-    public void draw(SpriteBatch batch, float parentAlpha) {
-        sprite.setPosition(pos.x + offset.x, pos.y + offset.y);
-        sprite.setRotation(rot);
-        sprite.draw(batch, parentAlpha);
+    public void endContact(Contact contact) {
+        if(luaOnEndContactFunc == null)
+            return;
+
+        LuaValue luaContact = CoerceJavaToLua.coerce(contact);
+        luaOnEndContactFunc.call(luaContact);
+    }
+
+    @Override
+    public void beginContact(Contact contact) {
+        if(luaOnBeginContactFunc == null)
+            return;
+
+        LuaValue luaContact = CoerceJavaToLua.coerce(contact);
+        luaOnBeginContactFunc.call(luaContact);
+    }
+
+    @Override
+    public void preSolve (Contact contact, Manifold oldManifold){
+    }
+
+    @Override
+    public void postSolve (Contact contact, ContactImpulse impulse){
     }
 }

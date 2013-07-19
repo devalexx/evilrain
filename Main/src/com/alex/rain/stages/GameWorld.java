@@ -2,6 +2,7 @@ package com.alex.rain.stages;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.helpers.LiquidHelper;
+import com.alex.rain.listeners.GameContactListener;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.models.*;
 import com.alex.rain.screens.*;
@@ -36,6 +37,8 @@ public class GameWorld extends Stage {
     private LiquidHelper liquidHelper;
     private LuaFunction luaOnCreateFunc;
     private LuaFunction luaOnCheckFunc;
+    private LuaFunction luaOnBeginContactFunc;
+    private LuaFunction luaOnEndContactFunc;
     private boolean wonGame;
     private Table table;
     private ShaderProgram shader;
@@ -50,13 +53,14 @@ public class GameWorld extends Stage {
     private boolean itRain;
     private Cloud cloud;
     private BitmapFont font = new BitmapFont();
-    private int levelNumber = -1;
+    private int levelNumber = 0;
     private String winHint;
     private final boolean lightVersion;
     private int dropsMax;
     private final float dropTextureRadius;
     private boolean physicsEnabled = true;
     private boolean liquidForcesEnabled = true;
+    private GameContactListener contactListener;
 
     public GameWorld(String name) {
         lightVersion = RainGame.isLightVersion();
@@ -79,6 +83,8 @@ public class GameWorld extends Stage {
             cs.eval(sb);
             luaOnCheckFunc = (LuaFunction) sb.get("onCheck");
             luaOnCreateFunc = (LuaFunction) sb.get("onCreate");
+            luaOnBeginContactFunc = (LuaFunction) sb.get("onBeginContact");
+            luaOnEndContactFunc = (LuaFunction) sb.get("onEndContact");
         } catch (Exception e) {
             //LogHandler.log.error(e.getMessage(), e);
             System.out.println("error: " + filename + ". " + e);
@@ -105,6 +111,9 @@ public class GameWorld extends Stage {
         m_fboRegion.flip(false, true);
 
         debugRenderer = new Box2DDebugRenderer();
+
+        contactListener = new GameContactListener(luaOnBeginContactFunc, luaOnEndContactFunc);
+        physicsWorld.setContactListener(contactListener);
     }
 
     public void add(SimpleActor actor) {
