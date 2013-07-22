@@ -52,6 +52,7 @@ public class GameWorld extends Stage {
     private float timeLastDrop;
     private boolean itRain;
     private Cloud cloud;
+    private Emitter emitter;
     private BitmapFont font = new BitmapFont();
     private int levelNumber = 0;
     private String winHint;
@@ -125,6 +126,8 @@ public class GameWorld extends Stage {
 
         if(actor.getType() == SimpleActor.TYPE.CLOUD)
             cloud = (Cloud)actor;
+        else if(actor.getType() == SimpleActor.TYPE.EMITTER)
+            emitter = (Emitter)actor;
 
         if(actor.getType() == SimpleActor.TYPE.DROP) {
             getRoot().addActorAt(0, actor);
@@ -150,7 +153,8 @@ public class GameWorld extends Stage {
         if(liquidForcesEnabled)
             liquidHelper.applyLiquidConstraint(1/60f); // TODO: check this shit?
         if(physicsEnabled)
-            physicsWorld.step(1/15f, 6, 3);
+            physicsWorld.step(1/60f, 6, 3);
+
         super.act(delta);
 
         LuaValue luaDrop = CoerceJavaToLua.coerce(dropList);
@@ -167,6 +171,18 @@ public class GameWorld extends Stage {
                 float offset = r.nextFloat() * cloud.getWidth() * 2/3;
                 add(drop);
                 drop.setPosition(new Vector2(cloud.getPosition().x - cloud.getWidth() / 3 + offset, cloud.getPosition().y));
+                timeLastDrop = time;
+            }
+        }
+
+        if(itRain && !wonGame && emitter != null && dropList.size() < dropsMax) {
+            if(time - timeLastDrop > (lightVersion ? 0.5 : 0.05)) {
+                Drop drop = new Drop();
+                Random r = new Random();
+                float offset = r.nextFloat() * emitter.getWidth() * 2/3;
+                add(drop);
+                drop.setPosition(new Vector2(emitter.getPosition().x - emitter.getWidth() / 3 + offset, emitter.getPosition().y));
+                drop.getBody().applyLinearImpulse(new Vector2(drop.getBody().getMass() * 100 / delta, 0), drop.getBody().getWorldCenter());
                 timeLastDrop = time;
             }
         }
@@ -249,7 +265,7 @@ public class GameWorld extends Stage {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if(wonGame || cloud != null || dropList.size() > dropsMax)
+        if(wonGame || cloud != null || emitter != null || dropList.size() > dropsMax)
             return true;
         Drop drop = new Drop();
         Random r = new Random();
@@ -282,6 +298,15 @@ public class GameWorld extends Stage {
                 cloud.setLinearVelocity(new Vector2(20, 0));
                 cloud.setDirection(2);
             }
+        } else if(keyCode == Input.Keys.UP) {
+            if(emitter != null) {
+                emitter.setLinearVelocity(new Vector2(0, 20));
+            }
+
+        } else if(keyCode == Input.Keys.DOWN) {
+            if(emitter != null) {
+                emitter.setLinearVelocity(new Vector2(0, -20));
+            }
         } else if(keyCode == Input.Keys.SPACE) {
             itRain = true;
             if(cloud != null) {
@@ -303,6 +328,14 @@ public class GameWorld extends Stage {
             if(cloud != null) {
                 cloud.setLinearVelocity(new Vector2(0, 0));
                 cloud.setDirection(0);
+            }
+        } else if(keyCode == Input.Keys.UP) {
+            if(emitter != null) {
+                emitter.setLinearVelocity(new Vector2(0, 0));
+            }
+        } else if(keyCode == Input.Keys.DOWN) {
+            if(emitter != null) {
+                emitter.setLinearVelocity(new Vector2(0, 0));
             }
         } else if(keyCode == Input.Keys.SPACE) {
             itRain = false;

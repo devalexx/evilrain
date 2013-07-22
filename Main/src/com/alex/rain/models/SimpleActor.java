@@ -25,7 +25,8 @@ public abstract class SimpleActor extends Actor {
         NONE,
         DROP,
         GROUND,
-        CLOUD
+        CLOUD,
+        EMITTER
     }
 
     public final short CATEGORY_ALL = 0x0001;
@@ -76,6 +77,10 @@ public abstract class SimpleActor extends Actor {
 
     public void applyForceToCenter(Vector2 vec) {
         body.applyForceToCenter(vec);
+    }
+
+    public void applyLinearImpulse(Vector2 pos, Vector2 point) {
+        body.applyLinearImpulse(pos, point);
     }
 
     public Body getBody() {
