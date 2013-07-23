@@ -25,7 +25,7 @@ function onCreate(world)
     ground:addVertex(8, 48)
     world:add(ground)
 
-    dynamicActor = luajava.newInstance(DynamicActor)
+    dynamicActor = luajava.newInstance(Home)
     dynamicActor:setBodyBox(200, 100)
     dynamicActor:setSpriteBox(200, 100)
     world:add(dynamicActor)

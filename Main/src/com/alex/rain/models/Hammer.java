@@ -20,7 +20,7 @@ public class Hammer extends DynamicActor {
     @Override
     public void createPhysicsActor(World physicsWorld) {
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(getWidth() / 7, getHeight() / 2);
+        polygonShape.setAsBox(getPhysicsWidth() / 7, getPhysicsHeight() / 2);
         offset.set(-getWidth() / 2, -getHeight() / 2);
         sprite.setOrigin(getWidth() / 2, getHeight() / 2);
 
@@ -34,8 +34,8 @@ public class Hammer extends DynamicActor {
         body = physicsWorld.createBody(bodyDef);
         body.createFixture(fixtureDef);
 
-        polygonShape.setAsBox(getWidth() / 2, getHeight() / 7, new Vector2(0, getHeight() / 3), 0);
-        offset.set(-getWidth() / 2, -getHeight() / 2);
+        polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 7,
+                new Vector2(0, getPhysicsHeight() / 3), 0);
 
         body.createFixture(fixtureDef);
         body.resetMassData();

@@ -46,7 +46,7 @@ public class Cloud extends KinematicActor {
     @Override
     public void createPhysicsActor(World physicsWorld) {
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(getWidth() / 2, getHeight() / 2);
+        polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 2);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
@@ -68,9 +68,6 @@ public class Cloud extends KinematicActor {
 
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
-        //sprite.setPosition(pos.x + offset.x, pos.y + offset.y);
-        //sprite.setRotation(rot);
-        //sprite.draw(batch, parentAlpha);
         if(direction < 0) {
             batch.draw(animation.getKeyFrame(RainGame.getTime(), true), pos.x + offset.x, pos.y + offset.y);
         } else if(direction == 1) {

@@ -16,7 +16,7 @@ public class Drop extends SimpleActor {
     public Drop() {
         super();
         type = TYPE.DROP;
-        RADIUS = RainGame.isLightVersion() ? 6f : 3f;
+        RADIUS = RainGame.isLightVersion() ? 0.5f : 0.3f;
     }
 
     @Override

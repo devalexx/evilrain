@@ -2,6 +2,7 @@ package com.alex.rain.models;
 
 import com.alex.rain.helpers.Box2DSeparatorHelper;
 import com.alex.rain.managers.TextureManager;
+import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -50,13 +51,9 @@ public class Ground extends SimpleActor {
     public void createPhysicsActor(World physicsWorld) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-        //bodyDef.position.set(200, 100);
 
         body = physicsWorld.createBody(bodyDef);
 
-        /*PolygonShape polygonShape1 = new PolygonShape();
-        PolygonShape polygonShape2 = new PolygonShape();
-        PolygonShape polygonShape3 = new PolygonShape();*/
         PolygonShape polygonShape = new PolygonShape();
 
         FixtureDef fixtureDef = new FixtureDef();
@@ -66,21 +63,16 @@ public class Ground extends SimpleActor {
         fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.6f;*/
 
-        /*List<Vector2> vertices = new ArrayList<Vector2>();
-        vertices.add(new Vector2(0, 0));
-        vertices.add(new Vector2(100, 0));
-        vertices.add(new Vector2(100, 20));
-        vertices.add(new Vector2(90, 10));
-        vertices.add(new Vector2(10, 10));
-        vertices.add(new Vector2(0, 20));*/
+        for(Vector2 v : vertices)
+            v.mul(GameWorld.WORLD_TO_BOX);
 
         Box2DSeparatorHelper separatorHelper = new Box2DSeparatorHelper();
-        //System.out.println(separatorHelper.Validate(vertices));
         separatorHelper.Separate(body, fixtureDef, vertices, 30);
 
-        //polygonShape.set(vertices.toArray(new Vector2[vertices.size()]));
-
         polygonShape.dispose();
+
+        for(Vector2 v : vertices)
+            v.mul(GameWorld.BOX_TO_WORLD);
     }
 
     public void addVertex(float x, float y) {

@@ -20,6 +20,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        camera.viewportHeight = 480;
+        camera.viewportWidth = 800;
+        camera.position.set(camera.viewportWidth * .5f, camera.viewportHeight * .5f, 0f);
     }
 
     @Override
@@ -28,9 +31,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.viewportHeight = Gdx.graphics.getHeight();
-        camera.viewportWidth = Gdx.graphics.getWidth();
+        camera = (OrthographicCamera) world.getCamera();
+        camera.viewportHeight = 480;
+        camera.viewportWidth = 800;
 
         camera.position.set(camera.viewportWidth * .5f, camera.viewportHeight * .5f, 0f);
     }

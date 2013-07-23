@@ -1,5 +1,6 @@
 package com.alex.rain.models;
 
+import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
@@ -51,7 +52,7 @@ public abstract class SimpleActor extends Actor {
     }
 
     public void setPosition(Vector2 vec) {
-        body.setTransform(vec, body.getAngle());
+        body.setTransform(vec.cpy().mul(GameWorld.WORLD_TO_BOX), body.getAngle());
         pos.set(vec);
     }
 
@@ -60,7 +61,7 @@ public abstract class SimpleActor extends Actor {
     }
 
     public void setLinearVelocity(Vector2 vec) {
-        body.setLinearVelocity(vec);
+        body.setLinearVelocity(vec.cpy().mul(GameWorld.WORLD_TO_BOX));
         linVel.set(vec);
     }
 
@@ -73,6 +74,8 @@ public abstract class SimpleActor extends Actor {
         pos = body.getPosition();
         rot = (float)Math.toDegrees(body.getAngle());
         linVel = body.getLinearVelocity();
+        pos.mul(GameWorld.BOX_TO_WORLD);
+        linVel.mul(GameWorld.BOX_TO_WORLD);
     }
 
     public void applyForceToCenter(Vector2 vec) {
@@ -102,5 +105,13 @@ public abstract class SimpleActor extends Actor {
 
     public void setSpriteBox(float width, float height) {
         sprite.setSize(width, height);
+    }
+
+    public float getPhysicsWidth() {
+        return getWidth() * GameWorld.WORLD_TO_BOX;
+    }
+
+    public float getPhysicsHeight() {
+        return getHeight() * GameWorld.WORLD_TO_BOX;
     }
 }

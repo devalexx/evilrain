@@ -63,6 +63,8 @@ public class GameWorld extends Stage {
     private boolean liquidForcesEnabled = true;
     private boolean useShader = true;
     private GameContactListener contactListener;
+    public static final float WORLD_TO_BOX = 0.1f;
+    public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
 
     public GameWorld(String name) {
         lightVersion = RainGame.isLightVersion();
@@ -98,9 +100,11 @@ public class GameWorld extends Stage {
                 Gdx.files.internal("data/drop_shader_light.frag").readString() :
                 Gdx.files.internal("data/drop_shader.frag").readString();
 
-        shader = new ShaderProgram(VERTEX, FRAGMENT);
-        if(!shader.isCompiled())
-            System.out.println(shader.getLog());
+        if (Gdx.graphics.isGL20Available()) {
+            shader = new ShaderProgram(VERTEX, FRAGMENT);
+            if(!shader.isCompiled())
+                System.out.println(shader.getLog());
+        }
 
         dropTexture = TextureManager.getInstance().getTexture("forward.png");
         dropTextureRadius = lightVersion ? dropTexture.getWidth() * 2f : dropTexture.getWidth();
@@ -144,7 +148,8 @@ public class GameWorld extends Stage {
 
     public void createWorld() {
         LuaValue luaWorld = CoerceJavaToLua.coerce(this);
-        luaOnCreateFunc.call(luaWorld);
+        if(luaOnCreateFunc != null)
+            luaOnCreateFunc.call(luaWorld);
     }
 
     @Override
@@ -182,7 +187,7 @@ public class GameWorld extends Stage {
                 float offset = r.nextFloat() * emitter.getWidth() * 2/3;
                 add(drop);
                 drop.setPosition(new Vector2(emitter.getPosition().x - emitter.getWidth() / 3 + offset, emitter.getPosition().y));
-                drop.getBody().applyLinearImpulse(new Vector2(drop.getBody().getMass() * 100 / delta, 0), drop.getBody().getWorldCenter());
+                drop.getBody().applyForceToCenter(new Vector2(drop.getBody().getMass() * 20 / delta, 0));
                 timeLastDrop = time;
             }
         }
@@ -388,8 +393,19 @@ public class GameWorld extends Stage {
                 font.draw(getSpriteBatch(), "Hint: "+winHint, 10, Gdx.graphics.getHeight()-60);
         getSpriteBatch().end();
 
-        if(debugRendererEnabled)
+        if(debugRendererEnabled) {
+            getCamera().viewportHeight *= WORLD_TO_BOX;
+            getCamera().viewportWidth *= WORLD_TO_BOX;
+            getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
+
+            getCamera().update();
             debugRenderer.render(physicsWorld, getCamera().combined);
+
+            getCamera().viewportHeight = 480;
+            getCamera().viewportWidth = 800;
+            getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
+            getCamera().update();
+        }
     }
 
     public void setWinHint(String winHint) {
