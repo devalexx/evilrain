@@ -106,7 +106,7 @@ public class GameWorld extends Stage {
                 System.out.println(shader.getLog());
         }
 
-        dropTexture = TextureManager.getInstance().getTexture("forward.png");
+        dropTexture = TextureManager.getInstance().getTexture("drop.png");
         dropTextureRadius = lightVersion ? dropTexture.getWidth() * 2f : dropTexture.getWidth();
         backgroundTexture = TextureManager.getInstance().getTexture("background.png");
 

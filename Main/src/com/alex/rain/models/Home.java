@@ -25,7 +25,7 @@ public class Home extends DynamicActor {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
-        fixtureDef.density = 1;
+        fixtureDef.density = 10;
         fixtureDef.friction = 10.4f;
 
         BodyDef bodyDef = new BodyDef();

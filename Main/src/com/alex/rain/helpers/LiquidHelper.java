@@ -1,8 +1,6 @@
 package com.alex.rain.helpers;
 
-import com.alex.rain.hashgrid.HashGrid;
 import com.alex.rain.models.Drop;
-import com.badlogic.gdx.math.Vector2;
 
 import java.util.*;
 
@@ -12,146 +10,186 @@ import java.util.*;
  */
 
 public class LiquidHelper {
-    public final float RADIUS;
-    public final float IDEAL_RADIUS;
-    public final float IDEAL_RADIUS_A;
-    public final float MULTIPLIER;
-    public final float IDEAL_RADIUS_SQ;
-    public final float VISCOSITY = 0.004f;
-    public final float EPSILON = 0.001f;
     private final List<Drop> dropList;
-    private HashMap<Drop, Integer> dropIndexMap;
-    private HashGrid<Drop> grid;
-    private Vector2[] _delta;
-    private Vector2[] _scaledPositions;
-    private Vector2[] _scaledVelocities;
-    private Vector2 change = new Vector2();
-    private Vector2 relativePosition = new Vector2();
-    private float[] distances = new float[60];
-    private float[] oneminusq = new float[60];
+    private int dropListSize;
+    private final float fluidMinX = 0f;
+    private final  float fluidMaxX = 800f;
+    private final float fluidMinY = 0f;
+    private final float fluidMaxY = 480f;
+    private final int hashWidth = 30, hashHeight = 20;
+    private final ArrayList<Integer>[][] hash = new ArrayList[hashWidth][hashHeight];
+    private final float VISCOSITY = 0.004f;
+    private final float RADIUS;
+    private final float IDEAL_RADIUS;
+    private final float IDEAL_RADIUS_SQ;
+    private final float MULTIPLIER;
+    private final float EPSILON = 0.001f;
+    private final ArrayList<Integer> neighbors = new ArrayList<Integer>(100);
+
+    private float[] xchange;
+    private float[] ychange;
+    private float[] xs;
+    private float[] ys;
+    private float[] vxs;
+    private float[] vys;
 
     public LiquidHelper(ArrayList<Drop> dropList, boolean lightVersion) {
         this.dropList = dropList;
-        dropIndexMap = new HashMap<Drop, Integer>();
-        grid = new HashGrid<Drop>(800, 480, lightVersion ? 36 : 18);
-        RADIUS = lightVersion ? 72f : 36f;
-        IDEAL_RADIUS = lightVersion ? 400f : 200f;
-        IDEAL_RADIUS_A = IDEAL_RADIUS - 0.01f;
+        dropListSize = dropList.size();
+        RADIUS = lightVersion ? 40f : 30f;
+        IDEAL_RADIUS = lightVersion ? 500f : 500f;
         MULTIPLIER = IDEAL_RADIUS / RADIUS;
         IDEAL_RADIUS_SQ = IDEAL_RADIUS * IDEAL_RADIUS;
-    }
 
-    private HashGrid<Drop> createHashGrid() {
-        grid.updateAll();
-
-        if(grid.size() != dropList.size())
-            for(int i = grid.size(); i < dropList.size(); i++)
-                grid.add(dropList.get(i));
-
-        return grid;
-    }
-
-    private void prepareArrays() {
-        if(_delta == null || _delta.length != dropList.size()) {
-            _delta = new Vector2[dropList.size()];
-            _scaledPositions = new Vector2[dropList.size()];
-            _scaledVelocities = new Vector2[dropList.size()];
-            dropIndexMap.clear();
-
-            for (int i = 0; i < dropList.size(); i++) {
-                _scaledPositions[i] = new Vector2();
-                _scaledVelocities[i] = new Vector2();
-                _delta[i] = new Vector2();
+        for (int i = 0; i < hashWidth; ++i) {
+            for (int j = 0; j < hashHeight; ++j) {
+                hash[i][j] = new ArrayList<Integer>();
             }
+        }
+        createRequiredData();
+    }
+
+    public final static float map(final float val, final float fromMin, final float fromMax,
+                final float toMin, final float toMax) {
+        final float mult = (val - fromMin) / (fromMax - fromMin);
+        final float res = toMin + mult * (toMax - toMin);
+        return res;
+    }
+
+    private int hashX(float x) {
+        float f = map(x, fluidMinX, fluidMaxX, 0, hashWidth - .001f);
+        return (int) f;
+    }
+
+    private int hashY(float y) {
+        float f = map(y, fluidMinY, fluidMaxY, 0, hashHeight - .001f);
+        return (int) f;
+    }
+
+    private void hashLocations() {
+        for (int a = 0; a < hashWidth; a++) {
+            for (int b = 0; b < hashHeight; b++) {
+                hash[a][b].clear();
+            }
+        }
+
+        for (int a = 0; a < dropListSize; a++) {
+            int hcell = hashX(dropList.get(a).getPosition().x);
+            int vcell = hashY(dropList.get(a).getPosition().y);
+            if (hcell > -1 && hcell < hashWidth && vcell > -1 && vcell < hashHeight)
+                hash[hcell][vcell].add(new Integer(a));
         }
     }
 
-    private void prepareSimulation() {
-        int i = 0;
-        for (Drop particle : dropList) {
-            _scaledPositions[i].set(particle.getPosition()).mul(MULTIPLIER);
-            _scaledVelocities[i].set(particle.getLinearVelocity()).mul(MULTIPLIER);
-            _delta[i].set(0, 0);
-            if(_delta.length != dropIndexMap.size()) {
-                dropIndexMap.put(particle, i);
-            }
-            i++;
-        }
+    public void createRequiredData() {
+        xchange = new float[dropListSize];
+        ychange = new float[dropListSize];
+        xs = new float[dropListSize];
+        ys = new float[dropListSize];
+        vxs = new float[dropListSize];
+        vys = new float[dropListSize];
     }
 
-    public void applyLiquidConstraint(float deltaT) {
-        createHashGrid();
+    public void applyLiquidConstraint(final float deltaT) {
+        if(dropListSize != dropList.size()) {
+            dropListSize = dropList.size();
+            createRequiredData();
+        }
 
-        prepareArrays();
-        prepareSimulation();
+        hashLocations();
+        Arrays.fill(xchange, 0.0f);
+        Arrays.fill(ychange, 0.0f);
 
-        float p, pnear, pressure, presnear, factor, oneminusqSq;
-        int i = 0, i2, a;
-        for(Drop particle : dropList) {
-            // Calculate pressure
-            p = 0.0f;
-            pnear = 0.0f;
-            Object[] neighbors = grid.get(particle.getPosition()).toArray();
-            a = 0;
-            for(Object o : neighbors) {
-                i2 = dropIndexMap.get(o);
-                relativePosition.set(_scaledPositions[i2]).sub(_scaledPositions[i]);
-                float distanceSq = relativePosition.len2();
+        for (int i = 0; i < dropListSize; ++i) {
+            xs[i] = MULTIPLIER * dropList.get(i).getPosition().x;
+            ys[i] = MULTIPLIER * dropList.get(i).getPosition().y;
+            vxs[i] = MULTIPLIER * dropList.get(i).getLinearVelocity().x;
+            vys[i] = MULTIPLIER * dropList.get(i).getLinearVelocity().y;
+        }
 
-                //within idealRad check
-                if (distanceSq < IDEAL_RADIUS_SQ) {
-                    distances[a] = (float)Math.sqrt(distanceSq);
-                    if (distances[a] < EPSILON)
-                        distances[a] = IDEAL_RADIUS_A;
-                    oneminusq[a] = 1.0f - (distances[a] / IDEAL_RADIUS);
-                    oneminusqSq = oneminusq[a] * oneminusq[a];
-                    p += oneminusqSq;
-                    pnear += oneminusqSq * oneminusq[a];
+        for (int i = 0; i < dropListSize; i++) {
+            // Populate the neighbor list from the 9 proximate cells
+            neighbors.clear();
+            int hcell = hashX(dropList.get(i).getPosition().x);
+            int vcell = hashY(dropList.get(i).getPosition().y);
+            for (int nx = -1; nx < 2; nx++) {
+                for (int ny = -1; ny < 2; ny++) {
+                    int xc = hcell + nx;
+                    int yc = vcell + ny;
+                    if (xc > -1 && xc < hashWidth && yc > -1 && yc < hashHeight && hash[xc][yc].size() > 0) {
+                        for (int a = 0; a < hash[xc][yc].size(); a++) {
+                            Integer ne = hash[xc][yc].get(a);
+                            if (ne != null && ne != i)
+                                neighbors.add(ne);
+                        }
+                    }
                 }
-
-                a++;
             }
 
-            // Apply forces
-            pressure = (p - 5f) / 2.0f; //normal pressure term
-            presnear = pnear / 2.0f; //near particles term
-            change.set(0, 0);
-            a = 0;
-            for(Object o : neighbors) {
-                if(distances[a] == Float.MAX_VALUE)
-                    continue;
+            // Particle pressure calculated by particle proximity
+            // Pressures = 0 iff all particles within range are IDEAL_RADIUS distance away
+            float[] vlen = new float[neighbors.size()];
+            float p = 0.0f;
+            float pnear = 0.0f;
+            for (int a = 0; a < neighbors.size(); a++) {
+                int j = neighbors.get(a);
+                float vx = xs[j] - xs[i];
+                float vy = ys[j] - ys[i];
 
-                i2 = dropIndexMap.get(o);
-                relativePosition.set(_scaledPositions[i2]).sub(_scaledPositions[i]);
-
-                if (distances[a] < IDEAL_RADIUS) {
-                    factor = oneminusq[a] * (pressure + presnear * oneminusq[a]) / (2.0F * distances[a]);
-                    Vector2 d = relativePosition.mul(factor);
-                    Vector2 relativeVelocity = _scaledVelocities[i2].tmp().sub(_scaledVelocities[i]);
-
-                    factor = VISCOSITY * oneminusq[a] * deltaT;
-                    d.sub(relativeVelocity.mul(factor));
-                    _delta[i2].add(d);
-                    change.sub(d);
+                // early exit check
+                if (vx > -IDEAL_RADIUS && vx < IDEAL_RADIUS && vy > -IDEAL_RADIUS && vy < IDEAL_RADIUS) {
+                    float vlensqr = (vx * vx + vy * vy);
+                    // within IDEAL_RADIUS check
+                    if (vlensqr < IDEAL_RADIUS_SQ) {
+                        vlen[a] = (float) Math.sqrt(vlensqr);
+                        if (vlen[a] < EPSILON)
+                            vlen[a] = IDEAL_RADIUS - .01f;
+                        float oneminusq = 1.0f - (vlen[a] / IDEAL_RADIUS);
+                        float oneminusqSq = oneminusq * oneminusq;
+                        p = (p + oneminusqSq);
+                        pnear = (pnear + oneminusq * oneminusqSq);
+                    } else {
+                        vlen[a] = Float.MAX_VALUE;
+                    }
                 }
-
-                a++;
             }
-            _delta[i].add(change);
 
-            i++;
+            float pressure = (p - 4F) / 2.0F; // normal pressure term
+            float presnear = pnear / 2.0F; // near particles term
+            float changex = 0.0F;
+            float changey = 0.0F;
+            for (int a = 0; a < neighbors.size(); a++) {
+                int j = neighbors.get(a);
+                float vx = xs[j] - xs[i];
+                float vy = ys[j] - ys[i];
+                if (vx > -IDEAL_RADIUS && vx < IDEAL_RADIUS && vy > -IDEAL_RADIUS && vy < IDEAL_RADIUS) {
+                    if (vlen[a] < IDEAL_RADIUS) {
+                        float oneminusq = 1.0f - (vlen[a] / IDEAL_RADIUS);
+                        float factor = oneminusq * (pressure + presnear * oneminusq) / (2.0F * vlen[a]);
+                        float dx = vx * factor;
+                        float dy = vy * factor;
+                        float relvx = vxs[j] - vxs[i];
+                        float relvy = vys[j] - vys[i];
+                        factor = VISCOSITY * oneminusq * deltaT;
+                        dx -= relvx * factor;
+                        dy -= relvy * factor;
+
+                        xchange[j] += dx;
+                        ychange[j] += dy;
+                        changex -= dx;
+                        changey -= dy;
+                    }
+                }
+            }
+
+            xchange[i] += changex;
+            ychange[i] += changey;
         }
 
-        moveParticles(deltaT);
-    }
-
-    private void moveParticles(float deltaT) {
-        int i = 0;
-        for (Drop particle : dropList) {
-            particle.setPosition(particle.getPosition().tmp().add(_delta[i].div(MULTIPLIER)));
-            particle.setLinearVelocity(particle.getLinearVelocity().tmp().add(_delta[i].div((MULTIPLIER * deltaT))));
-
-            i++;
+        for (int i = 0; i < dropListSize; ++i) {
+            dropList.get(i).setPosition(dropList.get(i).getPosition().add(xchange[i] / MULTIPLIER, ychange[i] / MULTIPLIER));
+            dropList.get(i).setLinearVelocity(dropList.get(i).getLinearVelocity().add(xchange[i] / (MULTIPLIER * deltaT), ychange[i] / (MULTIPLIER * deltaT)));
         }
+
     }
 }

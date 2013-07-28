@@ -61,6 +61,7 @@ public class RainGame extends Game {
         gameWorld.createWorld();
         stage = gameWorld;
         Gdx.input.setInputProcessor(stage);
+        Gdx.input.setCatchBackKey(true);
 
         screen = new GameScreen(gameWorld);
         setScreen(screen);
