@@ -4,7 +4,7 @@ EvilRain is the physics-based logic game. The main idea of project is water simu
 Desktop and Android versions are available now.
 
 ##Used libs:
-[LibGDX](http://libgdx.badlogicgames.com/), [luaj](http://luaj.org/)
+[LibGDX](http://libgdx.badlogicgames.com/), [luaj](http://luaj.org/), [JBox2D (Liquid demo)](http://www.jbox2d.org/liquid/), [Convex Separator](http://www.emanueleferonato.com/2011/09/12/create-non-convex-complex-shapes-with-box2d/)
 
 ##Screenshots:
 ![alt text](http://i.imgur.com/hKIkoCI.png "EvilRain - Screenshot 1")

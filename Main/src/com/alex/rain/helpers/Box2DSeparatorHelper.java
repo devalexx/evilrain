@@ -10,6 +10,18 @@ import java.util.*;
  * @since: 07.06.13
  */
 
+/*
+* Convex Separator for Box2D Flash
+*
+* This class has been written by Antoan Angelov.
+* It is designed to work with Erin Catto's Box2D physics library.
+*
+* Everybody can use this software for any purpose, under two restrictions:
+* 1. You cannot claim that you wrote this software.
+* 2. You can not remove or alter this notice.
+*
+*/
+
 public class Box2DSeparatorHelper {
     /**
      * Separates a non-convex polygon into convex polygons and adds them as fixtures to the <code>body</code> parameter.<br/>
