@@ -8,3 +8,6 @@ Desktop and Android versions are available now.
 
 ##Screenshots:
 ![alt text](http://i.imgur.com/hKIkoCI.png "EvilRain - Screenshot 1")
+
+##Videos:
+![EvilRain 0.0.2](http://www.youtube.com/watch?v=3NtfpD5y_YY)
