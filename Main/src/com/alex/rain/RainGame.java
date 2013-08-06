@@ -30,6 +30,7 @@ public class RainGame extends Game {
     @Override
     public void create() {
         lightVersion = Gdx.app.getType() != Application.ApplicationType.Desktop;
+        TextureManager.getInstance().getAtlas("pack.atlas");
 
         GameWorld gameWorld = new GameWorld("level1");
         gameWorld.createWorld();

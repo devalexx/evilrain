@@ -12,8 +12,7 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class Hammer extends DynamicActor {
     public Hammer() {
-        texture = TextureManager.getInstance().getTexture("hammer.png");
-        sprite = new Sprite(texture);
+        sprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("hammer");
         setBodyBox(128, 128);
     }
 

@@ -11,8 +11,7 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class Emitter extends KinematicActor {
     public Emitter() {
-        texture = TextureManager.getInstance().getTexture("emitter.png");
-        sprite = new Sprite(texture);
+        sprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("emitter");
         offset.set(-32, -32);
         type = TYPE.EMITTER;
         setBodyBox(64, 64);

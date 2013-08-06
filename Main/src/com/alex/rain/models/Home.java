@@ -11,8 +11,7 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class Home extends DynamicActor {
     public Home() {
-        texture = TextureManager.getInstance().getTexture("home1.png");
-        sprite = new Sprite(texture);
+        sprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("home1");
         setBodyBox(32, 100);
     }
 

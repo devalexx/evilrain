@@ -2,6 +2,7 @@ package com.alex.rain.managers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.*;
 
 import java.util.*;
 
@@ -13,12 +14,67 @@ import java.util.*;
 public class TextureManager {
     private Map<String, Texture> textureMap = new HashMap<String, Texture>();
     private Map<Texture, TextureData> textureDataMap = new HashMap<Texture, TextureData>();
+
+    private Map<String, TextureAtlas> textureAtlasMap = new HashMap<String, TextureAtlas>();
+    private Map<String, TextureAtlas> textureAtlasNameMap = new HashMap<String, TextureAtlas>();
+    private Map<TextureAtlas, TextureAtlas.TextureAtlasData> textureAtlasDataMap =
+            new HashMap<TextureAtlas, TextureAtlas.TextureAtlasData>();
+
     private static TextureManager manager = new TextureManager();
     
     private TextureManager() {}
 
     public static TextureManager getInstance() {
         return manager;
+    }
+
+    public Sprite getSpriteFromDefaultAtlas(String textureName) {
+        return getSpriteFromAtlas("pack.atlas", textureName);
+    }
+
+    public Sprite getSpriteFromAtlas(String atlasName, String textureName) {
+        if(atlasName == null)
+            for(TextureAtlas textureAtlas : textureAtlasMap.values()) {
+                Sprite s = textureAtlas.createSprite(textureName);
+                if(s != null)
+                    return s;
+            }
+
+        if(textureAtlasMap.containsKey(atlasName)) {
+            return textureAtlasMap.get(atlasName).createSprite(textureName);
+        }
+
+        return null;
+    }
+
+    public Sprite getRegionFromDefaultAtlas(String textureName) {
+        return getSpriteFromAtlas("pack.atlas", textureName);
+    }
+
+    public TextureAtlas.AtlasRegion getRegionFromAtlas(String atlasName, String textureName) {
+        if(atlasName == null)
+            for(TextureAtlas textureAtlas : textureAtlasMap.values()) {
+                TextureAtlas.AtlasRegion ar = textureAtlas.findRegion(textureName);
+                if(ar != null)
+                    return ar;
+            }
+
+        if(textureAtlasMap.containsKey(atlasName)) {
+            return textureAtlasMap.get(atlasName).findRegion(textureName);
+        }
+
+        return null;
+    }
+
+    public TextureAtlas getAtlas(String path) {
+        if(textureAtlasMap.containsKey(path)) {
+            return textureAtlasMap.get(path);
+        } else {
+            TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal("data/" + path));
+            textureAtlasMap.put(path, textureAtlas);
+            //textureAtlasDataMap.put(textureAtlas, textureAtlas.getTextureAtlasData());
+            return textureAtlas;
+        }
     }
 
     public Texture getTexture(String path) {
@@ -36,5 +92,7 @@ public class TextureManager {
         for(Texture texture : textureMap.values()) {
             texture.load(textureDataMap.get(texture));
         }
+
+        // todo: reload texture atlases
     }
 }

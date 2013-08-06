@@ -15,6 +15,7 @@ public class Cloud extends KinematicActor {
     TextureRegion leftTextureRegion;
     TextureRegion rightTextureRegion;
     TextureRegion stayTextureRegion;
+    TextureRegion textureRegion;
 
     final int FRAME_ROWS = 2;
     final int FRAME_COLS = 3;
@@ -22,9 +23,9 @@ public class Cloud extends KinematicActor {
     int direction;
 
     public Cloud() {
-        texture = TextureManager.getInstance().getTexture("cloud.png");
+        sprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("cloud");
 
-        TextureRegion[][] tmp = TextureRegion.split(texture, texture.getWidth() / FRAME_COLS, texture.getHeight() / FRAME_ROWS);
+        TextureRegion[][] tmp = sprite.split((int)sprite.getWidth() / FRAME_COLS, (int)sprite.getHeight() / FRAME_ROWS);
 
         leftTextureRegion = tmp[0][1];
         rightTextureRegion = tmp[0][2];
@@ -37,7 +38,6 @@ public class Cloud extends KinematicActor {
         }
         animation = new Animation(0.25f, animTextureRegion);
 
-        sprite = new Sprite(texture);
         offset.set(-100, -50);
         type = SimpleActor.TYPE.CLOUD;
         setBodyBox(200, 100);

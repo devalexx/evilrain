@@ -42,7 +42,7 @@ public class GameWorld extends Stage {
     private boolean wonGame;
     private Table table;
     private ShaderProgram shader;
-    private Texture dropTexture, backgroundTexture;
+    private Sprite dropTexture, backgroundTexture;
     private final Box2DDebugRenderer debugRenderer;
     private boolean debugRendererEnabled;
     private final SpriteBatch sbS;
@@ -106,9 +106,9 @@ public class GameWorld extends Stage {
                 System.out.println(shader.getLog());
         }
 
-        dropTexture = TextureManager.getInstance().getTexture("drop.png");
+        dropTexture = TextureManager.getInstance().getSpriteFromDefaultAtlas("drop");
         dropTextureRadius = lightVersion ? dropTexture.getWidth() * 2f : dropTexture.getWidth();
-        backgroundTexture = TextureManager.getInstance().getTexture("background.png");
+        backgroundTexture = TextureManager.getInstance().getSpriteFromDefaultAtlas("background");
 
         sbS = new SpriteBatch();
         sbS.setShader(shader);

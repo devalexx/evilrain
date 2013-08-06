@@ -20,18 +20,16 @@ import java.util.*;
 
 public class Ground extends SimpleActor {
     List<Vector2> vertices = new ArrayList<Vector2>();
-    ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     PolygonSprite poly;
     PolygonSpriteBatch polyBatch;
-    Texture textureSolid;
+    TextureRegion textureRegion;
 
     public Ground(World physicsWorld) {
         super();
         type = TYPE.GROUND;
 
-
-        textureSolid = TextureManager.getInstance().getTexture("grass.png");
+        textureRegion = TextureManager.getInstance().getRegionFromDefaultAtlas("grass");
         polyBatch = new PolygonSpriteBatch();
     }
 
@@ -42,7 +40,7 @@ public class Ground extends SimpleActor {
             verticesFloat[i*2] = vertices.get(i).x;
             verticesFloat[i*2+1] = vertices.get(i).y;
         }
-        PolygonRegion polyReg = new PolygonRegion(new TextureRegion(textureSolid), verticesFloat);
+        PolygonRegion polyReg = new PolygonRegion(textureRegion, verticesFloat);
         poly = new PolygonSprite(polyReg);
         poly.setOrigin(200, 200);
     }
