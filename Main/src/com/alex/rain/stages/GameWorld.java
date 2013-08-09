@@ -42,7 +42,7 @@ public class GameWorld extends Stage {
     private boolean wonGame;
     private Table table;
     private ShaderProgram shader;
-    private Sprite dropTexture, backgroundTexture;
+    private Sprite dropSprite, backgroundSprite;
     private final Box2DDebugRenderer debugRenderer;
     private boolean debugRendererEnabled;
     private final SpriteBatch sbS;
@@ -106,9 +106,9 @@ public class GameWorld extends Stage {
                 System.out.println(shader.getLog());
         }
 
-        dropTexture = TextureManager.getInstance().getSpriteFromDefaultAtlas("drop");
-        dropTextureRadius = lightVersion ? dropTexture.getWidth() * 2f : dropTexture.getWidth();
-        backgroundTexture = TextureManager.getInstance().getSpriteFromDefaultAtlas("background");
+        dropSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("drop");
+        dropTextureRadius = lightVersion ? dropSprite.getWidth() * 2f : dropSprite.getWidth();
+        backgroundSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("background");
 
         sbS = new SpriteBatch();
         sbS.setShader(shader);
@@ -359,7 +359,7 @@ public class GameWorld extends Stage {
     @Override
     public void draw() {
         getSpriteBatch().begin();
-            getSpriteBatch().draw(backgroundTexture, 0, 0);
+            getSpriteBatch().draw(backgroundSprite, 0, 0);
         getSpriteBatch().end();
 
         if(useShader) {
@@ -367,7 +367,7 @@ public class GameWorld extends Stage {
                 getSpriteBatch().begin();
                 Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
                 for (Drop drop : dropList) {
-                    getSpriteBatch().draw(dropTexture, drop.getPosition().x - dropTextureRadius / 2,
+                    getSpriteBatch().draw(dropSprite, drop.getPosition().x - dropTextureRadius / 2,
                             drop.getPosition().y - dropTextureRadius / 2, dropTextureRadius, dropTextureRadius);
                 }
                 getSpriteBatch().end();
