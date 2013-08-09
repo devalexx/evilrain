@@ -113,9 +113,14 @@ public class GameWorld extends Stage {
         sbS = new SpriteBatch();
         sbS.setShader(shader);
 
-        m_fbo = new FrameBuffer(Pixmap.Format.RGB565, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
-        m_fboRegion = new TextureRegion(m_fbo.getColorBufferTexture());
-        m_fboRegion.flip(false, true);
+        if(Gdx.graphics.isGL20Available()) {
+            m_fbo = new FrameBuffer(Pixmap.Format.RGB565, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+            m_fboRegion = new TextureRegion(m_fbo.getColorBufferTexture());
+            m_fboRegion.flip(false, true);
+        } else {
+            m_fbo = null;
+            m_fboRegion = null;
+        }
 
         debugRenderer = new Box2DDebugRenderer();
 
@@ -356,31 +361,52 @@ public class GameWorld extends Stage {
         return dropList.size();
     }
 
+    private void drawDrops() {
+        for (Drop drop : dropList) {
+            float offsetx = drop.getLinearVelocity().x / 50f;
+            if(offsetx > 10)
+                offsetx = 10;
+            float offsety = drop.getLinearVelocity().y / 50f;
+            if(offsety > 10)
+                offsety = 10;
+            getSpriteBatch().draw(dropSprite, drop.getPosition().x - offsetx - dropTextureRadius / 4,
+                    drop.getPosition().y - offsety - dropTextureRadius / 4, dropTextureRadius/2, dropTextureRadius/2);
+            getSpriteBatch().draw(dropSprite, drop.getPosition().x - dropTextureRadius / 2,
+                    drop.getPosition().y - dropTextureRadius / 2, dropTextureRadius, dropTextureRadius);
+            getSpriteBatch().draw(dropSprite, drop.getPosition().x + offsetx - dropTextureRadius / 4,
+                    drop.getPosition().y + offsety - dropTextureRadius / 4, dropTextureRadius/2, dropTextureRadius/2);
+        }
+    }
+
     @Override
     public void draw() {
+        getSpriteBatch().setProjectionMatrix(getCamera().projection);
         getSpriteBatch().begin();
             getSpriteBatch().draw(backgroundSprite, 0, 0);
         getSpriteBatch().end();
 
-        if(useShader) {
-            m_fbo.begin();
-                getSpriteBatch().begin();
-                Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-                for (Drop drop : dropList) {
-                    getSpriteBatch().draw(dropSprite, drop.getPosition().x - dropTextureRadius / 2,
-                            drop.getPosition().y - dropTextureRadius / 2, dropTextureRadius, dropTextureRadius);
-                }
-                getSpriteBatch().end();
-            m_fbo.end();
+        if(m_fbo != null) {
+            if(useShader) {
+                m_fbo.begin();
+                    getSpriteBatch().begin();
+                        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+                        drawDrops();
+                    getSpriteBatch().end();
+                m_fbo.end();
 
-            sbS.begin();
-                if(!lightVersion)
-                    shader.setUniformf("u_time", time);
-                sbS.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
-            sbS.end();
+                sbS.begin();
+                    if(!lightVersion)
+                        shader.setUniformf("u_time", time);
+                    sbS.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
+                sbS.end();
+            } else {
+                getSpriteBatch().begin();
+                    getSpriteBatch().draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
+                getSpriteBatch().end();
+            }
         } else {
             getSpriteBatch().begin();
-                getSpriteBatch().draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
+                drawDrops();
             getSpriteBatch().end();
         }
 
@@ -399,7 +425,7 @@ public class GameWorld extends Stage {
             getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
 
             getCamera().update();
-            debugRenderer.render(physicsWorld, getCamera().combined);
+            debugRenderer.render(physicsWorld, getCamera().projection);
 
             getCamera().viewportHeight = 480;
             getCamera().viewportWidth = 800;

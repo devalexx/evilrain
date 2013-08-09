@@ -37,7 +37,7 @@ public class LiquidHelper {
         this.dropList = dropList;
         dropListSize = dropList.size();
         RADIUS = lightVersion ? 40f : 30f;
-        IDEAL_RADIUS = lightVersion ? 500f : 500f;
+        IDEAL_RADIUS = lightVersion ? 400f : 300f;
         MULTIPLIER = IDEAL_RADIUS / RADIUS;
         IDEAL_RADIUS_SQ = IDEAL_RADIUS * IDEAL_RADIUS;
 

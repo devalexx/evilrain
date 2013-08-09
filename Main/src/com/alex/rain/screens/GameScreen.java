@@ -20,13 +20,16 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        camera.viewportHeight = 480;
+        /*camera.viewportHeight = 480;
         camera.viewportWidth = 800;
-        camera.position.set(camera.viewportWidth * .5f, camera.viewportHeight * .5f, 0f);
+        camera.position.set(0, 0, 0f);*/
     }
 
     @Override
-    public void resize(int i, int i2) {
+    public void resize(int width, int height) {
+        camera.viewportWidth = 800;
+        camera.viewportHeight = 480;
+        camera.position.set(0, -10, 0f);
     }
 
     @Override
