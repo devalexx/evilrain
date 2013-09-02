@@ -452,6 +452,8 @@ public class GameWorld extends Stage {
         getSpriteBatch().end();
 
         if(debugRendererEnabled) {
+            liquidHelper.drawDebug();
+
             getCamera().viewportHeight *= WORLD_TO_BOX;
             getCamera().viewportWidth *= WORLD_TO_BOX;
             getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
