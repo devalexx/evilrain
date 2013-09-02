@@ -79,6 +79,8 @@ public class GameWorld extends Stage {
     private final boolean lightVersion;
     private int dropsMax;
     private final float dropTextureRadius;
+    private final float dropTextureRadiusHalf;
+    private final float dropTextureRadiusQuarter;
     private boolean physicsEnabled = true;
     private boolean liquidForcesEnabled = true;
     private boolean useShader = true;
@@ -127,6 +129,8 @@ public class GameWorld extends Stage {
 
         dropSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("drop");
         dropTextureRadius = lightVersion ? dropSprite.getWidth() * 2f : dropSprite.getWidth();
+        dropTextureRadiusHalf = dropTextureRadius / 2;
+        dropTextureRadiusQuarter = dropTextureRadius / 4;
         backgroundSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("background");
 
         spriteBatchShadered = new SpriteBatch();
@@ -251,25 +255,21 @@ public class GameWorld extends Stage {
 
         final Label label = new Label(wonGame ? "Victory!" : "Menu", skin);
         table.add(label);
-        //label.setPosition(0, -100);
 
         table.row().width(400).padTop(10);
 
         final TextButton button = new TextButton("Next", skin);
         table.add(button);
-        //button.setPosition(0, -100);
 
         table.row().width(400).padTop(10);
 
         final TextButton button2 = new TextButton("Restart", skin);
         table.add(button2);
-        //button2.setPosition(0, 0);
 
         table.row().width(400).padTop(10);
 
         final TextButton button3 = new TextButton("Back to main menu", skin);
         table.add(button3);
-        //button3.setPosition(0, 100);
 
         button.addListener(new ChangeListener() {
             @Override
@@ -389,25 +389,27 @@ public class GameWorld extends Stage {
 
     private void drawDrops() {
         for (Drop drop : dropList) {
-            float offsetx = drop.getLinearVelocity().x / 50f;
+            Vector2 v = drop.getLinearVelocity();
+            Vector2 p = drop.getPosition();
+            float offsetx = v.x / 50f;
             if(offsetx > 10)
                 offsetx = 10;
-            float offsety = drop.getLinearVelocity().y / 50f;
+            float offsety = v.y / 50f;
             if(offsety > 10)
                 offsety = 10;
-            getSpriteBatch().draw(dropSprite, drop.getPosition().x - offsetx - dropTextureRadius / 4,
-                    drop.getPosition().y - offsety - dropTextureRadius / 4, dropTextureRadius/2, dropTextureRadius/2);
-            getSpriteBatch().draw(dropSprite, drop.getPosition().x - dropTextureRadius / 2,
-                    drop.getPosition().y - dropTextureRadius / 2, dropTextureRadius, dropTextureRadius);
-            getSpriteBatch().draw(dropSprite, drop.getPosition().x + offsetx - dropTextureRadius / 4,
-                    drop.getPosition().y + offsety - dropTextureRadius / 4, dropTextureRadius/2, dropTextureRadius/2);
+            if(!lightVersion)
+                getSpriteBatch().draw(dropSprite, p.x - offsetx - dropTextureRadiusQuarter,
+                        p.y - offsety - dropTextureRadiusQuarter, dropTextureRadiusHalf, dropTextureRadiusHalf);
+            getSpriteBatch().draw(dropSprite, p.x - dropTextureRadiusHalf,
+                    p.y - dropTextureRadiusHalf, dropTextureRadius, dropTextureRadius);
+            if(!lightVersion)
+                getSpriteBatch().draw(dropSprite, p.x + offsetx - dropTextureRadiusQuarter,
+                        p.y + offsety - dropTextureRadiusQuarter, dropTextureRadiusHalf, dropTextureRadiusHalf);
         }
     }
 
     @Override
     public void draw() {
-        if(table != null) table.invalidate();
-        Gdx.input.setInputProcessor(this);
         getCamera().viewportHeight = 480;
         getCamera().viewportWidth = 800;
         getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
