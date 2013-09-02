@@ -4,25 +4,44 @@ import com.alex.rain.RainGame;
 import com.alex.rain.helpers.LiquidHelper;
 import com.alex.rain.listeners.GameContactListener;
 import com.alex.rain.managers.TextureManager;
-import com.alex.rain.models.*;
-import com.alex.rain.screens.*;
-import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.*;
+import com.alex.rain.models.Cloud;
+import com.alex.rain.models.Drop;
+import com.alex.rain.models.Emitter;
+import com.alex.rain.models.SimpleActor;
+import com.alex.rain.screens.MainMenuScreen;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.glutils.*;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import org.luaj.vm2.*;
-import org.luaj.vm2.lib.jse.*;
+import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.script.LuaScriptEngine;
 
-import javax.script.*;
-import java.io.*;
-import java.util.*;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.ScriptEngine;
+import javax.script.SimpleBindings;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author: Alexander Shubenkov
@@ -45,7 +64,8 @@ public class GameWorld extends Stage {
     private Sprite dropSprite, backgroundSprite;
     private final Box2DDebugRenderer debugRenderer;
     private boolean debugRendererEnabled;
-    private final SpriteBatch sbS;
+    private final SpriteBatch spriteBatchShadered;
+    private final PolygonSpriteBatch polygonSpriteBatch;
     private final FrameBuffer m_fbo;
     private final TextureRegion m_fboRegion;
     private float time;
@@ -65,10 +85,9 @@ public class GameWorld extends Stage {
     private GameContactListener contactListener;
     public static final float WORLD_TO_BOX = 0.1f;
     public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
-
     public GameWorld(String name) {
         lightVersion = RainGame.isLightVersion();
-        dropsMax = lightVersion ? 100 : 1000;
+        dropsMax = lightVersion ? 1000 : 1000;
         liquidHelper = new LiquidHelper(dropList, lightVersion);
 
         String filename = "data/" + name + ".lua";
@@ -110,8 +129,10 @@ public class GameWorld extends Stage {
         dropTextureRadius = lightVersion ? dropSprite.getWidth() * 2f : dropSprite.getWidth();
         backgroundSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("background");
 
-        sbS = new SpriteBatch();
-        sbS.setShader(shader);
+        spriteBatchShadered = new SpriteBatch();
+        spriteBatchShadered.setShader(shader);
+
+        polygonSpriteBatch = new PolygonSpriteBatch();
 
         if(Gdx.graphics.isGL20Available()) {
             m_fbo = new FrameBuffer(Pixmap.Format.RGB565, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
@@ -147,7 +168,8 @@ public class GameWorld extends Stage {
     }
 
     public void addUI(Actor actor) {
-        addActor(actor);
+        addActor(actor); //
+        //actor.setVisible(false);
         uiActorList.add(actor);
     }
 
@@ -181,6 +203,7 @@ public class GameWorld extends Stage {
                 float offset = r.nextFloat() * cloud.getWidth() * 2/3;
                 add(drop);
                 drop.setPosition(new Vector2(cloud.getPosition().x - cloud.getWidth() / 3 + offset, cloud.getPosition().y));
+                drop.getBody().applyForceToCenter(new Vector2(0, -drop.getBody().getMass() * 20 / delta));
                 timeLastDrop = time;
             }
         }
@@ -201,6 +224,7 @@ public class GameWorld extends Stage {
     private void showWinnerMenu() {
         table = new Table();
         table.setFillParent(true);
+        table.debug();
         addUI(table);
 
         Skin skin = new Skin();
@@ -223,29 +247,29 @@ public class GameWorld extends Stage {
         labelStyle.font = skin.getFont("default");
         skin.add("default", labelStyle);
 
-        table.row().width(400).padTop(10);
+        table.row().width(100).padTop(10);
 
         final Label label = new Label(wonGame ? "Victory!" : "Menu", skin);
         table.add(label);
-        label.setPosition(0, -100);
+        //label.setPosition(0, -100);
 
         table.row().width(400).padTop(10);
 
         final TextButton button = new TextButton("Next", skin);
         table.add(button);
-        button.setPosition(0, -100);
+        //button.setPosition(0, -100);
 
         table.row().width(400).padTop(10);
 
         final TextButton button2 = new TextButton("Restart", skin);
         table.add(button2);
-        button2.setPosition(0, 0);
+        //button2.setPosition(0, 0);
 
         table.row().width(400).padTop(10);
 
         final TextButton button3 = new TextButton("Back to main menu", skin);
         table.add(button3);
-        button3.setPosition(0, 100);
+        //button3.setPosition(0, 100);
 
         button.addListener(new ChangeListener() {
             @Override
@@ -281,7 +305,9 @@ public class GameWorld extends Stage {
         Random r = new Random();
         int offset = r.nextInt(10) - 10;
         add(drop);
-        drop.setPosition(new Vector2(screenX + offset, Gdx.graphics.getHeight() - screenY + offset));
+        float x = screenX + offset;
+        float y = Gdx.graphics.getHeight() - screenY + offset;
+        drop.setPosition(new Vector2(x * 800f / Gdx.graphics.getWidth(), y * 480f / Gdx.graphics.getHeight()));
 
         return true;
     }
@@ -296,7 +322,7 @@ public class GameWorld extends Stage {
             liquidForcesEnabled = !liquidForcesEnabled;
         else if(keyCode == Input.Keys.F7 || keyCode == Input.Keys.S)
             useShader = !useShader;
-        else if(keyCode == Input.Keys.ESCAPE || keyCode == Input.Keys.Q)
+        else if(keyCode == Input.Keys.ESCAPE || keyCode == Input.Keys.Q || keyCode == Input.Keys.BACK)
             showWinnerMenu();
         else if(keyCode == Input.Keys.LEFT) {
             if(cloud != null) {
@@ -380,7 +406,14 @@ public class GameWorld extends Stage {
 
     @Override
     public void draw() {
-        getSpriteBatch().setProjectionMatrix(getCamera().projection);
+        if(table != null) table.invalidate();
+        Gdx.input.setInputProcessor(this);
+        getCamera().viewportHeight = 480;
+        getCamera().viewportWidth = 800;
+        getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
+        getCamera().update();
+        getSpriteBatch().setProjectionMatrix(getCamera().combined);
+        polygonSpriteBatch.setProjectionMatrix(getCamera().combined);
         getSpriteBatch().begin();
             getSpriteBatch().draw(backgroundSprite, 0, 0);
         getSpriteBatch().end();
@@ -394,14 +427,14 @@ public class GameWorld extends Stage {
                     getSpriteBatch().end();
                 m_fbo.end();
 
-                sbS.begin();
+                spriteBatchShadered.begin();
                     if(!lightVersion)
                         shader.setUniformf("u_time", time);
-                    sbS.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
-                sbS.end();
+                    spriteBatchShadered.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
+                spriteBatchShadered.end();
             } else {
                 getSpriteBatch().begin();
-                    getSpriteBatch().draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
+                    drawDrops();
                 getSpriteBatch().end();
             }
         } else {
@@ -410,31 +443,50 @@ public class GameWorld extends Stage {
             getSpriteBatch().end();
         }
 
-        getCamera().update();
         getSpriteBatch().begin();
+            if(table!=null)
+                table.setVisible(false);
             getRoot().draw(getSpriteBatch(), 1);
-            font.draw(getSpriteBatch(), "FPS: "+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
-            font.draw(getSpriteBatch(), "Drops: "+getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
-            if(winHint != null)
-                font.draw(getSpriteBatch(), "Hint: "+winHint, 10, Gdx.graphics.getHeight()-60);
+            if(table!=null)
+                table.setVisible(true);
         getSpriteBatch().end();
 
         if(debugRendererEnabled) {
             getCamera().viewportHeight *= WORLD_TO_BOX;
             getCamera().viewportWidth *= WORLD_TO_BOX;
             getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
-
             getCamera().update();
-            debugRenderer.render(physicsWorld, getCamera().projection);
+            //getSpriteBatch().setProjectionMatrix(getCamera().combined);
 
-            getCamera().viewportHeight = 480;
-            getCamera().viewportWidth = 800;
-            getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
-            getCamera().update();
+            debugRenderer.render(physicsWorld, getCamera().combined);
         }
+
+        getCamera().viewportHeight = Gdx.graphics.getHeight();
+        getCamera().viewportWidth = Gdx.graphics.getWidth();
+        getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
+        getCamera().update();
+        getSpriteBatch().setProjectionMatrix(getCamera().combined);
+
+        getSpriteBatch().begin();
+            if(table != null) {
+                table.setPosition(getRoot().getX(), getRoot().getY());
+                table.draw(getSpriteBatch(), 1f);
+            }
+            font.draw(getSpriteBatch(), "FPS: "+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
+            font.draw(getSpriteBatch(), "Drops: "+getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
+            if(winHint != null)
+                font.draw(getSpriteBatch(), "Hint: "+winHint, 10, Gdx.graphics.getHeight()-60);
+        getSpriteBatch().end();
+
+        if(debugRendererEnabled)
+            Table.drawDebug(this);
     }
 
     public void setWinHint(String winHint) {
         this.winHint = winHint;
+    }
+
+    public PolygonSpriteBatch getPolygonSpriteBatch() {
+        return polygonSpriteBatch;
     }
 }

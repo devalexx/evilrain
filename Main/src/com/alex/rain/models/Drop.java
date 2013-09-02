@@ -3,8 +3,6 @@ package com.alex.rain.models;
 import com.alex.rain.RainGame;
 import com.badlogic.gdx.physics.box2d.*;
 
-import java.net.URL;
-
 /**
  * @author: Alexander Shubenkov
  * @since: 29.05.13
@@ -33,8 +31,8 @@ public class Drop extends SimpleActor {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 1.0f;
-        fixtureDef.friction = 0.0f;
-        fixtureDef.restitution = 0.4f;
+        fixtureDef.friction = 0.1f;
+        fixtureDef.restitution = 0.0f;
         fixtureDef.filter.categoryBits = CATEGORY_ALL;
 
         Fixture fixture = body.createFixture(fixtureDef);

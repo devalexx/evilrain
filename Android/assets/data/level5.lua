@@ -19,16 +19,6 @@ function onCreate(world)
     dynamicActor:setPosition(luajava.newInstance(Vector2, 650, 300))
     table.insert(dynActorArray, dynamicActor)
 
-    for i = 0, 5 do
-        dynamicActorTmp = luajava.newInstance(Home)
-        dynamicActorTmp:setBodyBox(20, 50 + i * 10)
-        dynamicActorTmp:setSpriteBox(20, 50 + i * 10)
-        world:add(dynamicActorTmp)
-        dynamicActorTmp:setPosition(luajava.newInstance(Vector2, 150 + i * 50, 200))
-
-        table.insert(dynActorArray, dynamicActorTmp)
-    end
-
     emitterActor = luajava.newInstance(Emitter)
     world:add(emitterActor)
     emitterActor:setPosition(luajava.newInstance(Vector2, 300, 300))

@@ -2,9 +2,11 @@ package com.alex.rain;
 
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.screens.GameScreen;
-import com.alex.rain.screens.MainMenuScreen;
 import com.alex.rain.stages.GameWorld;
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
@@ -32,7 +34,7 @@ public class RainGame extends Game {
         lightVersion = Gdx.app.getType() != Application.ApplicationType.Desktop;
         TextureManager.getInstance().getAtlas("pack.atlas");
 
-        GameWorld gameWorld = new GameWorld("level1");
+        GameWorld gameWorld = new GameWorld("test");
         gameWorld.createWorld();
         stage = gameWorld;
         Gdx.input.setInputProcessor(stage);
@@ -86,5 +88,10 @@ public class RainGame extends Game {
     public void resume() {
         super.resume();
         TextureManager.getInstance().reload();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        stage.setViewport(width, height, false);
     }
 }

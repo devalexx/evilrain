@@ -66,31 +66,36 @@ public class LevelsMenu implements Screen {
 
         final TextButton button0 = new TextButton("Test", skin);
         table.add(button0);
-        button0.setPosition(0, -100);
 
         table.row().width(400).padTop(10);
 
         final TextButton button1 = new TextButton("Level 1", skin);
         table.add(button1);
-        button1.setPosition(0, -100);
 
         table.row().width(400).padTop(10);
 
         final TextButton button2 = new TextButton("Level 2", skin);
         table.add(button2);
-        button2.setPosition(0, 0);
 
         table.row().width(400).padTop(10);
 
         final TextButton button3 = new TextButton("Level 3", skin);
         table.add(button3);
-        button3.setPosition(0, 0);
 
         table.row().width(400).padTop(10);
 
-        final TextButton button4 = new TextButton("Back", skin);
+        final TextButton button4 = new TextButton("Level 4", skin);
         table.add(button4);
-        button4.setPosition(0, 100);
+
+        table.row().width(400).padTop(10);
+
+        final TextButton button5 = new TextButton("Level 5", skin);
+        table.add(button5);
+
+        table.row().width(400).padTop(10);
+
+        final TextButton buttonB = new TextButton("Back", skin);
+        table.add(buttonB);
 
         button0.addListener(new ChangeListener() {
             @Override
@@ -117,6 +122,18 @@ public class LevelsMenu implements Screen {
             }
         });
         button4.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                RainGame.getInstance().setLevel("level4");
+            }
+        });
+        button5.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                RainGame.getInstance().setLevel("level5");
+            }
+        });
+        buttonB.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 RainGame.getInstance().setScreen(new MainMenuScreen());

@@ -1,8 +1,10 @@
 package com.alex.rain.models;
 
 import com.alex.rain.managers.TextureManager;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 
 /**
  * @author: Alexander Shubenkov
@@ -24,7 +26,7 @@ public class Home extends DynamicActor {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
-        fixtureDef.density = 10;
+        fixtureDef.density = 3;
         fixtureDef.friction = 10.4f;
 
         BodyDef bodyDef = new BodyDef();

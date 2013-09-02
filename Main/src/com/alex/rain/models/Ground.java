@@ -3,15 +3,15 @@ package com.alex.rain.models;
 import com.alex.rain.helpers.Box2DSeparatorHelper;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.stages.GameWorld;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author: Alexander Shubenkov
@@ -25,7 +25,7 @@ public class Ground extends SimpleActor {
     PolygonSpriteBatch polyBatch;
     TextureRegion textureRegion;
 
-    public Ground(World physicsWorld) {
+    public Ground() {
         super();
         type = TYPE.GROUND;
 
@@ -86,8 +86,9 @@ public class Ground extends SimpleActor {
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
         batch.end();
+        polyBatch.setProjectionMatrix(batch.getProjectionMatrix());
         polyBatch.begin();
-        poly.draw(polyBatch);
+            poly.draw(polyBatch);
         polyBatch.end();
         batch.begin();
     }

@@ -20,7 +20,9 @@ public class Emitter extends KinematicActor {
     @Override
     public void createPhysicsActor(World physicsWorld) {
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(getWidth() / 2, getHeight() / 2);
+        polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 2);
+        offset.set(-getWidth() / 2, -getHeight() / 2);
+        sprite.setOrigin(getWidth() / 2, getHeight() / 2);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;

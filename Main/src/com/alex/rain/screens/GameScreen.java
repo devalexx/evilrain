@@ -1,9 +1,8 @@
 package com.alex.rain.screens;
 
 import com.alex.rain.stages.GameWorld;
-import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 
 /**
  * @author: Alexander Shubenkov
@@ -27,9 +26,10 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.viewportWidth = 800;
+        /*camera.viewportWidth = 800;
         camera.viewportHeight = 480;
-        camera.position.set(0, -10, 0f);
+        camera.position.set(0, -10, 0f);*/
+        //world.getSpriteBatch().setProjectionMatrix(camera.projection);
     }
 
     @Override
