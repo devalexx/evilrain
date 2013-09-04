@@ -9,6 +9,7 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/Desktop/libs/gdx-backend-lwjgl-natives.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/Main/libs/gdx.jar" path-in-jar="/" />
       <element id="dir-copy" path="$PROJECT_DIR$/Android/assets" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Main/libs/luaj-jse-3.0-beta1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
