@@ -398,16 +398,17 @@ public class GameWorld extends Stage {
             if(offsety > 10)
                 offsety = 10;
             if(!lightVersion)
-                getSpriteBatch().draw(dropSprite, p.x - offsetx - dropTextureRadiusQuarter,
+                sb.draw(dropSprite, p.x - offsetx - dropTextureRadiusQuarter,
                         p.y - offsety - dropTextureRadiusQuarter, dropTextureRadiusHalf, dropTextureRadiusHalf);
-            getSpriteBatch().draw(dropSprite, p.x - dropTextureRadiusHalf,
+            sb.draw(dropSprite, p.x - dropTextureRadiusHalf,
                     p.y - dropTextureRadiusHalf, dropTextureRadius, dropTextureRadius);
             if(!lightVersion)
-                getSpriteBatch().draw(dropSprite, p.x + offsetx - dropTextureRadiusQuarter,
+                sb.draw(dropSprite, p.x + offsetx - dropTextureRadiusQuarter,
                         p.y + offsety - dropTextureRadiusQuarter, dropTextureRadiusHalf, dropTextureRadiusHalf);
         }
     }
 
+    public SpriteBatch sb = new SpriteBatch(175);
     @Override
     public void draw() {
         getCamera().viewportHeight = 480;
@@ -423,10 +424,10 @@ public class GameWorld extends Stage {
         if(m_fbo != null) {
             if(useShader) {
                 m_fbo.begin();
-                    getSpriteBatch().begin();
+                    sb.begin();
                         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
                         drawDrops();
-                    getSpriteBatch().end();
+                    sb.end();
                 m_fbo.end();
 
                 spriteBatchShadered.begin();
