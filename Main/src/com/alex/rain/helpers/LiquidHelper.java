@@ -18,15 +18,19 @@ public class LiquidHelper {
     private final float fluidMinY = 0f;
     private final float fluidMaxY = 480f;
     private final int hashWidthCount = 30, hashHeightCount = 20;
-    private final ArrayList<Integer>[][] hash = new ArrayList[hashWidthCount][hashHeightCount];
+    private final float hashWidthCountE = hashWidthCount - 0.001f, hashHeightCountE = hashHeightCount - 0.001f;
+    private final float hashColWidth = hashWidthCountE / fluidMaxX, hashColHeight = hashHeightCountE / fluidMaxY;
+    private final int [][][] hash;
+    private final int [][] hashSize;
+    private final int MAX_NUMBER = 500;
     private final float VISCOSITY = 0.004f;
     private final float RADIUS;
     private final float IDEAL_RADIUS;
     private final float IDEAL_RADIUS_SQ;
     private final float MULTIPLIER;
     private final float EPSILON = 0.001f;
-    private final int[] neighbors = new int[1000];
-    private final float[] vlen = new float[1000];
+    private final int[] neighbors = new int[MAX_NUMBER];
+    private final float[] vlen = new float[MAX_NUMBER];
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     private float[] xchange;
@@ -36,6 +40,7 @@ public class LiquidHelper {
     private float[] vxs;
     private float[] vys;
 
+    float cellWidth, cellHeight;
     public LiquidHelper(ArrayList<Drop> dropList, boolean lightVersion) {
         this.dropList = dropList;
         dropListSize = dropList.size();
@@ -44,35 +49,30 @@ public class LiquidHelper {
         MULTIPLIER = IDEAL_RADIUS / RADIUS;
         IDEAL_RADIUS_SQ = IDEAL_RADIUS * IDEAL_RADIUS;
 
-        for (int i = 0; i < hashWidthCount; ++i) {
+        cellWidth = fluidMaxX / hashWidthCount;
+        cellHeight = fluidMaxY / hashHeightCount;
+        hash = new int[hashWidthCount][hashHeightCount][MAX_NUMBER];
+        hashSize = new int[hashWidthCount][hashHeightCount];
+        /*for (int i = 0; i < hashWidthCount; ++i) {
             for (int j = 0; j < hashHeightCount; ++j) {
                 hash[i][j] = new ArrayList<Integer>();
             }
-        }
+        }*/
         createRequiredData();
     }
 
-    public final static float map(final float val, final float fromMin, final float fromMax,
-                final float toMin, final float toMax) {
-        final float mult = (val - fromMin) / (fromMax - fromMin);
-        final float res = toMin + mult * (toMax - toMin);
-        return res;
-    }
-
     private int hashX(float x) {
-        float f = map(x, fluidMinX, fluidMaxX, 0, hashWidthCount - .001f);
-        return (int) f;
+        return (int)(x * hashColWidth);
     }
 
     private int hashY(float y) {
-        float f = map(y, fluidMinY, fluidMaxY, 0, hashHeightCount - .001f);
-        return (int) f;
+        return (int)(y * hashColHeight);
     }
 
     private void hashLocations() {
         for (int a = 0; a < hashWidthCount; a++) {
             for (int b = 0; b < hashHeightCount; b++) {
-                hash[a][b].clear();
+                hashSize[a][b] = 0;
             }
         }
 
@@ -80,7 +80,7 @@ public class LiquidHelper {
             int hcell = hashX(dropList.get(a).getPosition().x);
             int vcell = hashY(dropList.get(a).getPosition().y);
             if (hcell > -1 && hcell < hashWidthCount && vcell > -1 && vcell < hashHeightCount)
-                hash[hcell][vcell].add(new Integer(a));
+                hash[hcell][vcell][hashSize[hcell][vcell]++] = a;
         }
     }
 
@@ -119,9 +119,9 @@ public class LiquidHelper {
                 int xc = hcell + nx;
                 for (int ny = -1; ny < 2; ny++) {
                     int yc = vcell + ny;
-                    if (xc > -1 && xc < hashWidthCount && yc > -1 && yc < hashHeightCount && hash[xc][yc].size() > 0) {
-                        for (int a = 0; a < hash[xc][yc].size(); a++) {
-                            int ne = hash[xc][yc].get(a);
+                    if (xc > -1 && xc < hashWidthCount && yc > -1 && yc < hashHeightCount && hashSize[xc][yc] > 0) {
+                        for (int a = 0; a < hashSize[xc][yc]; a++) {
+                            int ne = hash[xc][yc][a];
                             if (ne != i)
                                 neighbors[neighborsSize++] = ne;
                         }
