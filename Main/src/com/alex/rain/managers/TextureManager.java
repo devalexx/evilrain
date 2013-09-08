@@ -3,6 +3,7 @@ package com.alex.rain.managers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.FileTextureData;
 
 import java.util.*;
 
@@ -72,7 +73,15 @@ public class TextureManager {
         } else {
             TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal("data/" + path));
             textureAtlasMap.put(path, textureAtlas);
-            //textureAtlasDataMap.put(textureAtlas, textureAtlas.getTextureAtlasData());
+            for(Texture texture : textureAtlas.getTextures()) {
+                String name = "" + texture;
+                if(texture.getTextureData() instanceof FileTextureData)
+                    name = ((FileTextureData)texture.getTextureData()).getFileHandle().name();
+
+                textureMap.put(name, texture);
+                textureDataMap.put(texture, texture.getTextureData());
+            }
+
             return textureAtlas;
         }
     }
@@ -92,7 +101,5 @@ public class TextureManager {
         for(Texture texture : textureMap.values()) {
             texture.load(textureDataMap.get(texture));
         }
-
-        // todo: reload texture atlases
     }
 }
