@@ -31,9 +31,23 @@ home1
   orig: 32, 100
   offset: 0, 0
   index: -1
-emitter
+arrow
   rotate: false
   xy: 933, 933
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+button
+  rotate: false
+  xy: 837, 803
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+emitter
+  rotate: false
+  xy: 933, 867
   size: 64, 64
   orig: 64, 64
   offset: 0, 0

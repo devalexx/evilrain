@@ -26,8 +26,8 @@ public class Home extends DynamicActor {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
-        fixtureDef.density = 3;
-        fixtureDef.friction = 10.4f;
+        fixtureDef.density = 2;
+        fixtureDef.friction = 1f;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;

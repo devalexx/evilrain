@@ -92,6 +92,7 @@ public class RainGame extends Game {
 
     @Override
     public void resize(int width, int height) {
-        stage.setViewport(width, height, false);
+        if(stage != null)
+            stage.setViewport(width, height, false);
     }
 }

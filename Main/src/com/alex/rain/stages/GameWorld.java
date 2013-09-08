@@ -22,12 +22,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -59,7 +59,7 @@ public class GameWorld extends Stage {
     private LuaFunction luaOnBeginContactFunc;
     private LuaFunction luaOnEndContactFunc;
     private boolean wonGame;
-    private Table table;
+    private Table table, tableControl;
     private ShaderProgram shader;
     private Sprite dropSprite, backgroundSprite;
     private final Box2DDebugRenderer debugRenderer;
@@ -87,6 +87,8 @@ public class GameWorld extends Stage {
     private GameContactListener contactListener;
     public static final float WORLD_TO_BOX = 0.1f;
     public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
+    private Skin skin = new Skin();
+
     public GameWorld(String name) {
         lightVersion = RainGame.isLightVersion();
         dropsMax = lightVersion ? 1000 : 1000;
@@ -102,6 +104,8 @@ public class GameWorld extends Stage {
 
         try {
             //Reader reader = new FileReader(filename);
+            if(!Gdx.files.internal(filename).exists())
+                filename = "data/test.lua";
             Reader reader = new StringReader(
                     Gdx.files.internal(filenameMain).readString() + Gdx.files.internal(filename).readString());
             cs = ((Compilable)engine).compile(reader);
@@ -151,6 +155,110 @@ public class GameWorld extends Stage {
 
         contactListener = new GameContactListener(luaOnBeginContactFunc, luaOnEndContactFunc);
         physicsWorld.setContactListener(contactListener);
+
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        skin.add("white", new Texture(pixmap));
+
+        skin.add("default", new BitmapFont());
+
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
+        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
+        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
+        textButtonStyle.font = skin.getFont("default");
+        skin.add("default", textButtonStyle);
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = skin.getFont("default");
+        skin.add("default", labelStyle);
+    }
+
+    private void createControls() {
+        tableControl = new Table();
+        tableControl.setFillParent(true);
+        tableControl.debug();
+        addUI(tableControl);
+        Sprite arrowLeftSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("arrow");
+        Sprite arrowDownSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("arrow");
+        Sprite arrowRightSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("arrow");
+        arrowLeftSprite.setRotation(90);
+        arrowDownSprite.setRotation(180);
+        arrowRightSprite.setRotation(-90);
+        ImageButton arrowUpButton = new ImageButton(new SpriteDrawable(TextureManager.getInstance().getSpriteFromDefaultAtlas("arrow")));
+        ImageButton arrowDownButton = new ImageButton(new SpriteDrawable(arrowDownSprite));
+        ImageButton arrowLeftButton = new ImageButton(new SpriteDrawable(arrowLeftSprite));
+        ImageButton arrowRightButton = new ImageButton(new SpriteDrawable(arrowRightSprite));
+        ImageButton actionButton = new ImageButton(new SpriteDrawable(TextureManager.getInstance().getSpriteFromDefaultAtlas("button")));
+        tableControl.left();
+        tableControl.bottom();
+        tableControl.add(arrowUpButton).colspan(3);
+        tableControl.row();
+        tableControl.add(arrowLeftButton);
+        tableControl.add(arrowDownButton);
+        tableControl.add(arrowRightButton);
+        tableControl.add(actionButton);
+        arrowLeftButton.addListener(new ClickListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                handleAction(Input.Keys.LEFT, false);
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                handleAction(Input.Keys.LEFT, true);
+                return true;
+            }
+        });
+        arrowRightButton.addListener(new ClickListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                handleAction(Input.Keys.RIGHT, false);
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                handleAction(Input.Keys.RIGHT, true);
+                return true;
+            }
+        });
+        arrowUpButton.addListener(new ClickListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                handleAction(Input.Keys.UP, false);
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                handleAction(Input.Keys.UP, true);
+                return true;
+            }
+        });
+        arrowDownButton.addListener(new ClickListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                handleAction(Input.Keys.DOWN, false);
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                handleAction(Input.Keys.DOWN, true);
+                return true;
+            }
+        });
+        actionButton.addListener(new ClickListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                handleAction(Input.Keys.SPACE, false);
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                handleAction(Input.Keys.SPACE, true);
+                return true;
+            }
+        });
     }
 
     public void add(SimpleActor actor) {
@@ -169,11 +277,15 @@ public class GameWorld extends Stage {
         } else {
             addActor(actor);
         }
+
+        if((cloud != null || emitter != null) && lightVersion)
+            createControls();
+        if(tableControl != null)
+            tableControl.toFront();
     }
 
     public void addUI(Actor actor) {
-        addActor(actor); //
-        //actor.setVisible(false);
+        addActor(actor);
         uiActorList.add(actor);
     }
 
@@ -201,7 +313,7 @@ public class GameWorld extends Stage {
         }
 
         if(itRain && !wonGame && cloud != null && dropList.size() < dropsMax) {
-            if(time - timeLastDrop > (lightVersion ? 0.5 : 0.05)) {
+            if(time - timeLastDrop > (lightVersion ? 0.09 : 0.05)) {
                 Drop drop = new Drop();
                 Random r = new Random();
                 float offset = r.nextFloat() * cloud.getWidth() * 2/3;
@@ -213,43 +325,26 @@ public class GameWorld extends Stage {
         }
 
         if(itRain && !wonGame && emitter != null && dropList.size() < dropsMax) {
-            if(time - timeLastDrop > (lightVersion ? 0.5 : 0.05)) {
+            if(time - timeLastDrop > (lightVersion ? 0.09 : 0.05)) {
                 Drop drop = new Drop();
                 Random r = new Random();
                 float offset = r.nextFloat() * emitter.getWidth() * 2/3;
                 add(drop);
                 drop.setPosition(new Vector2(emitter.getPosition().x - emitter.getWidth() / 3 + offset, emitter.getPosition().y));
-                drop.getBody().applyForceToCenter(new Vector2(drop.getBody().getMass() * 20 / delta, 0));
+                drop.getBody().applyForceToCenter(new Vector2(drop.getBody().getMass() * 30 / delta, 0));
                 timeLastDrop = time;
             }
         }
     }
 
     private void showWinnerMenu() {
+        if(table != null)
+            return;
+
         table = new Table();
         table.setFillParent(true);
         table.debug();
         addUI(table);
-
-        Skin skin = new Skin();
-
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.WHITE);
-        pixmap.fill();
-        skin.add("white", new Texture(pixmap));
-
-        skin.add("default", new BitmapFont());
-
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
-        textButtonStyle.font = skin.getFont("default");
-        skin.add("default", textButtonStyle);
-
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
-        labelStyle.font = skin.getFont("default");
-        skin.add("default", labelStyle);
 
         table.row().width(100).padTop(10);
 
@@ -309,7 +404,7 @@ public class GameWorld extends Stage {
         float y = Gdx.graphics.getHeight() - screenY + offset;
         drop.setPosition(new Vector2(x * 800f / Gdx.graphics.getWidth(), y * 480f / Gdx.graphics.getHeight()));
 
-        return true;
+        return false;
     }
 
     @Override
@@ -322,65 +417,74 @@ public class GameWorld extends Stage {
             liquidForcesEnabled = !liquidForcesEnabled;
         else if(keyCode == Input.Keys.F7 || keyCode == Input.Keys.S)
             useShader = !useShader;
-        else if(keyCode == Input.Keys.ESCAPE || keyCode == Input.Keys.Q || keyCode == Input.Keys.BACK)
+        else if(keyCode == Input.Keys.ESCAPE || keyCode == Input.Keys.Q || keyCode == Input.Keys.BACK) {
+            if(table != null)
+                RainGame.getInstance().setMenu(new MainMenuScreen());
             showWinnerMenu();
-        else if(keyCode == Input.Keys.LEFT) {
-            if(cloud != null) {
-                cloud.setLinearVelocity(new Vector2(-20, 0));
-                cloud.setDirection(1);
-            }
-        } else if(keyCode == Input.Keys.RIGHT) {
-            if(cloud != null) {
-                cloud.setLinearVelocity(new Vector2(20, 0));
-                cloud.setDirection(2);
-            }
-        } else if(keyCode == Input.Keys.UP) {
-            if(emitter != null) {
-                emitter.setLinearVelocity(new Vector2(0, 20));
-            }
+        } else if(keyCode == Input.Keys.LEFT || keyCode == Input.Keys.RIGHT || keyCode == Input.Keys.UP ||
+                keyCode == Input.Keys.DOWN || keyCode == Input.Keys.SPACE)
+            handleAction(keyCode, true);
 
-        } else if(keyCode == Input.Keys.DOWN) {
-            if(emitter != null) {
-                emitter.setLinearVelocity(new Vector2(0, -20));
-            }
-        } else if(keyCode == Input.Keys.SPACE) {
-            itRain = true;
-            if(cloud != null) {
-                cloud.setDirection(-1);
-            }
-        }
-
-        return true;
+        return false;
     }
 
     @Override
     public boolean keyUp(int keyCode) {
+        if(keyCode == Input.Keys.LEFT || keyCode == Input.Keys.RIGHT || keyCode == Input.Keys.UP ||
+                keyCode == Input.Keys.DOWN || keyCode == Input.Keys.SPACE)
+            handleAction(keyCode, false);
+
+        return true;
+    }
+
+    private void handleAction(int keyCode, boolean pressed) {
         if(keyCode == Input.Keys.LEFT) {
             if(cloud != null) {
-                cloud.setLinearVelocity(new Vector2(0, 0));
-                cloud.setDirection(0);
+                if(pressed) {
+                    cloud.setLinearVelocity(new Vector2(-20, 0));
+                    cloud.setDirection(1);
+                } else {
+                    cloud.setLinearVelocity(new Vector2(0, 0));
+                    cloud.setDirection(0);
+                }
             }
         } else if(keyCode == Input.Keys.RIGHT) {
             if(cloud != null) {
-                cloud.setLinearVelocity(new Vector2(0, 0));
-                cloud.setDirection(0);
+                if(pressed) {
+                    cloud.setLinearVelocity(new Vector2(20, 0));
+                    cloud.setDirection(2);
+                } else {
+                    cloud.setLinearVelocity(new Vector2(0, 0));
+                    cloud.setDirection(0);
+                }
             }
         } else if(keyCode == Input.Keys.UP) {
             if(emitter != null) {
-                emitter.setLinearVelocity(new Vector2(0, 0));
+                if(pressed)
+                    emitter.setLinearVelocity(new Vector2(0, 20));
+                else
+                    emitter.setLinearVelocity(new Vector2(0, 0));
             }
         } else if(keyCode == Input.Keys.DOWN) {
             if(emitter != null) {
-                emitter.setLinearVelocity(new Vector2(0, 0));
+                if(pressed)
+                    emitter.setLinearVelocity(new Vector2(0, -20));
+                else
+                    emitter.setLinearVelocity(new Vector2(0, 0));
             }
         } else if(keyCode == Input.Keys.SPACE) {
-            itRain = false;
-            if(cloud != null) {
-                cloud.setDirection(0);
+            if(pressed) {
+                itRain = true;
+                if(cloud != null) {
+                    cloud.setDirection(-1);
+                }
+            } else {
+                itRain = false;
+                if(cloud != null) {
+                    cloud.setDirection(0);
+                }
             }
         }
-
-        return true;
     }
 
     public int getDropsNumber() {
@@ -417,33 +521,28 @@ public class GameWorld extends Stage {
         getCamera().update();
         getSpriteBatch().setProjectionMatrix(getCamera().combined);
         polygonSpriteBatch.setProjectionMatrix(getCamera().combined);
+        sb.setProjectionMatrix(getCamera().combined);
         getSpriteBatch().begin();
             getSpriteBatch().draw(backgroundSprite, 0, 0);
         getSpriteBatch().end();
 
-        if(m_fbo != null) {
-            if(useShader) {
-                m_fbo.begin();
-                    sb.begin();
-                        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-                        drawDrops();
-                    sb.end();
-                m_fbo.end();
-
-                spriteBatchShadered.begin();
-                    if(!lightVersion)
-                        shader.setUniformf("u_time", time);
-                    spriteBatchShadered.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
-                spriteBatchShadered.end();
-            } else {
-                getSpriteBatch().begin();
+        if(m_fbo != null && useShader) {
+            m_fbo.begin();
+                sb.begin();
+                    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
                     drawDrops();
-                getSpriteBatch().end();
-            }
+                sb.end();
+            m_fbo.end();
+
+            spriteBatchShadered.begin();
+                if(!lightVersion)
+                    shader.setUniformf("u_time", time);
+                spriteBatchShadered.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
+            spriteBatchShadered.end();
         } else {
-            getSpriteBatch().begin();
+            sb.begin();
                 drawDrops();
-            getSpriteBatch().end();
+            sb.end();
         }
 
         getSpriteBatch().begin();
