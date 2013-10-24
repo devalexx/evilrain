@@ -17,7 +17,7 @@ import com.alex.rain.helpers.Box2DSeparatorHelper;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -48,12 +48,9 @@ public class Ground extends SimpleActor {
             verticesFloat[i*2] = vertices.get(i).x;
             verticesFloat[i*2+1] = vertices.get(i).y;
         }
-        PolygonRegion polyReg = new PolygonRegion(textureRegion, verticesFloat);
-        // TODO: fix it (wrong texture coordinates)
-        for(int i = 0; i < polyReg.getTextureCoords().length / 2; i++) {
-            polyReg.getTextureCoords()[i*2] *= 0.469;
-            polyReg.getTextureCoords()[i*2+1] *= 0.341;
-        }
+
+        PolygonRegion polyReg = new PolygonRegion(textureRegion, verticesFloat,
+                new EarClippingTriangulator().computeTriangles(verticesFloat).toArray());
 
         poly = new PolygonSprite(polyReg);
         poly.setOrigin(200, 200);

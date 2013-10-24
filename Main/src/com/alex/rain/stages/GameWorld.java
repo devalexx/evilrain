@@ -327,7 +327,7 @@ public class GameWorld extends Stage {
                 float offset = r.nextFloat() * cloud.getWidth() * 2/3;
                 add(drop);
                 drop.setPosition(new Vector2(cloud.getPosition().x - cloud.getWidth() / 3 + offset, cloud.getPosition().y));
-                drop.getBody().applyForceToCenter(new Vector2(0, -drop.getBody().getMass() * 20 / delta));
+                drop.getBody().applyForceToCenter(new Vector2(0, -drop.getBody().getMass() * 20 / delta), true);
                 timeLastDrop = time;
             }
         }
@@ -339,7 +339,7 @@ public class GameWorld extends Stage {
                 float offset = r.nextFloat() * emitter.getWidth() * 2/3;
                 add(drop);
                 drop.setPosition(new Vector2(emitter.getPosition().x - emitter.getWidth() / 3 + offset, emitter.getPosition().y));
-                drop.getBody().applyForceToCenter(new Vector2(drop.getBody().getMass() * 30 / delta, 0));
+                drop.getBody().applyForceToCenter(new Vector2(drop.getBody().getMass() * 30 / delta, 0), true);
                 timeLastDrop = time;
             }
         }

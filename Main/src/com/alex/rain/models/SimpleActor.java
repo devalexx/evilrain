@@ -87,11 +87,11 @@ public abstract class SimpleActor extends Actor {
     }
 
     public void applyForceToCenter(Vector2 vec) {
-        body.applyForceToCenter(vec);
+        body.applyForceToCenter(vec, true);
     }
 
     public void applyLinearImpulse(Vector2 pos, Vector2 point) {
-        body.applyLinearImpulse(pos, point);
+        body.applyLinearImpulse(pos, point, true);
     }
 
     public Body getBody() {
