@@ -24,10 +24,7 @@ import com.alex.rain.models.SimpleActor;
 import com.alex.rain.screens.MainMenuScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -76,6 +73,8 @@ public class GameWorld extends Stage {
     private final PolygonSpriteBatch polygonSpriteBatch;
     private final FrameBuffer m_fbo;
     private final TextureRegion m_fboRegion;
+    private final SpriteBatch sb;
+    private final Camera cam;
     private float time;
     private float timeLastDrop;
     private boolean itRain;
@@ -147,6 +146,9 @@ public class GameWorld extends Stage {
 
         spriteBatchShadered = new SpriteBatch();
         spriteBatchShadered.setShader(shader);
+
+        sb = getSpriteBatch();
+        cam = getCamera();
 
         polygonSpriteBatch = new PolygonSpriteBatch();
 
@@ -500,7 +502,8 @@ public class GameWorld extends Stage {
     }
 
     private void drawDrops() {
-        for (Drop drop : dropList) {
+        for(int i = 0, dropListSize = dropList.size(); i < dropListSize; i++) {
+            Drop drop = dropList.get(i);
             Vector2 v = drop.getLinearVelocity();
             Vector2 p = drop.getPosition();
             float offsetx = v.x / 50f;
@@ -520,19 +523,18 @@ public class GameWorld extends Stage {
         }
     }
 
-    public SpriteBatch sb = new SpriteBatch(175);
     @Override
     public void draw() {
-        getCamera().viewportHeight = 480;
-        getCamera().viewportWidth = 800;
-        getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
-        getCamera().update();
-        getSpriteBatch().setProjectionMatrix(getCamera().combined);
-        polygonSpriteBatch.setProjectionMatrix(getCamera().combined);
-        sb.setProjectionMatrix(getCamera().combined);
-        getSpriteBatch().begin();
-            getSpriteBatch().draw(backgroundSprite, 0, 0);
-        getSpriteBatch().end();
+        cam.viewportHeight = 480;
+        cam.viewportWidth = 800;
+        cam.position.set(cam.viewportWidth * .5f, cam.viewportHeight * .5f, 0f);
+        cam.update();
+        sb.setProjectionMatrix(cam.combined);
+        polygonSpriteBatch.setProjectionMatrix(cam.combined);
+        sb.setProjectionMatrix(cam.combined);
+        sb.begin();
+            sb.draw(backgroundSprite, 0, 0);
+        sb.end();
 
         if(m_fbo != null && useShader) {
             m_fbo.begin();
@@ -553,42 +555,42 @@ public class GameWorld extends Stage {
             sb.end();
         }
 
-        getSpriteBatch().begin();
+        sb.begin();
             if(table!=null)
                 table.setVisible(false);
-            getRoot().draw(getSpriteBatch(), 1);
+            getRoot().draw(sb, 1);
             if(table!=null)
                 table.setVisible(true);
-        getSpriteBatch().end();
+        sb.end();
 
         if(debugRendererEnabled) {
             liquidHelper.drawDebug();
 
-            getCamera().viewportHeight *= WORLD_TO_BOX;
-            getCamera().viewportWidth *= WORLD_TO_BOX;
-            getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
-            getCamera().update();
-            //getSpriteBatch().setProjectionMatrix(getCamera().combined);
+            cam.viewportHeight *= WORLD_TO_BOX;
+            cam.viewportWidth *= WORLD_TO_BOX;
+            cam.position.set(cam.viewportWidth * .5f, cam.viewportHeight * .5f, 0f);
+            cam.update();
+            //sb.setProjectionMatrix(cam.combined);
 
-            debugRenderer.render(physicsWorld, getCamera().combined);
+            debugRenderer.render(physicsWorld, cam.combined);
         }
 
-        getCamera().viewportHeight = Gdx.graphics.getHeight();
-        getCamera().viewportWidth = Gdx.graphics.getWidth();
-        getCamera().position.set(getCamera().viewportWidth * .5f, getCamera().viewportHeight * .5f, 0f);
-        getCamera().update();
-        getSpriteBatch().setProjectionMatrix(getCamera().combined);
+        cam.viewportHeight = Gdx.graphics.getHeight();
+        cam.viewportWidth = Gdx.graphics.getWidth();
+        cam.position.set(cam.viewportWidth * .5f, cam.viewportHeight * .5f, 0f);
+        cam.update();
+        sb.setProjectionMatrix(cam.combined);
 
-        getSpriteBatch().begin();
+        sb.begin();
             if(table != null) {
                 table.setPosition(getRoot().getX(), getRoot().getY());
-                table.draw(getSpriteBatch(), 1f);
+                table.draw(sb, 1f);
             }
-            font.draw(getSpriteBatch(), "FPS: "+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
-            font.draw(getSpriteBatch(), "Drops: "+getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
+            font.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
+            font.draw(sb, "Drops: "+getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
             if(winHint != null)
-                font.draw(getSpriteBatch(), "Hint: "+winHint, 10, Gdx.graphics.getHeight()-60);
-        getSpriteBatch().end();
+                font.draw(sb, "Hint: "+winHint, 10, Gdx.graphics.getHeight()-60);
+        sb.end();
 
         if(debugRendererEnabled)
             Table.drawDebug(this);

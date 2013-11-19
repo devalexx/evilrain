@@ -73,7 +73,7 @@ public class Ground extends SimpleActor {
         fixtureDef.restitution = 0.6f;*/
 
         for(Vector2 v : vertices)
-            v.mul(GameWorld.WORLD_TO_BOX);
+            v.scl(GameWorld.WORLD_TO_BOX);
 
         Box2DSeparatorHelper separatorHelper = new Box2DSeparatorHelper();
         separatorHelper.Separate(body, fixtureDef, vertices, 30);
@@ -81,7 +81,7 @@ public class Ground extends SimpleActor {
         polygonShape.dispose();
 
         for(Vector2 v : vertices)
-            v.mul(GameWorld.BOX_TO_WORLD);
+            v.scl(GameWorld.BOX_TO_WORLD);
     }
 
     public void addVertex(float x, float y) {
