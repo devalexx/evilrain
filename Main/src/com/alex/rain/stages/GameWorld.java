@@ -153,7 +153,7 @@ public class GameWorld extends Stage {
         polygonSpriteBatch = new PolygonSpriteBatch();
 
         if(Gdx.graphics.isGL20Available()) {
-            m_fbo = new FrameBuffer(Pixmap.Format.RGB565, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+            m_fbo = new FrameBuffer(Pixmap.Format.RGBA4444, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
             m_fboRegion = new TextureRegion(m_fbo.getColorBufferTexture());
             m_fboRegion.flip(false, true);
         } else {

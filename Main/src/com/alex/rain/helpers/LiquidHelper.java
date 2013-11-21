@@ -29,12 +29,11 @@ public class LiquidHelper {
     private final  float fluidMaxX = 800f;
     private final float fluidMinY = 0f;
     private final float fluidMaxY = 480f;
-    private final int hashWidthCount = 30, hashHeightCount = 20;
-    private final float hashWidthCountE = hashWidthCount - 0.001f, hashHeightCountE = hashHeightCount - 0.001f;
-    private final float hashColWidth = hashWidthCountE / fluidMaxX, hashColHeight = hashHeightCountE / fluidMaxY;
+    private final int hashWidthCount, hashHeightCount;
+    private final float hashColWidth, hashColHeight;
     private final int [][][] hash;
     private final int [][] hashSize;
-    private final int MAX_NUMBER = 500;
+    private final int MAX_NUMBER = 400;
     private final float VISCOSITY = 0.004f;
     private final float RADIUS;
     private final float IDEAL_RADIUS;
@@ -58,6 +57,14 @@ public class LiquidHelper {
         dropListSize = dropList.size();
         RADIUS = lightVersion ? 40f : 30f;
         IDEAL_RADIUS = lightVersion ? 400f : 300f;
+        hashWidthCount = lightVersion ? 48 : 38;
+        hashHeightCount = lightVersion ? 34 : 24;
+
+        float hashWidthCountE = hashWidthCount - 0.001f;
+        float hashHeightCountE = hashHeightCount - 0.001f;
+        hashColWidth = hashWidthCountE / fluidMaxX;
+        hashColHeight = hashHeightCountE / fluidMaxY;
+
         MULTIPLIER = IDEAL_RADIUS / RADIUS;
         IDEAL_RADIUS_SQ = IDEAL_RADIUS * IDEAL_RADIUS;
 
