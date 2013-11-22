@@ -3,7 +3,7 @@ dynActorArray = {}
 function onCreate(world)
     world:setWinHint('Drop houses!')
 
-    ground = luajava.newInstance(Ground)
+    ground = luajava.new(Ground)
     ground:addVertex(752, 48)
     ground:addVertex(752, 344)
     ground:addVertex(696, 208)
@@ -14,24 +14,24 @@ function onCreate(world)
     ground:addVertex(32, 32)
     world:add(ground)
 
-    dynamicActor = luajava.newInstance(Home)
+    dynamicActor = luajava.new(Home)
     world:add(dynamicActor)
-    dynamicActor:setPosition(luajava.newInstance(Vector2, 650, 300))
+    dynamicActor:setPosition(luajava.new(Vector2, 650, 300))
     table.insert(dynActorArray, dynamicActor)
 
     for i = 0, 3 do
-        dynamicActorTmp = luajava.newInstance(Home)
+        dynamicActorTmp = luajava.new(Home)
         dynamicActorTmp:setBodyBox(20, 100 + i * 10)
         dynamicActorTmp:setSpriteBox(20, 100 + i * 10)
         world:add(dynamicActorTmp)
-        dynamicActorTmp:setPosition(luajava.newInstance(Vector2, 150 + i * 90, 200))
+        dynamicActorTmp:setPosition(luajava.new(Vector2, 150 + i * 90, 200))
 
         table.insert(dynActorArray, dynamicActorTmp)
     end
 
-    cloud = luajava.newInstance(Cloud)
+    cloud = luajava.new(Cloud)
     world:add(cloud)
-    cloud:setPosition(luajava.newInstance(Vector2, 650, 420))
+    cloud:setPosition(luajava.new(Vector2, 650, 420))
 end
 
 function onCheck(mArray)

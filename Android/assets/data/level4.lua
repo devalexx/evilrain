@@ -4,7 +4,7 @@ isContacted = false
 function onCreate(world)
     world:setWinHint('Use hammer!')
 
-    ground = luajava.newInstance(Ground)
+    ground = luajava.new(Ground)
     ground:addVertex(752, 48)
     ground:addVertex(752, 344)
     ground:addVertex(696, 208)
@@ -15,16 +15,16 @@ function onCreate(world)
     ground:addVertex(32, 32)
     world:add(ground)
 
-    dynamicActor = luajava.newInstance(Hammer)
+    dynamicActor = luajava.new(Hammer)
     world:add(dynamicActor)
-    dynamicActor:setPosition(luajava.newInstance(Vector2, 600, 300))
+    dynamicActor:setPosition(luajava.new(Vector2, 600, 300))
     table.insert(dynActorArray, dynamicActor)
 
-    dynamicActorTmp = luajava.newInstance(Home)
+    dynamicActorTmp = luajava.new(Home)
     dynamicActorTmp:setBodyBox(20, 100)
     dynamicActorTmp:setSpriteBox(20, 100)
     world:add(dynamicActorTmp)
-    dynamicActorTmp:setPosition(luajava.newInstance(Vector2, 450, 200))
+    dynamicActorTmp:setPosition(luajava.new(Vector2, 450, 200))
 
     table.insert(dynActorArray, dynamicActorTmp)
 end

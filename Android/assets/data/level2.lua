@@ -1,7 +1,7 @@
 function onCreate(world)
     world:setWinHint('Flood house!!')
 
-    ground = luajava.newInstance(Ground)
+    ground = luajava.new(Ground)
     ground:addVertex(736, 48)
     ground:addVertex(736, 352)
     ground:addVertex(720, 352)
@@ -25,11 +25,11 @@ function onCreate(world)
     ground:addVertex(8, 48)
     world:add(ground)
 
-    dynamicActor = luajava.newInstance(Home)
+    dynamicActor = luajava.new(Home)
     dynamicActor:setBodyBox(200, 100)
     dynamicActor:setSpriteBox(200, 100)
     world:add(dynamicActor)
-    dynamicActor:setPosition(luajava.newInstance(Vector2, 200, 150))
+    dynamicActor:setPosition(luajava.new(Vector2, 200, 150))
 end
 
 function onCheck(mArray)
