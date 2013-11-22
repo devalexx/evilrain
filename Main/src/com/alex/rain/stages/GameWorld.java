@@ -97,6 +97,7 @@ public class GameWorld extends Stage {
     private Skin skin = new Skin();
 
     public GameWorld(String name) {
+        //super(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, new SpriteBatch(3000, 10));
         lightVersion = RainGame.isLightVersion();
         dropsMax = lightVersion ? 1000 : 1000;
         liquidHelper = new LiquidHelper(dropList, lightVersion);
@@ -307,11 +308,18 @@ public class GameWorld extends Stage {
 
     @Override
     public void act(float delta) {
-        time += Gdx.graphics.getDeltaTime();
+        float dt = Gdx.graphics.getDeltaTime();
+        time += dt;
+
+        if(dt < 1/120f)
+            dt = 1/120f;
+        else if(dt > 1/60f)
+            dt = 1/60f;
+
         if(liquidForcesEnabled)
-            liquidHelper.applyLiquidConstraint(1/60f); // TODO: check this shit?
+            liquidHelper.applyLiquidConstraint(dt);
         if(physicsEnabled)
-            physicsWorld.step(1/60f, 6, 3);
+            physicsWorld.step(dt, 6, 3);
 
         super.act(delta);
 
@@ -517,9 +525,6 @@ public class GameWorld extends Stage {
                         p.y - offsety - dropTextureRadiusQuarter, dropTextureRadiusHalf, dropTextureRadiusHalf);
             sb.draw(dropSprite, p.x - dropTextureRadiusHalf,
                     p.y - dropTextureRadiusHalf, dropTextureRadius, dropTextureRadius);
-            if(!lightVersion)
-                sb.draw(dropSprite, p.x + offsetx - dropTextureRadiusQuarter,
-                        p.y + offsety - dropTextureRadiusQuarter, dropTextureRadiusHalf, dropTextureRadiusHalf);
         }
     }
 
