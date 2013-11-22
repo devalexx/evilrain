@@ -14,10 +14,14 @@
 package com.alex.rain.models;
 
 import com.alex.rain.RainGame;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.*;
 
 public class Drop extends SimpleActor {
-    public final float RADIUS;
+    private static float RADIUS;
+    private static CircleShape circleShape;
+    private static BodyDef bodyDef;
+    private Color color = Color.BLUE;
 
     public Drop() {
         super();
@@ -27,24 +31,41 @@ public class Drop extends SimpleActor {
 
     @Override
     public void createPhysicsActor(World physicsWorld) {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(210, 140);
-
-        body = physicsWorld.createBody(bodyDef);
-
-        CircleShape circle = new CircleShape();
-        circle.setRadius(RADIUS);
+        body = physicsWorld.createBody(getBodyDef());
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = circle;
-        fixtureDef.density = 1.0f;
-        fixtureDef.friction = 0.1f;
+        fixtureDef.shape = getCircleShape();
+        //fixtureDef.density = 1.0f; //bad for performance
+        fixtureDef.friction = 0.0025f;
         fixtureDef.restitution = 0.0f;
         fixtureDef.filter.categoryBits = CATEGORY_ALL;
 
         Fixture fixture = body.createFixture(fixtureDef);
+    }
 
-        circle.dispose();
+    private static CircleShape getCircleShape() {
+        if(circleShape == null) {
+            circleShape = new CircleShape();
+            circleShape.setRadius(RADIUS);
+        }
+
+        return circleShape;
+    }
+
+    private static BodyDef getBodyDef() {
+        if(bodyDef == null) {
+            bodyDef = new BodyDef();
+            bodyDef.type = BodyDef.BodyType.DynamicBody;
+        }
+
+        return bodyDef;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

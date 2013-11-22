@@ -33,11 +33,12 @@ public class LiquidHelper {
     private final float hashColWidth, hashColHeight;
     private final int [][][] hash;
     private final int [][] hashSize;
-    private final int MAX_NUMBER = 400;
+    private final int MAX_NUMBER = 300;
     private final float VISCOSITY = 0.004f;
     private final float RADIUS;
     private final float IDEAL_RADIUS;
     private final float IDEAL_RADIUS_SQ;
+    private final float IDEAL_RADIUS_MINUS001;
     private final float MULTIPLIER;
     private final float EPSILON = 0.001f;
     private final int[] neighbors = new int[MAX_NUMBER];
@@ -57,6 +58,7 @@ public class LiquidHelper {
         dropListSize = dropList.size();
         RADIUS = lightVersion ? 40f : 30f;
         IDEAL_RADIUS = lightVersion ? 400f : 300f;
+        IDEAL_RADIUS_MINUS001 = IDEAL_RADIUS - .01f;
         hashWidthCount = lightVersion ? 48 : 38;
         hashHeightCount = lightVersion ? 34 : 24;
 
@@ -109,6 +111,9 @@ public class LiquidHelper {
     }
 
     public void applyLiquidConstraint(final float deltaT) {
+        float deltatTViscosity = deltaT * VISCOSITY;
+        float deltaTMultiplier = deltaT * MULTIPLIER * 0.1f;
+
         if(dropListSize != dropList.size()) {
             dropListSize = dropList.size();
             createRequiredData();
@@ -160,7 +165,7 @@ public class LiquidHelper {
                     if (vlensqr < IDEAL_RADIUS_SQ) {
                         vlen[a] = (float) Math.sqrt(vlensqr);
                         if (vlen[a] < EPSILON)
-                            vlen[a] = IDEAL_RADIUS - .01f;
+                            vlen[a] = IDEAL_RADIUS_MINUS001;
                         float oneminusq = 1.0f - (vlen[a] / IDEAL_RADIUS);
                         float oneminusqSq = oneminusq * oneminusq;
                         p += oneminusqSq;
@@ -185,11 +190,9 @@ public class LiquidHelper {
                     float factor = oneminusq * (pressure + presnear * oneminusq) / (2.0F * vlen[a]);
                     float dx = vx * factor;
                     float dy = vy * factor;
-                    float relvx = vxs[j] - vxs[i];
-                    float relvy = vys[j] - vys[i];
-                    factor = VISCOSITY * oneminusq * deltaT;
-                    dx -= relvx * factor;
-                    dy -= relvy * factor;
+                    factor = deltatTViscosity * oneminusq;
+                    dx -= (vxs[j] - vxs[i]) * factor;
+                    dy -= (vys[j] - vys[i]) * factor;
 
                     xchange[j] += dx;
                     ychange[j] += dy;
@@ -202,7 +205,9 @@ public class LiquidHelper {
         for (int i = 0; i < dropListSize; i++) {
             // todo: is it correct?
             //dropList.get(i).setPosition(dropList.get(i).getPosition().add(xchange[i] / MULTIPLIER, ychange[i] / MULTIPLIER));
-            dropList.get(i).setLinearVelocity(dropList.get(i).getLinearVelocity().add(xchange[i] / (MULTIPLIER * deltaT), ychange[i] / (MULTIPLIER * deltaT)));
+            // todo: choose vel or force?
+            //dropList.get(i).setLinearVelocity(dropList.get(i).getLinearVelocity().add(xchange[i] / (MULTIPLIER * deltaT), ychange[i] / (MULTIPLIER * deltaT)));
+            dropList.get(i).applyForceToCenter(xchange[i] / deltaTMultiplier, ychange[i] / deltaTMultiplier, true);
         }
 
     }

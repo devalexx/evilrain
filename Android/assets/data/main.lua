@@ -11,3 +11,5 @@ Cloud = "com.alex.rain.models.Cloud"
 Emitter = "com.alex.rain.models.Emitter"
 -- System Classes
 Vector2 = "com.badlogic.gdx.math.Vector2"
+
+Color = luajava.bindClass("com.badlogic.gdx.graphics.Color")

@@ -319,7 +319,7 @@ public class GameWorld extends Stage {
         if(liquidForcesEnabled)
             liquidHelper.applyLiquidConstraint(dt);
         if(physicsEnabled)
-            physicsWorld.step(dt, 6, 3);
+            physicsWorld.step(dt, 4, 2);
 
         super.act(delta);
 
@@ -510,6 +510,7 @@ public class GameWorld extends Stage {
     }
 
     private void drawDrops() {
+        Color lastColor = null;
         for(int i = 0, dropListSize = dropList.size(); i < dropListSize; i++) {
             Drop drop = dropList.get(i);
             Vector2 v = drop.getLinearVelocity();
@@ -520,12 +521,17 @@ public class GameWorld extends Stage {
             float offsety = v.y / 50f;
             if(offsety > 10)
                 offsety = 10;
+            if(!drop.getColor().equals(lastColor)) {
+                sb.setColor(drop.getColor());
+                lastColor = drop.getColor();
+            }
             if(!lightVersion)
                 sb.draw(dropSprite, p.x - offsetx - dropTextureRadiusQuarter,
                         p.y - offsety - dropTextureRadiusQuarter, dropTextureRadiusHalf, dropTextureRadiusHalf);
             sb.draw(dropSprite, p.x - dropTextureRadiusHalf,
                     p.y - dropTextureRadiusHalf, dropTextureRadius, dropTextureRadius);
         }
+        sb.setColor(1, 1, 1, 1);
     }
 
     @Override
@@ -569,14 +575,13 @@ public class GameWorld extends Stage {
         sb.end();
 
         if(debugRendererEnabled) {
-            liquidHelper.drawDebug();
-
             cam.viewportHeight *= WORLD_TO_BOX;
             cam.viewportWidth *= WORLD_TO_BOX;
             cam.position.set(cam.viewportWidth * .5f, cam.viewportHeight * .5f, 0f);
             cam.update();
             //sb.setProjectionMatrix(cam.combined);
 
+            liquidHelper.drawDebug();
             debugRenderer.render(physicsWorld, cam.combined);
         }
 

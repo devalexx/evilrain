@@ -90,6 +90,10 @@ public abstract class SimpleActor extends Actor {
         body.applyForceToCenter(vec, true);
     }
 
+    public void applyForceToCenter(float x, float y, boolean wake) {
+        body.applyForceToCenter(x, y, wake);
+    }
+
     public void applyLinearImpulse(Vector2 pos, Vector2 point) {
         body.applyLinearImpulse(pos, point, true);
     }
