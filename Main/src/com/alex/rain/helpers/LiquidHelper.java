@@ -223,4 +223,27 @@ public class LiquidHelper {
             shapeRenderer.line(0, j * 480 / hashHeightCount, 800, j * 480 / hashHeightCount);
         shapeRenderer.end();
     }
+
+    public LinkedList<Drop> getDrops(Vector2 cursorPosition, float radius) {
+        LinkedList<Drop> drops = new LinkedList<Drop>();
+
+        int numW = (int) (radius / (fluidMaxX / hashWidthCount));
+        int numH = (int) (radius / (fluidMaxY / hashHeightCount));
+        int hcell = hashX(cursorPosition.x);
+        int vcell = hashY(cursorPosition.y);
+
+        for (int nx = -numW; nx < numW; nx++) {
+            int xc = hcell + nx;
+            for (int ny = -numH; ny < numH; ny++) {
+                int yc = vcell + ny;
+                if (xc > -1 && xc < hashWidthCount && yc > -1 && yc < hashHeightCount && hashSize[xc][yc] > 0) {
+                    for (int a = 0; a < hashSize[xc][yc]; a++) {
+                        drops.add(dropList.get(hash[xc][yc][a]));
+                    }
+                }
+            }
+        }
+
+        return drops;
+    }
 }

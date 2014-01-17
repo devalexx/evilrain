@@ -49,9 +49,8 @@ import javax.script.ScriptEngine;
 import javax.script.SimpleBindings;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 public class GameWorld extends Stage {
     private World physicsWorld = new World(new Vector2(0, -9.8f), true);
@@ -95,6 +94,9 @@ public class GameWorld extends Stage {
     public static final float WORLD_TO_BOX = 0.1f;
     public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
     private Skin skin = new Skin();
+    private int pressingAction = 0;
+    private Vector2 cursorPosition;
+    private LinkedList<Drop> selectedDrops;
 
     public GameWorld(String name) {
         //super(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, new SpriteBatch(3000, 10));
@@ -353,6 +355,15 @@ public class GameWorld extends Stage {
                 timeLastDrop = time;
             }
         }
+
+        if((pressingAction == 1 || pressingAction == 2) && cursorPosition != null) {
+            if(pressingAction == 2)
+                selectedDrops = liquidHelper.getDrops(cursorPosition, 50f);
+            for(Drop d : selectedDrops) {
+                d.applyForceToCenter((cursorPosition.x - d.getPosition().x) * 5f,
+                        (cursorPosition.y - d.getPosition().y) * 5f, true);
+            }
+        }
     }
 
     private void showWinnerMenu() {
@@ -411,16 +422,37 @@ public class GameWorld extends Stage {
     }
 
     @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        cursorPosition = new Vector2(screenX * 800f / Gdx.graphics.getWidth(),
+                (Gdx.graphics.getHeight() - screenY) * 480f / Gdx.graphics.getHeight());
+        selectedDrops = liquidHelper.getDrops(cursorPosition, 50f);
+        return super.touchDown(screenX, screenY, pointer, button);
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        cursorPosition = null;
+        selectedDrops = null;
+        return super.touchUp(screenX, Gdx.graphics.getHeight() - screenY, pointer, button);
+    }
+
+    @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if(wonGame || cloud != null || emitter != null || dropList.size() > dropsMax)
             return true;
-        Drop drop = new Drop();
-        Random r = new Random();
-        int offset = r.nextInt(10) - 10;
-        add(drop);
-        float x = screenX + offset;
-        float y = Gdx.graphics.getHeight() - screenY + offset;
-        drop.setPosition(new Vector2(x * 800f / Gdx.graphics.getWidth(), y * 480f / Gdx.graphics.getHeight()));
+
+        if(pressingAction == 0) {
+            Drop drop = new Drop();
+            Random r = new Random();
+            int offset = r.nextInt(10) - 10;
+            add(drop);
+            float x = screenX + offset;
+            float y = Gdx.graphics.getHeight() - screenY + offset;
+            drop.setPosition(new Vector2(x * 800f / Gdx.graphics.getWidth(), y * 480f / Gdx.graphics.getHeight()));
+        }
+
+        cursorPosition.set(screenX * 800f / Gdx.graphics.getWidth(),
+                (Gdx.graphics.getHeight() - screenY) * 480f / Gdx.graphics.getHeight());
 
         return false;
     }
@@ -612,5 +644,9 @@ public class GameWorld extends Stage {
 
     public PolygonSpriteBatch getPolygonSpriteBatch() {
         return polygonSpriteBatch;
+    }
+
+    public void setPressingAction(int action) {
+        pressingAction = action;
     }
 }
