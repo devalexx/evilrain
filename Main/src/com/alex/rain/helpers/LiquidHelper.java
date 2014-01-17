@@ -15,6 +15,7 @@ package com.alex.rain.helpers;
 
 import com.alex.rain.models.Drop;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.*;
 
@@ -26,18 +27,19 @@ public class LiquidHelper {
     private final List<Drop> dropList;
     private int dropListSize;
     private final float fluidMinX = 0f;
-    private final  float fluidMaxX = 800f;
+    private final float fluidMaxX = 800f;
     private final float fluidMinY = 0f;
     private final float fluidMaxY = 480f;
     private final int hashWidthCount, hashHeightCount;
     private final float hashColWidth, hashColHeight;
     private final int [][][] hash;
     private final int [][] hashSize;
-    private final int MAX_NUMBER = 300;
+    private final int MAX_NUMBER = 100;
     private final float VISCOSITY = 0.004f;
     private final float RADIUS;
     private final float IDEAL_RADIUS;
     private final float IDEAL_RADIUS_SQ;
+    private final float ONE_DIV_IDEAL_RADIUS;
     private final float IDEAL_RADIUS_MINUS001;
     private final float MULTIPLIER;
     private final float EPSILON = 0.001f;
@@ -58,6 +60,7 @@ public class LiquidHelper {
         dropListSize = dropList.size();
         RADIUS = lightVersion ? 40f : 30f;
         IDEAL_RADIUS = lightVersion ? 400f : 300f;
+        ONE_DIV_IDEAL_RADIUS = 1 / IDEAL_RADIUS;
         IDEAL_RADIUS_MINUS001 = IDEAL_RADIUS - .01f;
         hashWidthCount = lightVersion ? 48 : 38;
         hashHeightCount = lightVersion ? 34 : 24;
@@ -94,8 +97,9 @@ public class LiquidHelper {
         }
 
         for (int a = 0; a < dropListSize; a++) {
-            int hcell = hashX(dropList.get(a).getPosition().x);
-            int vcell = hashY(dropList.get(a).getPosition().y);
+            Drop d = dropList.get(a);
+            int hcell = hashX(d.getPosition().x);
+            int vcell = hashY(d.getPosition().y);
             if (hcell > -1 && hcell < hashWidthCount && vcell > -1 && vcell < hashHeightCount)
                 hash[hcell][vcell][hashSize[hcell][vcell]++] = a;
         }
@@ -111,8 +115,8 @@ public class LiquidHelper {
     }
 
     public void applyLiquidConstraint(final float deltaT) {
-        float deltatTViscosity = deltaT * VISCOSITY;
-        float deltaTMultiplier = deltaT * MULTIPLIER * 0.1f;
+        final float deltatTViscosity = deltaT * VISCOSITY;
+        final float deltaTMultiplier = deltaT * MULTIPLIER * 0.1f;
 
         if(dropListSize != dropList.size()) {
             dropListSize = dropList.size();
@@ -124,17 +128,19 @@ public class LiquidHelper {
         Arrays.fill(ychange, 0.0f);
 
         for (int i = 0; i < dropListSize; ++i) {
-            xs[i] = MULTIPLIER * dropList.get(i).getPosition().x;
-            ys[i] = MULTIPLIER * dropList.get(i).getPosition().y;
-            vxs[i] = MULTIPLIER * dropList.get(i).getLinearVelocity().x;
-            vys[i] = MULTIPLIER * dropList.get(i).getLinearVelocity().y;
+            Drop d = dropList.get(i);
+            xs[i] = MULTIPLIER * d.getPosition().x;
+            ys[i] = MULTIPLIER * d.getPosition().y;
+            vxs[i] = MULTIPLIER * d.getLinearVelocity().x;
+            vys[i] = MULTIPLIER * d.getLinearVelocity().y;
         }
 
         for (int i = 0; i < dropListSize; i++) {
             // Populate the neighbor list from the 9 proximate cells
             int neighborsSize = 0;
-            int hcell = hashX(dropList.get(i).getPosition().x);
-            int vcell = hashY(dropList.get(i).getPosition().y);
+            Vector2 v = dropList.get(i).getPosition();
+            int hcell = hashX(v.x);
+            int vcell = hashY(v.y);
             for (int nx = -1; nx < 2; nx++) {
                 int xc = hcell + nx;
                 for (int ny = -1; ny < 2; ny++) {
@@ -153,52 +159,49 @@ public class LiquidHelper {
             // Pressures = 0 iff all particles within range are IDEAL_RADIUS distance away
             float p = 0.0f;
             float pnear = 0.0f;
-            for (int a = 0; a < neighborsSize; a++) {
+            int a = 0;
+            while(++a < neighborsSize) {
                 int j = neighbors[a];
                 float vx = xs[j] - xs[i];
                 float vy = ys[j] - ys[i];
 
-                // early exit check
-                if (vx > -IDEAL_RADIUS && vx < IDEAL_RADIUS && vy > -IDEAL_RADIUS && vy < IDEAL_RADIUS) {
-                    float vlensqr = (vx * vx + vy * vy);
-                    // within IDEAL_RADIUS check
-                    if (vlensqr < IDEAL_RADIUS_SQ) {
-                        vlen[a] = (float) Math.sqrt(vlensqr);
-                        if (vlen[a] < EPSILON)
-                            vlen[a] = IDEAL_RADIUS_MINUS001;
-                        float oneminusq = 1.0f - (vlen[a] / IDEAL_RADIUS);
-                        float oneminusqSq = oneminusq * oneminusq;
-                        p += oneminusqSq;
-                        pnear += oneminusq * oneminusqSq;
-                    } else {
-                        vlen[a] = Float.MAX_VALUE;
-                    }
+                float vlensqr = (vx * vx + vy * vy);
+                // within IDEAL_RADIUS check
+                if (vlensqr < IDEAL_RADIUS_SQ) {
+                    vlen[a] = (float) Math.sqrt(vlensqr);
+                    if (vlen[a] < EPSILON)
+                        vlen[a] = IDEAL_RADIUS_MINUS001;
+                    float oneminusq = 1.0f - (vlen[a] * ONE_DIV_IDEAL_RADIUS);
+                    float oneminusqSq = oneminusq * oneminusq;
+                    p += oneminusqSq;
+                    pnear += oneminusq * oneminusqSq;
+                } else {
+                    vlen[a] = -1;
                 }
             }
 
             float pressure = (p - 4F) / 2.0F; // normal pressure term
             float presnear = pnear / 2.0F; // near particles term
-            for (int a = 0; a < neighborsSize; a++) {
-                if (vlen[a] == Float.MAX_VALUE)
+            a = 0;
+            while(++a < neighborsSize) {
+                if (vlen[a] < 0)
                     continue;
 
                 int j = neighbors[a];
                 float vx = xs[j] - xs[i];
                 float vy = ys[j] - ys[i];
-                if (vx > -IDEAL_RADIUS && vx < IDEAL_RADIUS && vy > -IDEAL_RADIUS && vy < IDEAL_RADIUS) {
-                    float oneminusq = 1.0f - (vlen[a] / IDEAL_RADIUS);
-                    float factor = oneminusq * (pressure + presnear * oneminusq) / (2.0F * vlen[a]);
-                    float dx = vx * factor;
-                    float dy = vy * factor;
-                    factor = deltatTViscosity * oneminusq;
-                    dx -= (vxs[j] - vxs[i]) * factor;
-                    dy -= (vys[j] - vys[i]) * factor;
+                float oneminusq = 1.0f - (vlen[a] * ONE_DIV_IDEAL_RADIUS);
+                float factor = oneminusq * (pressure + presnear * oneminusq) / (2.0F * vlen[a]);
+                float dx = vx * factor;
+                float dy = vy * factor;
+                factor = deltatTViscosity * oneminusq;
+                dx -= (vxs[j] - vxs[i]) * factor;
+                dy -= (vys[j] - vys[i]) * factor;
 
-                    xchange[j] += dx;
-                    ychange[j] += dy;
-                    xchange[i] -= dx;
-                    ychange[i] -= dy;
-                }
+                xchange[j] += dx;
+                ychange[j] += dy;
+                xchange[i] -= dx;
+                ychange[i] -= dy;
             }
         }
 
@@ -209,7 +212,6 @@ public class LiquidHelper {
             //dropList.get(i).setLinearVelocity(dropList.get(i).getLinearVelocity().add(xchange[i] / (MULTIPLIER * deltaT), ychange[i] / (MULTIPLIER * deltaT)));
             dropList.get(i).applyForceToCenter(xchange[i] / deltaTMultiplier, ychange[i] / deltaTMultiplier, true);
         }
-
     }
 
     public void drawDebug() {

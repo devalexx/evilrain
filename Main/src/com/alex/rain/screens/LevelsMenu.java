@@ -77,30 +77,20 @@ public class LevelsMenu implements Screen {
 
         table.row().width(400).padTop(10);
 
-        final TextButton button1 = new TextButton("Level 1", skin);
-        table.add(button1);
+        for(int i = 1; i < 7; i++) {
+            final TextButton button1 = new TextButton("Level " + String.valueOf(i), skin);
+            table.add(button1);
 
-        table.row().width(400).padTop(10);
+            table.row().width(400).padTop(10);
 
-        final TextButton button2 = new TextButton("Level 2", skin);
-        table.add(button2);
-
-        table.row().width(400).padTop(10);
-
-        final TextButton button3 = new TextButton("Level 3", skin);
-        table.add(button3);
-
-        table.row().width(400).padTop(10);
-
-        final TextButton button4 = new TextButton("Level 4", skin);
-        table.add(button4);
-
-        table.row().width(400).padTop(10);
-
-        final TextButton button5 = new TextButton("Level 5", skin);
-        table.add(button5);
-
-        table.row().width(400).padTop(10);
+            final String level = "level" + String.valueOf(i);
+            button1.addListener(new ChangeListener() {
+                @Override
+                public void changed (ChangeEvent event, Actor actor) {
+                    RainGame.getInstance().setLevel(level);
+                }
+            });
+        }
 
         final TextButton buttonB = new TextButton("Back", skin);
         table.add(buttonB);
@@ -111,36 +101,7 @@ public class LevelsMenu implements Screen {
                 RainGame.getInstance().setLevel("test");
             }
         });
-        button1.addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                RainGame.getInstance().setLevel("level1");
-            }
-        });
-        button2.addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                RainGame.getInstance().setLevel("level2");
-            }
-        });
-        button3.addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                RainGame.getInstance().setLevel("level3");
-            }
-        });
-        button4.addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                RainGame.getInstance().setLevel("level4");
-            }
-        });
-        button5.addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                RainGame.getInstance().setLevel("level5");
-            }
-        });
+
         buttonB.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
