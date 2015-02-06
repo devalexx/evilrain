@@ -15,8 +15,10 @@ package com.alex.rain.models;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.managers.TextureManager;
+import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.physics.box2d.*;
+import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Cloud extends KinematicActor {
     Animation animation;
@@ -52,20 +54,37 @@ public class Cloud extends KinematicActor {
     }
 
     @Override
-    public void createPhysicsActor(World physicsWorld) {
+    public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 2);
+        //polygonShape.setAsBox(getPhysicsWidth() / 2.5f, getPhysicsHeight() / 10);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
         fixtureDef.density = 1;
         fixtureDef.friction = 10.4f;
-        fixtureDef.filter.categoryBits = CATEGORY_CLOUD;
-        fixtureDef.filter.maskBits = MASK_NONE;
 
         BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(pos.cpy().scl(GameWorld.WORLD_TO_BOX));
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         body = physicsWorld.createBody(bodyDef);
+
+        polygonShape.set(new float[] {
+                -getPhysicsWidth() / 2.5f, getPhysicsHeight() / 3, // top
+                -getPhysicsWidth() / 2.5f, getPhysicsHeight() / 2.5f,
+                getPhysicsWidth() / 2.5f, getPhysicsHeight() / 2.5f,
+                getPhysicsWidth() / 2.5f, getPhysicsHeight() / 3});
+        body.createFixture(fixtureDef);
+        polygonShape.set(new float[] {
+                -getPhysicsWidth() / 2.5f, -getPhysicsHeight() / 2.5f, // left
+                -getPhysicsWidth() / 2.5f, getPhysicsHeight() / 2.5f,
+                -getPhysicsWidth() / 3, getPhysicsHeight() / 2.5f,
+                -getPhysicsWidth() / 3, -getPhysicsHeight() / 2.5f});
+        body.createFixture(fixtureDef);
+        polygonShape.set(new float[] {
+                getPhysicsWidth() / 2.5f, -getPhysicsHeight() / 2.5f, // right
+                getPhysicsWidth() / 2.5f, getPhysicsHeight() / 2.5f,
+                getPhysicsWidth() / 3, getPhysicsHeight() / 2.5f,
+                getPhysicsWidth() / 3, -getPhysicsHeight() / 2.5f});
         body.createFixture(fixtureDef);
         body.resetMassData();
 
@@ -75,7 +94,7 @@ public class Cloud extends KinematicActor {
     }
 
     @Override
-    public void draw(SpriteBatch batch, float parentAlpha) {
+    public void draw(Batch batch, float parentAlpha) {
         if(direction < 0) {
             batch.draw(animation.getKeyFrame(RainGame.getTime(), true), pos.x + offset.x, pos.y + offset.y);
         } else if(direction == 1) {

@@ -43,7 +43,7 @@ function onCheck(mArray)
         end
     end
 
-    if count > 250 then
+    if count > 50 then
         return true
     else
         return false

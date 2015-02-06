@@ -20,9 +20,10 @@ public class DesktopStarter {
     public static void main(String[] args) {
         LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
         cfg.title = "Drop";
-        cfg.useGL20 = true;
+        //cfg.useGL20 = true;
         cfg.width = 800;
         cfg.height = 480;
+        //new LwjglApplication(new LiquidfunTest()/*RainGame.getInstance()*/, cfg);
         new LwjglApplication(RainGame.getInstance(), cfg);
 
         Gdx.app.setLogLevel(Application.LOG_DEBUG);

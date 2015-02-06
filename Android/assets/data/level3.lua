@@ -57,7 +57,7 @@ function onCheck(mArray)
         end
     end
 
-    if has5 > 50 and hasElse == false then
+    if has5 > 40 and hasElse == false then
         return true
     else
         return false

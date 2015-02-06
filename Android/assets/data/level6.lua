@@ -19,14 +19,14 @@ function onCreate(world)
     ground:addVertex(8, 32)
     world:add(ground)
 
-    for i = 10, 20 do
-        for j = 10, 20 do
+    for i = 10, 11 do
+        for j = 10, 11 do
             drop = luajava.new(Drop)
-            world:add(drop)
             drop:setPosition(luajava.new(Vector2, i * 10 + 20, j * 10 + 20))
             if i < 30 then
                 drop:setColor(Color.GREEN)
             end
+            world:add(drop)
         end
     end
 end

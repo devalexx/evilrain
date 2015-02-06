@@ -14,14 +14,20 @@
 package com.alex.rain.models;
 
 import com.alex.rain.RainGame;
+import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import finnstr.libgdx.liquidfun.*;
 
 public class Drop extends SimpleActor {
     private static float RADIUS;
     private static CircleShape circleShape;
     private static BodyDef bodyDef;
     private Color color = Color.BLUE;
+    private int particleIndex;
+    public ParticleGroup particleGroup;
+    private ParticleSystem particleSystem;
 
     public Drop() {
         super();
@@ -30,17 +36,34 @@ public class Drop extends SimpleActor {
     }
 
     @Override
-    public void createPhysicsActor(World physicsWorld) {
-        body = physicsWorld.createBody(getBodyDef());
+    public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
+        this.particleSystem = particleSystem;
 
-        FixtureDef fixtureDef = new FixtureDef();
+        ParticleDef particleDef = new ParticleDef();
+        particleDef.flags.add(ParticleDef.ParticleType.b2_waterParticle);
+        particleDef.position.set(pos).scl(GameWorld.WORLD_TO_BOX);
+        particleDef.color.set(color);
+        particleDef.velocity.set(linVel);
+
+        /*FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = getCircleShape();
         //fixtureDef.density = 1.0f; //bad for performance
         fixtureDef.friction = 0.0025f;
         fixtureDef.restitution = 0.0f;
-        fixtureDef.filter.categoryBits = CATEGORY_ALL;
+        fixtureDef.filter.categoryBits = CATEGORY_ALL;*/
 
-        Fixture fixture = body.createFixture(fixtureDef);
+        ParticleGroupDef particleGroupDef = new ParticleGroupDef();
+        particleGroupDef.flags.add(ParticleDef.ParticleType.b2_waterParticle);
+        particleGroupDef.position.set(pos).scl(GameWorld.WORLD_TO_BOX);
+        particleGroupDef.color.set(color);
+        PolygonShape parShape = new PolygonShape();
+        parShape.setAsBox(GameWorld.WORLD_TO_BOX, GameWorld.WORLD_TO_BOX);
+        particleGroupDef.shape = parShape;
+        //particleIndex = particleSystem.createParticle(particleDef);
+        particleGroup = particleSystem.createParticleGroup(particleGroupDef);
+        particleIndex = particleGroup.getBufferIndex();
+
+        //Fixture fixture = body.createFixture(particleDef);
     }
 
     private static CircleShape getCircleShape() {
@@ -67,5 +90,34 @@ public class Drop extends SimpleActor {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    @Override
+    public void setPosition(Vector2 vec) {
+        pos.set(vec);
+    }
+
+    @Override
+    public Vector2 getPosition() {
+        /*float[] posArr = particleSystem.getParticlePositionBufferArray(false);
+        if(posArr.length == 0)
+            posArr = particleSystem.getParticlePositionBufferArray(true);*/
+        if(particleSystem != null)
+            pos.set(particleSystem.getParticlePositionBufferArray(false)[particleIndex*2],
+                    particleSystem.getParticlePositionBufferArray(false)[particleIndex*2+1]).scl(GameWorld.BOX_TO_WORLD);
+
+        return super.getPosition();
+    }
+
+    @Override
+    public void act(float delta) {
+        /*pos = body.getPosition();
+        rot = (float)Math.toDegrees(body.getAngle());
+        linVel = body.getLinearVelocity();
+        pos.scl(GameWorld.BOX_TO_WORLD);
+        linVel.scl(GameWorld.BOX_TO_WORLD);*/
+        //pos = new Vector2(particleSystem.getParticlePositionBufferX()[particleIndex], particleSystem.getParticlePositionBufferY()[particleIndex]);
+        //pos.scl(GameWorld.BOX_TO_WORLD);
+        //particleGroup.applyForce(new Vector2(-10, 0));
     }
 }

@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public abstract class SimpleActor extends Actor {
     protected Body body;
@@ -38,13 +39,7 @@ public abstract class SimpleActor extends Actor {
         EMITTER
     }
 
-    public final short CATEGORY_ALL = 0x0001;
-    public final short CATEGORY_CLOUD = 0x0002;
-
-    public final short MASK_ALL = -1;
-    public final short MASK_NONE = 0;
-
-    public abstract void createPhysicsActor(World physicsWorld);
+    public abstract void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld);
 
     public void prepareActor() {
 
@@ -60,7 +55,8 @@ public abstract class SimpleActor extends Actor {
     }
 
     public void setPosition(Vector2 vec) {
-        body.setTransform(vec.cpy().mul(GameWorld.WORLD_TO_BOX), body.getAngle());
+        if(body != null)
+            body.setTransform(vec.cpy().scl(GameWorld.WORLD_TO_BOX), body.getAngle());
         pos.set(vec);
     }
 
@@ -69,7 +65,8 @@ public abstract class SimpleActor extends Actor {
     }
 
     public void setLinearVelocity(Vector2 vec) {
-        body.setLinearVelocity(vec.cpy().mul(GameWorld.WORLD_TO_BOX));
+        if(body != null)
+            body.setLinearVelocity(vec.cpy().scl(GameWorld.WORLD_TO_BOX));
         linVel.set(vec);
     }
 
@@ -82,8 +79,8 @@ public abstract class SimpleActor extends Actor {
         pos = body.getPosition();
         rot = (float)Math.toDegrees(body.getAngle());
         linVel = body.getLinearVelocity();
-        pos.mul(GameWorld.BOX_TO_WORLD);
-        linVel.mul(GameWorld.BOX_TO_WORLD);
+        pos.scl(GameWorld.BOX_TO_WORLD);
+        linVel.scl(GameWorld.BOX_TO_WORLD);
     }
 
     public void applyForceToCenter(Vector2 vec) {

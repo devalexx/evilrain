@@ -20,7 +20,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class RainGame extends Game {
@@ -55,7 +55,7 @@ public class RainGame extends Game {
 
     @Override
     public void render() {
-        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         if(stage != null) {
             stage.draw();
             stage.act(Gdx.graphics.getDeltaTime());
@@ -101,6 +101,6 @@ public class RainGame extends Game {
     @Override
     public void resize(int width, int height) {
         if(stage != null)
-            stage.setViewport(width, height, false);
+            stage.getViewport().setScreenSize(width, height);
     }
 }

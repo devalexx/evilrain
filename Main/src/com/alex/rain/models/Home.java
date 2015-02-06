@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Home extends DynamicActor {
     public Home() {
@@ -26,7 +27,7 @@ public class Home extends DynamicActor {
     }
 
     @Override
-    public void createPhysicsActor(World physicsWorld) {
+    public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 2);
         offset.set(-getWidth() / 2, -getHeight() / 2);

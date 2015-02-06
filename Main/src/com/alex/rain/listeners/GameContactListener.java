@@ -13,10 +13,10 @@
  ******************************************************************************/
 package com.alex.rain.listeners;
 
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.*;
+import finnstr.libgdx.liquidfun.ParticleBodyContact;
+import finnstr.libgdx.liquidfun.ParticleContact;
+import finnstr.libgdx.liquidfun.ParticleSystem;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -37,6 +37,26 @@ public class GameContactListener implements ContactListener {
 
         LuaValue luaContact = CoerceJavaToLua.coerce(contact);
         luaOnEndContactFunc.call(luaContact);
+    }
+
+    @Override
+    public void beginParticleBodyContact(ParticleSystem particleSystem, ParticleBodyContact particleBodyContact) {
+        return;
+    }
+
+    @Override
+    public void endParticleBodyContact(Fixture fixture, ParticleSystem particleSystem, int i) {
+        return;
+    }
+
+    @Override
+    public void beginParticleContact(ParticleSystem particleSystem, ParticleContact particleContact) {
+        return;
+    }
+
+    @Override
+    public void endParticleContact(ParticleSystem particleSystem, int i, int i2) {
+        return;
     }
 
     @Override

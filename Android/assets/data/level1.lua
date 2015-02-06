@@ -30,8 +30,8 @@ function onCreate(world)
     end
 
     cloud = luajava.new(Cloud)
-    world:add(cloud)
     cloud:setPosition(luajava.new(Vector2, 650, 420))
+    world:add(cloud)
 end
 
 function onCheck(mArray)

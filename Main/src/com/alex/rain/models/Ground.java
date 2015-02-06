@@ -22,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import finnstr.libgdx.liquidfun.ParticleSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +58,7 @@ public class Ground extends SimpleActor {
     }
 
     @Override
-    public void createPhysicsActor(World physicsWorld) {
+    public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
 
@@ -89,7 +90,7 @@ public class Ground extends SimpleActor {
     }
 
     @Override
-    public void draw(SpriteBatch batch, float parentAlpha) {
+    public void draw(Batch batch, float parentAlpha) {
         batch.end();
         polyBatch.setProjectionMatrix(batch.getProjectionMatrix());
         polyBatch.begin();

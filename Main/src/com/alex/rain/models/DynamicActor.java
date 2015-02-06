@@ -13,11 +13,11 @@
  ******************************************************************************/
 package com.alex.rain.models;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Batch;
 
 public abstract class DynamicActor extends SimpleActor {
     @Override
-    public void draw(SpriteBatch batch, float parentAlpha) {
+    public void draw(Batch batch, float parentAlpha) {
         sprite.setPosition(pos.x + offset.x, pos.y + offset.y);
         sprite.setRotation(rot);
         sprite.draw(batch, parentAlpha);

@@ -14,9 +14,10 @@
 package com.alex.rain.models;
 
 import com.badlogic.gdx.physics.box2d.World;
+import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class KinematicActor extends SimpleActor {
     @Override
-    public void createPhysicsActor(World physicsWorld) {
+    public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
     }
 }
