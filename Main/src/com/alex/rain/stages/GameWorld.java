@@ -36,7 +36,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import finnstr.libgdx.liquidfun.ParticleDebugRenderer;
@@ -53,8 +52,9 @@ import javax.script.ScriptEngine;
 import javax.script.SimpleBindings;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GameWorld extends Stage {
     private World physicsWorld = new World(new Vector2(0, -9.8f), true);
@@ -72,7 +72,8 @@ public class GameWorld extends Stage {
     private ShaderProgram shader;
     private Sprite backgroundSprite;
     private final Box2DDebugRenderer debugRenderer;
-    private final ParticleDebugRenderer particleDebugRenderer;
+    private final ParticleDebugRenderer particleDebugRendererCircle;
+    private final ParticleDebugRenderer particleDebugRendererDot;
     private final ParticleRenderer particleRenderer;
     private boolean debugRendererEnabled;
     private final SpriteBatch spriteBatchShadered;
@@ -101,10 +102,12 @@ public class GameWorld extends Stage {
     private int pressingAction = 0;
     private Vector2 cursorPosition;
     private List<Drop> selectedDrops;
+    private ParticleSystemDef particleSystemDef;
+    private float PARTICLE_RADIUS = 7f;
 
     public GameWorld(String name) {
-        ParticleSystemDef particleSystemDef = new ParticleSystemDef();
-        particleSystemDef.radius = 7f * GameWorld.WORLD_TO_BOX;
+        particleSystemDef = new ParticleSystemDef();
+        particleSystemDef.radius = PARTICLE_RADIUS * GameWorld.WORLD_TO_BOX;
         //particleSystemDef.pressureStrength = 0.4f;
         particleSystemDef.dampingStrength = 0.2f;
 
@@ -165,7 +168,8 @@ public class GameWorld extends Stage {
         m_fboRegion.flip(false, true);
 
         debugRenderer = new Box2DDebugRenderer();
-        particleDebugRenderer = new ParticleDebugRenderer(Color.RED, 100000);
+        particleDebugRendererDot = new ParticleDebugRenderer(Color.RED, 100000);
+        particleDebugRendererCircle = new ParticleDebugRenderer(Color.BLUE, 100000);
         particleRenderer = new ParticleRenderer(Color.RED, 100000);
 
         contactListener = new GameContactListener(luaOnBeginContactFunc, luaOnEndContactFunc);
@@ -312,18 +316,19 @@ public class GameWorld extends Stage {
 
     @Override
     public void act(float delta) {
-        float dt = Gdx.graphics.getDeltaTime();
+        final float dt = Gdx.graphics.getDeltaTime();
+        final float step = 1 / 60f;
         time += dt;
 
-        if(dt < 1/120f)
+        /*if(dt < 1/120f)
             dt = 1/120f;
         else if(dt > 1/60f)
-            dt = 1/60f;
+            dt = 1/60f;*/
 
         /*if(liquidForcesEnabled)
             liquidHelper.applyLiquidConstraint(dt);*/
         if(physicsEnabled)
-            physicsWorld.step(dt, 4, 2, 2);
+            physicsWorld.step(step, 4, 2, 6);
         particleSystem.getParticlePositionBufferArray(true);
 
         super.act(delta);
@@ -365,7 +370,7 @@ public class GameWorld extends Stage {
                 selectedDrops = liquidHelper.getDrops(cursorPosition, 50f);
             for(Drop d : selectedDrops) {
                 d.particleGroup.applyForce(new Vector2((cursorPosition.x - d.getPosition().x) ,
-                        (cursorPosition.y - d.getPosition().y) ).scl(5f));
+                        (cursorPosition.y - d.getPosition().y)).nor().scl(0.8f));
             }
         }
     }
@@ -433,7 +438,7 @@ public class GameWorld extends Stage {
         selectedDrops = new ArrayList<Drop>();
         float[] pos = particleSystem.getParticlePositionBufferArray(false);
         for(int i = 0; i < pos.length; i += 2) {
-            if(Math.abs(cursorPosition.x - pos[i]) < 2 && Math.abs(cursorPosition.y - pos[i + 1]) < 2)
+            if(Math.abs(cursorPosition.x - pos[i]) < 1 && Math.abs(cursorPosition.y - pos[i + 1]) < 1)
                 selectedDrops.add(dropList.get(i / 2));
         }
         cursorPosition.scl(BOX_TO_WORLD);
@@ -562,7 +567,8 @@ public class GameWorld extends Stage {
     }
 
     private void drawDrops() {
-        particleRenderer.render(particleSystem, BOX_TO_WORLD * 3, cam.combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
+        particleRenderer.render(particleSystem, PARTICLE_RADIUS / 2 * BOX_TO_WORLD, cam.combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
+
     }
 
     @Override
@@ -587,8 +593,8 @@ public class GameWorld extends Stage {
             m_fbo.end();
 
             spriteBatchShadered.begin();
-                if(!lightVersion)
-                    shader.setUniformf("u_time", time);
+                /*if(!lightVersion)
+                    shader.setUniformf("u_time", time);*/
                 spriteBatchShadered.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
             spriteBatchShadered.end();
         } else {
@@ -614,7 +620,8 @@ public class GameWorld extends Stage {
 
             liquidHelper.drawDebug();
             debugRenderer.render(physicsWorld, cam.combined);
-            particleDebugRenderer.render(particleSystem, BOX_TO_WORLD * 2, cam.combined);
+            particleDebugRendererCircle.render(particleSystem, PARTICLE_RADIUS / 2.5f * BOX_TO_WORLD, cam.combined);
+            particleDebugRendererDot.render(particleSystem, PARTICLE_RADIUS / 10f * BOX_TO_WORLD, cam.combined);
         }
 
         cam.viewportHeight = Gdx.graphics.getHeight();

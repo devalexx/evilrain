@@ -26,7 +26,6 @@ public class MainActivity extends AndroidApplication {
         cfg.useAccelerometer = false;
         cfg.useCompass = false;
         cfg.useWakelock = true;
-        cfg.useGL20 = true;
         LuajavaLib.classLoader = this.getApplicationContext().getClassLoader();
         initialize(RainGame.getInstance(), cfg);
     }

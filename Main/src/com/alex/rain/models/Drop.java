@@ -45,13 +45,6 @@ public class Drop extends SimpleActor {
         particleDef.color.set(color);
         particleDef.velocity.set(linVel);
 
-        /*FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = getCircleShape();
-        //fixtureDef.density = 1.0f; //bad for performance
-        fixtureDef.friction = 0.0025f;
-        fixtureDef.restitution = 0.0f;
-        fixtureDef.filter.categoryBits = CATEGORY_ALL;*/
-
         ParticleGroupDef particleGroupDef = new ParticleGroupDef();
         particleGroupDef.flags.add(ParticleDef.ParticleType.b2_waterParticle);
         particleGroupDef.position.set(pos).scl(GameWorld.WORLD_TO_BOX);
@@ -62,8 +55,6 @@ public class Drop extends SimpleActor {
         //particleIndex = particleSystem.createParticle(particleDef);
         particleGroup = particleSystem.createParticleGroup(particleGroupDef);
         particleIndex = particleGroup.getBufferIndex();
-
-        //Fixture fixture = body.createFixture(particleDef);
     }
 
     private static CircleShape getCircleShape() {
