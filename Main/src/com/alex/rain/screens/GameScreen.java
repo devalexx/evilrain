@@ -34,6 +34,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        world.getViewport().update(width, height, true);
         /*camera.viewportWidth = 800;
         camera.viewportHeight = 480;
         camera.position.set(0, -10, 0f);*/
@@ -42,11 +43,11 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        camera = (OrthographicCamera) world.getCamera();
+        /*camera = (OrthographicCamera) world.getCamera();
         camera.viewportHeight = 480;
         camera.viewportWidth = 800;
 
-        camera.position.set(camera.viewportWidth * .5f, camera.viewportHeight * .5f, 0f);
+        camera.position.set(camera.viewportWidth * .5f, camera.viewportHeight * .5f, 0f);*/
     }
 
     @Override

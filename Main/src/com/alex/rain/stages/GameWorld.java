@@ -25,7 +25,10 @@ import com.alex.rain.renderer.ParticleRenderer;
 import com.alex.rain.screens.MainMenuScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -38,6 +41,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import finnstr.libgdx.liquidfun.ParticleDebugRenderer;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 import finnstr.libgdx.liquidfun.ParticleSystemDef;
@@ -81,7 +86,6 @@ public class GameWorld extends Stage {
     private final FrameBuffer m_fbo;
     private final TextureRegion m_fboRegion;
     private final Batch sb;
-    private final Camera cam;
     private float time;
     private float timeLastDrop;
     private boolean itRain;
@@ -106,6 +110,10 @@ public class GameWorld extends Stage {
     private float PARTICLE_RADIUS = 7f;
 
     public GameWorld(String name) {
+        setViewport(new FillViewport(800, 480));
+        setViewport(new ExtendViewport(800, 480));
+        getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+
         particleSystemDef = new ParticleSystemDef();
         particleSystemDef.radius = PARTICLE_RADIUS * GameWorld.WORLD_TO_BOX;
         //particleSystemDef.pressureStrength = 0.4f;
@@ -145,8 +153,8 @@ public class GameWorld extends Stage {
         }
 
         final String VERTEX = Gdx.files.internal("data/drop_shader.vert").readString();
-        final String FRAGMENT = lightVersion ?
-                Gdx.files.internal("data/drop_shader_light.frag").readString() :
+        final String FRAGMENT = /*lightVersion ?
+                Gdx.files.internal("data/drop_shader_light.frag").readString() :*/
                 Gdx.files.internal("data/drop_shader.frag").readString();
 
         shader = new ShaderProgram(VERTEX, FRAGMENT);
@@ -159,7 +167,6 @@ public class GameWorld extends Stage {
         spriteBatchShadered.setShader(shader);
 
         sb = getBatch();
-        cam = getCamera();
 
         polygonSpriteBatch = new PolygonSpriteBatch();
 
@@ -567,19 +574,23 @@ public class GameWorld extends Stage {
     }
 
     private void drawDrops() {
-        particleRenderer.render(particleSystem, PARTICLE_RADIUS / 2 * BOX_TO_WORLD, cam.combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
+        particleRenderer.render(particleSystem,
+                PARTICLE_RADIUS / 2 * BOX_TO_WORLD,
+                getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
 
     }
 
     @Override
     public void draw() {
-        cam.viewportHeight = 480;
+        /*cam.viewportHeight = 480;
         cam.viewportWidth = 800;
         cam.position.set(cam.viewportWidth * .5f, cam.viewportHeight * .5f, 0f);
         cam.update();
-        sb.setProjectionMatrix(cam.combined);
-        polygonSpriteBatch.setProjectionMatrix(cam.combined);
-        sb.setProjectionMatrix(cam.combined);
+        sb.setProjectionMatrix(cam.combined);*/
+        //polygonSpriteBatch.setProjectionMatrix(getCamera().combined);
+        //sb.setProjectionMatrix(getCamera().combined);
+        //getBatch().setProjectionMatrix(getCamera().combined);
+        sb.setProjectionMatrix(getCamera().combined);
         sb.begin();
             sb.draw(backgroundSprite, 0, 0);
         sb.end();
@@ -612,27 +623,15 @@ public class GameWorld extends Stage {
         sb.end();
 
         if(debugRendererEnabled) {
-            cam.viewportHeight *= WORLD_TO_BOX;
-            cam.viewportWidth *= WORLD_TO_BOX;
-            cam.position.set(cam.viewportWidth * .5f, cam.viewportHeight * .5f, 0f);
-            cam.update();
-            //sb.setProjectionMatrix(cam.combined);
-
             liquidHelper.drawDebug();
-            debugRenderer.render(physicsWorld, cam.combined);
-            particleDebugRendererCircle.render(particleSystem, PARTICLE_RADIUS / 2.5f * BOX_TO_WORLD, cam.combined);
-            particleDebugRendererDot.render(particleSystem, PARTICLE_RADIUS / 10f * BOX_TO_WORLD, cam.combined);
+            debugRenderer.render(physicsWorld, getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
+            particleDebugRendererCircle.render(particleSystem, PARTICLE_RADIUS / 2.5f * BOX_TO_WORLD, getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
+            particleDebugRendererDot.render(particleSystem, PARTICLE_RADIUS / 10f * BOX_TO_WORLD, getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
         }
-
-        cam.viewportHeight = Gdx.graphics.getHeight();
-        cam.viewportWidth = Gdx.graphics.getWidth();
-        cam.position.set(cam.viewportWidth * .5f, cam.viewportHeight * .5f, 0f);
-        cam.update();
-        sb.setProjectionMatrix(cam.combined);
 
         sb.begin();
             if(table != null) {
-                table.setPosition(getRoot().getX(), getRoot().getY());
+                table.setPosition(0, 0);
                 table.draw(sb, 1f);
             }
             font.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);

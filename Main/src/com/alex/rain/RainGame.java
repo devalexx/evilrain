@@ -42,7 +42,7 @@ public class RainGame extends Game {
         lightVersion = Gdx.app.getType() != Application.ApplicationType.Desktop;
         TextureManager.getInstance().getAtlas("pack.atlas");
 
-        GameWorld gameWorld = new GameWorld("test");
+        GameWorld gameWorld = new GameWorld("level2");
         gameWorld.createWorld();
         stage = gameWorld;
         Gdx.input.setInputProcessor(stage);
@@ -100,7 +100,6 @@ public class RainGame extends Game {
 
     @Override
     public void resize(int width, int height) {
-        if(stage != null)
-            stage.getViewport().setScreenSize(width, height);
+        getScreen().resize(width, height);
     }
 }
