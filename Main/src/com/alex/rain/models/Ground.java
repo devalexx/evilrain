@@ -16,7 +16,9 @@ package com.alex.rain.models;
 import com.alex.rain.helpers.Box2DSeparatorHelper;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.stages.GameWorld;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -31,7 +33,8 @@ public class Ground extends SimpleActor {
     List<Vector2> vertices = new ArrayList<Vector2>();
 
     PolygonSprite poly;
-    PolygonSpriteBatch polyBatch;
+    static PolygonSpriteBatch polyBatch = new PolygonSpriteBatch();
+    static ShapeRenderer shapeRenderer = new ShapeRenderer();
     TextureRegion textureRegion;
 
     public Ground() {
@@ -39,7 +42,6 @@ public class Ground extends SimpleActor {
         type = TYPE.GROUND;
 
         textureRegion = TextureManager.getInstance().getRegionFromDefaultAtlas("grass");
-        polyBatch = new PolygonSpriteBatch();
     }
 
     @Override
@@ -96,6 +98,14 @@ public class Ground extends SimpleActor {
         polyBatch.begin();
             poly.draw(polyBatch);
         polyBatch.end();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            for(int i = 0; i < vertices.size() - 1; i++) {
+                shapeRenderer.setColor(Color.BLUE);
+                Vector2 v1 = vertices.get(i);
+                Vector2 v2 = vertices.get(i + 1);
+                shapeRenderer.line(v1.x, v1.y, v2.x, v2.y);
+            }
+        shapeRenderer.end();
         batch.begin();
     }
 }

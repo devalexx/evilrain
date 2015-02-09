@@ -1,5 +1,6 @@
 
 pack.png
+size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
@@ -12,9 +13,9 @@ arrow
   index: -1
 background
   rotate: false
-  xy: 2, 518
-  size: 800, 480
-  orig: 800, 480
+  xy: 804, 746
+  size: 20, 20
+  orig: 20, 20
   offset: 0, 0
   index: -1
 button
@@ -40,6 +41,13 @@ emitter
   index: -1
 grass
   rotate: false
+  xy: 2, 518
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: -1
+grass2
+  rotate: false
   xy: 2, 36
   size: 800, 480
   orig: 800, 480
@@ -61,6 +69,7 @@ home1
   index: -1
 
 pack2.png
+size: 1024,256
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none

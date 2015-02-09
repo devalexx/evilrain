@@ -1,2 +1,2 @@
-java -classpath ../libs/gdx.jar;../libs/gdx-tools.jar com.badlogic.gdx.tools.imagepacker.TexturePacker2 pack ../../Android/assets/data pack
+java -classpath ../libs/gdx.jar;gdx-tools.jar com.badlogic.gdx.tools.texturepacker.TexturePacker pack ../../Android/assets/data pack
 pause

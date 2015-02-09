@@ -75,7 +75,7 @@ public class GameWorld extends Stage {
     private boolean wonGame;
     private Table table, tableControl;
     private ShaderProgram shader;
-    private Sprite backgroundSprite;
+    private Texture backgroundTexture;
     private final Box2DDebugRenderer debugRenderer;
     private final ParticleDebugRenderer particleDebugRendererCircle;
     private final ParticleDebugRenderer particleDebugRendererDot;
@@ -161,7 +161,8 @@ public class GameWorld extends Stage {
         if(!shader.isCompiled())
             System.out.println(shader.getLog());
 
-        backgroundSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("background");
+        backgroundTexture = TextureManager.getInstance().getTexture("background.png");
+        backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
         spriteBatchShadered = new SpriteBatch();
         spriteBatchShadered.setShader(shader);
@@ -592,7 +593,7 @@ public class GameWorld extends Stage {
         //getBatch().setProjectionMatrix(getCamera().combined);
         sb.setProjectionMatrix(getCamera().combined);
         sb.begin();
-            sb.draw(backgroundSprite, 0, 0);
+            sb.draw(backgroundTexture, 0, 0, 0, 0, 800, 480);
         sb.end();
 
         if(m_fbo != null && useShader) {
@@ -604,8 +605,8 @@ public class GameWorld extends Stage {
             m_fbo.end();
 
             spriteBatchShadered.begin();
-                /*if(!lightVersion)
-                    shader.setUniformf("u_time", time);*/
+                if(!lightVersion)
+                    shader.setUniformf("u_time", time);
                 spriteBatchShadered.draw(m_fboRegion, 0, 0, m_fboRegion.getRegionWidth(), m_fboRegion.getRegionHeight());
             spriteBatchShadered.end();
         } else {
