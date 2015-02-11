@@ -23,6 +23,7 @@ import com.alex.rain.models.Emitter;
 import com.alex.rain.models.SimpleActor;
 import com.alex.rain.renderer.ParticleRenderer;
 import com.alex.rain.screens.MainMenuScreen;
+import com.alex.rain.viewports.GameViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -110,8 +111,7 @@ public class GameWorld extends Stage {
     private float PARTICLE_RADIUS = 7f;
 
     public GameWorld(String name) {
-        setViewport(new FillViewport(800, 480));
-        setViewport(new ExtendViewport(800, 480));
+        setViewport(new GameViewport());
         getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         particleSystemDef = new ParticleSystemDef();
@@ -593,7 +593,7 @@ public class GameWorld extends Stage {
         //getBatch().setProjectionMatrix(getCamera().combined);
         sb.setProjectionMatrix(getCamera().combined);
         sb.begin();
-            sb.draw(backgroundTexture, 0, 0, 0, 0, 800, 480);
+            sb.draw(backgroundTexture, -(int)getViewport().getWorldWidth(), -(int)getViewport().getWorldHeight(), 0, 0, (int)getViewport().getWorldWidth() * 2, (int)getViewport().getWorldHeight() * 2);
         sb.end();
 
         if(m_fbo != null && useShader) {
