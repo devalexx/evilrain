@@ -98,11 +98,12 @@ public class Ground extends SimpleActor {
         polyBatch.begin();
             poly.draw(polyBatch);
         polyBatch.end();
+        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            for(int i = 0; i < vertices.size() - 1; i++) {
+            for(int i = 0; i < vertices.size() ; i++) {
                 shapeRenderer.setColor(Color.BLUE);
                 Vector2 v1 = vertices.get(i);
-                Vector2 v2 = vertices.get(i + 1);
+                Vector2 v2 = i == vertices.size() - 1 ? vertices.get(0) : vertices.get(i + 1);
                 shapeRenderer.line(v1.x, v1.y, v2.x, v2.y);
             }
         shapeRenderer.end();
