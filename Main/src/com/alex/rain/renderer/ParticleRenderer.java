@@ -45,12 +45,17 @@ public class ParticleRenderer {
         return mesh.getMaxVertices();
     }
 
-    public void render (ParticleSystem pSystem, float pRadiusScale, Matrix4 pProjMatrix) {
+    public void render(ParticleSystem pSystem, float pRadiusScale, Matrix4 pProjMatrix, boolean useFBO) {
         if(pSystem == null)
             return;
 
         Gdx.gl20.glEnable(GL20.GL_BLEND);
-        Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+
+        if(useFBO)
+            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+        else
+            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
         Gdx.gl20.glEnable(GL20.GL_VERTEX_PROGRAM_POINT_SIZE);
         Gdx.gl20.glEnable(0x8861); //GL11.GL_POINT_SPRITE_OES
 

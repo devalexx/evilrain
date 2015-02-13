@@ -22,7 +22,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameViewport extends Viewport {
     public static final int WIDTH = 800, HEIGHT = 480;
-    private float offsetX, offsetY;
+    public float offsetX, offsetY;
+    public float fullWorldWidth, fullWorldHeight;
+    public float scale;
 
     public GameViewport() {
         setCamera(new OrthographicCamera());
@@ -30,7 +32,7 @@ public class GameViewport extends Viewport {
     }
 
     @Override
-    public void update (int screenWidth, int screenHeight, boolean centerCamera) {
+    public void update(int screenWidth, int screenHeight, boolean centerCamera) {
         Vector2 viewFit = Scaling.fit.apply(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
                 WIDTH, HEIGHT).cpy();
         Vector2 viewFill = Scaling.fill.apply(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
@@ -44,14 +46,20 @@ public class GameViewport extends Viewport {
         offsetY = isPortrait ? viewFill.y / 2 - HEIGHT / 2 : 0;
         setWorldSize(isLandscape ? viewFill.x : WIDTH,
                 isPortrait ? viewFill.y : HEIGHT);
+        fullWorldWidth = 2 * offsetX + getWorldWidth();
+        fullWorldHeight = 2 * offsetY + getWorldHeight();
+        if(offsetX < 0.01)
+            scale = (float)getScreenWidth() / WIDTH;
+        else
+            scale = (float)getScreenHeight() / HEIGHT;
         apply(centerCamera);
     }
 
-    public void apply (boolean centerCamera) {
+    public void apply(boolean centerCamera) {
         Gdx.gl.glViewport(getScreenX(), getScreenY(), getScreenWidth(), getScreenHeight());
         getCamera().viewportWidth = getWorldWidth();
         getCamera().viewportHeight = getWorldHeight();
-        if (centerCamera)
+        if(centerCamera)
             getCamera().position.set(- offsetX + getWorldWidth() / 2, - offsetY + getWorldHeight() / 2, 0);
         getCamera().update();
     }
