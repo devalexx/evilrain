@@ -13,6 +13,7 @@
  ******************************************************************************/
 package com.alex.rain.models;
 
+import com.alex.rain.RainGame;
 import com.alex.rain.helpers.Box2DSeparatorHelper;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.stages.GameWorld;
@@ -33,8 +34,8 @@ public class Ground extends SimpleActor {
     List<Vector2> vertices = new ArrayList<Vector2>();
 
     PolygonSprite poly;
-    static PolygonSpriteBatch polyBatch = new PolygonSpriteBatch();
-    static ShapeRenderer shapeRenderer = new ShapeRenderer();
+    PolygonSpriteBatch polyBatch = RainGame.polyBatch;
+    ShapeRenderer shapeRenderer = RainGame.shapeRenderer;
     TextureRegion textureRegion;
 
     public Ground() {
@@ -94,11 +95,9 @@ public class Ground extends SimpleActor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.end();
-        polyBatch.setProjectionMatrix(batch.getProjectionMatrix());
         polyBatch.begin();
             poly.draw(polyBatch);
         polyBatch.end();
-        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             for(int i = 0; i < vertices.size() ; i++) {
                 shapeRenderer.setColor(Color.BLUE);

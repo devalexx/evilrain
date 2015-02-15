@@ -21,6 +21,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class RainGame extends Game {
@@ -29,6 +31,8 @@ public class RainGame extends Game {
     static RainGame instance = new RainGame();
     static float time;
     static boolean lightVersion = true;
+    public static PolygonSpriteBatch polyBatch;
+    public static ShapeRenderer shapeRenderer;
 
     private RainGame() {
     }
@@ -39,6 +43,9 @@ public class RainGame extends Game {
 
     @Override
     public void create() {
+        polyBatch = new PolygonSpriteBatch();
+        shapeRenderer = new ShapeRenderer();
+
         lightVersion = Gdx.app.getType() != Application.ApplicationType.Desktop;
         TextureManager.getInstance().getAtlas("pack.atlas");
 

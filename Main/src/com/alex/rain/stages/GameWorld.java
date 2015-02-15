@@ -14,7 +14,6 @@
 package com.alex.rain.stages;
 
 import com.alex.rain.RainGame;
-import com.alex.rain.helpers.LiquidHelper;
 import com.alex.rain.listeners.GameContactListener;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.models.Cloud;
@@ -33,6 +32,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -43,8 +43,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import finnstr.libgdx.liquidfun.ParticleDebugRenderer;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 import finnstr.libgdx.liquidfun.ParticleSystemDef;
@@ -118,7 +116,7 @@ public class GameWorld extends Stage {
         particleSystemDef = new ParticleSystemDef();
         particleSystemDef.radius = PARTICLE_RADIUS * GameWorld.WORLD_TO_BOX;
         //particleSystemDef.pressureStrength = 0.4f;
-        particleSystemDef.dampingStrength = 0.2f;
+        particleSystemDef.dampingStrength = 0.5f;
 
         particleSystem = new ParticleSystem(physicsWorld, particleSystemDef);
 
@@ -392,7 +390,7 @@ public class GameWorld extends Stage {
             return;
 
         table = new Table();
-        table.setFillParent(true);
+        //table.setFillParent(true);
         table.debug();
         addUI(table);
 
@@ -576,9 +574,15 @@ public class GameWorld extends Stage {
 
     }
 
+    public void resize(int width, int height) {
+
+    }
+
     @Override
     public void draw() {
         sb.setProjectionMatrix(getCamera().combined);
+        RainGame.polyBatch.setProjectionMatrix(sb.getProjectionMatrix());
+        RainGame.shapeRenderer.setProjectionMatrix(sb.getProjectionMatrix());
         sb.begin();
             sb.draw(backgroundTexture, -(int)getViewport().getWorldWidth(), -(int)getViewport().getWorldHeight(), 0, 0, (int)getViewport().getWorldWidth() * 2, (int)getViewport().getWorldHeight() * 2);
         sb.end();
@@ -591,6 +595,16 @@ public class GameWorld extends Stage {
                     (int)gameViewport.fullWorldWidth, (int)gameViewport.fullWorldHeight, false);
             m_fboRegion = new TextureRegion(m_fbo.getColorBufferTexture());
             m_fboRegion.flip(false, true);
+        }
+
+        if(table != null) {
+            table.setPosition(-100, 0);
+            table.setSize(gameViewport.fullWorldWidth, gameViewport.fullWorldHeight);
+            /*table.padBottom(-100);
+            table.setOrigin(100, 100);
+            table.setFillParent(false);*/
+            table.pack();
+            table.invalidateHierarchy();
         }
 
         if(m_fbo != null && useShader) {
@@ -639,8 +653,14 @@ public class GameWorld extends Stage {
                 font.draw(sb, "Hint: "+winHint, 10, Gdx.graphics.getHeight()-60);
         sb.end();
 
-        /*if(debugRendererEnabled)
-            Table.drawDebug(this);*/
+        if(debugRendererEnabled) {
+            RainGame.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            if(table != null)
+                table.drawDebug(RainGame.shapeRenderer);
+            if(tableControl != null)
+                tableControl.drawDebug(RainGame.shapeRenderer);
+            RainGame.shapeRenderer.end();
+        }
     }
 
     public void setWinHint(String winHint) {
