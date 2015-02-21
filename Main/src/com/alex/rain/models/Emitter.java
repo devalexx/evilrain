@@ -20,7 +20,7 @@ import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Emitter extends KinematicActor {
     public Emitter() {
-        sprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("emitter");
+        sprite = TextureManager.getSpriteFromDefaultAtlas("emitter");
         offset.set(-32, -32);
         type = TYPE.EMITTER;
         setBodyBox(64, 64);

@@ -34,11 +34,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        world.getViewport().update(width, height, true);
-        /*camera.viewportWidth = 800;
-        camera.viewportHeight = 480;
-        camera.position.set(0, -10, 0f);*/
-        //world.getSpriteBatch().setProjectionMatrix(camera.projection);
+        world.resize(width, height);
     }
 
     @Override

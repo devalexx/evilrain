@@ -82,12 +82,12 @@ public class ParticleRenderer {
         else
             prefix +="#version 100\n";
 
-        final String vertexShader = Gdx.files.internal("data/drop_pre_shader.vert").readString();
-        final String fragmentShader = Gdx.files.internal("data/drop_pre_shader.frag").readString();
+        final String vertexShader = Gdx.files.internal("data/shaders/drop_pre_shader.vert").readString();
+        final String fragmentShader = Gdx.files.internal("data/shaders/drop_pre_shader.frag").readString();
 
         ShaderProgram shader = new ShaderProgram(prefix + vertexShader,
                 prefix + fragmentShader);
-        if (shader.isCompiled() == false) {
+        if(!shader.isCompiled()) {
             Gdx.app.log("ERROR", shader.getLog());
         }
 

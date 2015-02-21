@@ -33,7 +33,7 @@ public class Cloud extends KinematicActor {
     int direction;
 
     public Cloud() {
-        sprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("cloud");
+        sprite = TextureManager.getSpriteFromDefaultAtlas("cloud");
 
         TextureRegion[][] tmp = sprite.split((int)sprite.getWidth() / FRAME_COLS, (int)sprite.getHeight() / FRAME_ROWS);
 

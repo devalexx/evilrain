@@ -22,7 +22,7 @@ import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Home extends DynamicActor {
     public Home() {
-        sprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("home1");
+        sprite = TextureManager.getSpriteFromDefaultAtlas("home1");
         setBodyBox(32, 100);
     }
 

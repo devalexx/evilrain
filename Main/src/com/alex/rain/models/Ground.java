@@ -42,7 +42,7 @@ public class Ground extends SimpleActor {
         super();
         type = TYPE.GROUND;
 
-        textureRegion = TextureManager.getInstance().getRegionFromDefaultAtlas("grass");
+        textureRegion = TextureManager.getRegionFromDefaultAtlas("grass");
     }
 
     @Override

@@ -23,7 +23,7 @@ import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Hammer extends DynamicActor {
     public Hammer() {
-        sprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("hammer");
+        sprite = TextureManager.getSpriteFromDefaultAtlas("hammer");
         setBodyBox(128, 128);
     }
 

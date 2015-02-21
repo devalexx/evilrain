@@ -15,6 +15,7 @@ package com.alex.rain.stages;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.listeners.GameContactListener;
+import com.alex.rain.managers.ResourceManager;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.models.Cloud;
 import com.alex.rain.models.Drop;
@@ -72,7 +73,8 @@ public class GameWorld extends Stage {
     private LuaFunction luaOnBeginContactFunc;
     private LuaFunction luaOnEndContactFunc;
     private boolean wonGame;
-    private Table table, tableControl;
+    private Table tableUI;
+    private Window winnerWindow;
     private ShaderProgram shader;
     private Texture backgroundTexture;
     private final Box2DDebugRenderer debugRenderer;
@@ -90,7 +92,6 @@ public class GameWorld extends Stage {
     private boolean itRain;
     private Cloud cloud;
     private Emitter emitter;
-    private BitmapFont font = new BitmapFont();
     private int levelNumber = 0;
     private String winHint;
     private final boolean lightVersion;
@@ -101,12 +102,12 @@ public class GameWorld extends Stage {
     private GameContactListener contactListener;
     public static final float WORLD_TO_BOX = 0.01f;
     public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
-    private Skin skin = new Skin();
+    private Skin skin = ResourceManager.getSkin();
     private int pressingAction = 0;
     private Vector2 cursorPosition;
     private List<Drop> selectedDrops;
     private ParticleSystemDef particleSystemDef;
-    private float PARTICLE_RADIUS = 7f;
+    private float PARTICLE_RADIUS = 6f;
     private GameViewport gameViewport = new GameViewport();
 
     public GameWorld(String name) {
@@ -124,18 +125,18 @@ public class GameWorld extends Stage {
         lightVersion = RainGame.isLightVersion();
         dropsMax = lightVersion ? 1000 : 1000;
 
-        String filename = "data/" + name + ".lua";
+        String filename = "data/levels/" + name + ".lua";
 
         if(name.replaceAll("[\\D]", "").length() > 0)
             levelNumber = Integer.parseInt(name.replaceAll("[\\D]", ""));
-        String filenameMain = "data/main.lua";
+        String filenameMain = "data/levels/main.lua";
         ScriptEngine engine = new LuaScriptEngine();
         CompiledScript cs;
 
         try {
             //Reader reader = new FileReader(filename);
             if(!Gdx.files.internal(filename).exists())
-                filename = "data/test.lua";
+                filename = "data/levels/test.lua";
             Reader reader = new StringReader(
                     Gdx.files.internal(filenameMain).readString() + Gdx.files.internal(filename).readString());
             cs = ((Compilable)engine).compile(reader);
@@ -150,16 +151,16 @@ public class GameWorld extends Stage {
             System.out.println("error: " + filename + ". " + e);
         }
 
-        final String VERTEX = Gdx.files.internal("data/drop_shader.vert").readString();
+        final String VERTEX = Gdx.files.internal("data/shaders/drop_shader.vert").readString();
         final String FRAGMENT = /*lightVersion ?
-                Gdx.files.internal("data/drop_shader_light.frag").readString() :*/
-                Gdx.files.internal("data/drop_shader.frag").readString();
+                Gdx.files.internal("data/shaders/drop_shader_light.frag").readString() :*/
+                Gdx.files.internal("data/shaders/drop_shader.frag").readString();
 
         shader = new ShaderProgram(VERTEX, FRAGMENT);
         if(!shader.isCompiled())
             System.out.println(shader.getLog());
 
-        backgroundTexture = TextureManager.getInstance().getTexture("background.png");
+        backgroundTexture = TextureManager.getTexture("background.png");
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
         spriteBatchShadered = new SpriteBatch();
@@ -180,46 +181,50 @@ public class GameWorld extends Stage {
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
-        skin.add("white", new Texture(pixmap));
 
-        skin.add("default", new BitmapFont());
-
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
-        textButtonStyle.font = skin.getFont("default");
-        skin.add("default", textButtonStyle);
-
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
-        labelStyle.font = skin.getFont("default");
-        skin.add("default", labelStyle);
+        createUI();
     }
 
-    private void createControls() {
-        tableControl = new Table();
-        tableControl.setFillParent(true);
-        tableControl.debug();
-        addUI(tableControl);
-        Sprite arrowLeftSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("arrow");
-        Sprite arrowDownSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("arrow");
-        Sprite arrowRightSprite = TextureManager.getInstance().getSpriteFromDefaultAtlas("arrow");
+    private void createUI() {
+        tableUI = new Table();
+        tableUI.setFillParent(true);
+        tableUI.debug();
+        addUI(tableUI);
+
+        Button menuButton = new TextButton("Main Menu", skin);
+        tableUI.add(menuButton);
+
+        /*if(cloud == null && emitter == null)
+            return;*/
+
+        tableUI.row();
+
+        tableUI.add().expand();
+
+        tableUI.row();
+
+        Table controlButtonsTable = new Table();
+        controlButtonsTable.debug();
+        tableUI.add(controlButtonsTable);
+        Sprite arrowLeftSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
+        Sprite arrowDownSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
+        Sprite arrowRightSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
         arrowLeftSprite.setRotation(90);
         arrowDownSprite.setRotation(180);
         arrowRightSprite.setRotation(-90);
-        ImageButton arrowUpButton = new ImageButton(new SpriteDrawable(TextureManager.getInstance().getSpriteFromDefaultAtlas("arrow")));
+        ImageButton arrowUpButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("arrow")));
         ImageButton arrowDownButton = new ImageButton(new SpriteDrawable(arrowDownSprite));
         ImageButton arrowLeftButton = new ImageButton(new SpriteDrawable(arrowLeftSprite));
         ImageButton arrowRightButton = new ImageButton(new SpriteDrawable(arrowRightSprite));
-        ImageButton actionButton = new ImageButton(new SpriteDrawable(TextureManager.getInstance().getSpriteFromDefaultAtlas("button")));
-        tableControl.left();
-        tableControl.bottom();
-        tableControl.add(arrowUpButton).colspan(3);
-        tableControl.row();
-        tableControl.add(arrowLeftButton);
-        tableControl.add(arrowDownButton);
-        tableControl.add(arrowRightButton);
-        tableControl.add(actionButton);
+        ImageButton actionButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("button")));
+        controlButtonsTable.left();
+        controlButtonsTable.bottom();
+        controlButtonsTable.add(arrowUpButton).colspan(3);
+        controlButtonsTable.row();
+        controlButtonsTable.add(arrowLeftButton);
+        controlButtonsTable.add(arrowDownButton);
+        controlButtonsTable.add(arrowRightButton);
+        controlButtonsTable.add(actionButton);
         arrowLeftButton.addListener(new ClickListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -299,10 +304,8 @@ public class GameWorld extends Stage {
             addActor(actor);
         }
 
-        if((cloud != null || emitter != null) && lightVersion)
-            createControls();
-        if(tableControl != null)
-            tableControl.toFront();
+        if(tableUI != null)
+            tableUI.toFront();
     }
 
     public void addUI(Actor actor) {
@@ -386,33 +389,37 @@ public class GameWorld extends Stage {
     }
 
     private void showWinnerMenu() {
-        if(table != null)
+        if(winnerWindow != null)
             return;
 
-        table = new Table();
-        //table.setFillParent(true);
-        table.debug();
-        addUI(table);
+        winnerWindow = new Window("Title", skin);
+        winnerWindow.setSize(GameViewport.WIDTH / 1.5f, GameViewport.HEIGHT / 1.5f);
+        winnerWindow.setPosition(GameViewport.WIDTH / 2f - winnerWindow.getWidth(),
+                GameViewport.HEIGHT / 2f - winnerWindow.getHeight());
+        winnerWindow.setModal(true);
+        winnerWindow.setMovable(false);
+        winnerWindow.debug();
+        addUI(winnerWindow);
 
-        table.row().width(100).padTop(10);
+        winnerWindow.row().width(100).padTop(10);
 
         final Label label = new Label(wonGame ? "Victory!" : "Menu", skin);
-        table.add(label);
+        winnerWindow.add(label);
 
-        table.row().width(400).padTop(10);
+        winnerWindow.row().width(400).padTop(10);
 
         final TextButton button = new TextButton("Next", skin);
-        table.add(button);
+        winnerWindow.add(button);
 
-        table.row().width(400).padTop(10);
+        winnerWindow.row().width(400).padTop(10);
 
         final TextButton button2 = new TextButton("Restart", skin);
-        table.add(button2);
+        winnerWindow.add(button2);
 
-        table.row().width(400).padTop(10);
+        winnerWindow.row().width(400).padTop(10);
 
         final TextButton button3 = new TextButton("Back to main menu", skin);
-        table.add(button3);
+        winnerWindow.add(button3);
 
         button.addListener(new ClickListener() {
             @Override
@@ -434,6 +441,8 @@ public class GameWorld extends Stage {
                 RainGame.getInstance().setMenu(new MainMenuScreen());
             }
         });
+
+        winnerWindow.toFront();
     }
 
     public World getPhysicsWorld() {
@@ -494,7 +503,7 @@ public class GameWorld extends Stage {
         else if(keyCode == Input.Keys.F7 || keyCode == Input.Keys.S)
             useShader = !useShader;
         else if(keyCode == Input.Keys.ESCAPE || keyCode == Input.Keys.Q || keyCode == Input.Keys.BACK) {
-            if(table != null)
+            if(winnerWindow != null)
                 RainGame.getInstance().setMenu(new MainMenuScreen());
             showWinnerMenu();
         } else if(keyCode == Input.Keys.LEFT || keyCode == Input.Keys.RIGHT || keyCode == Input.Keys.UP ||
@@ -575,7 +584,21 @@ public class GameWorld extends Stage {
     }
 
     public void resize(int width, int height) {
+        getViewport().update(width, height, true);
 
+        if(m_fbo == null || m_fbo.getWidth() != gameViewport.getWorldWidth() || m_fbo.getHeight() != gameViewport.getWorldHeight()) {
+            if(m_fbo != null)
+                m_fbo.dispose();
+
+            m_fbo = new FrameBuffer(Pixmap.Format.RGBA4444,
+                    (int)gameViewport.getWorldWidth(), (int)gameViewport.getWorldHeight(), false);
+            m_fboRegion = new TextureRegion(m_fbo.getColorBufferTexture());
+            m_fboRegion.flip(false, true);
+        }
+
+        if(tableUI != null) {
+            tableUI.setPosition(-gameViewport.offsetX, -gameViewport.offsetY);
+        }
     }
 
     @Override
@@ -587,53 +610,27 @@ public class GameWorld extends Stage {
             sb.draw(backgroundTexture, -(int)getViewport().getWorldWidth(), -(int)getViewport().getWorldHeight(), 0, 0, (int)getViewport().getWorldWidth() * 2, (int)getViewport().getWorldHeight() * 2);
         sb.end();
 
-        if(m_fbo == null || m_fbo.getWidth() != gameViewport.fullWorldWidth || m_fbo.getHeight() != gameViewport.fullWorldHeight) {
-            if(m_fbo != null)
-                m_fbo.dispose();
-
-            m_fbo = new FrameBuffer(Pixmap.Format.RGBA4444,
-                    (int)gameViewport.fullWorldWidth, (int)gameViewport.fullWorldHeight, false);
-            m_fboRegion = new TextureRegion(m_fbo.getColorBufferTexture());
-            m_fboRegion.flip(false, true);
-        }
-
-        if(table != null) {
-            table.setPosition(-100, 0);
-            table.setSize(gameViewport.fullWorldWidth, gameViewport.fullWorldHeight);
-            /*table.padBottom(-100);
-            table.setOrigin(100, 100);
-            table.setFillParent(false);*/
-            table.pack();
-            table.invalidateHierarchy();
-        }
-
         if(m_fbo != null && useShader) {
             m_fbo.begin();
-                sb.begin();
-                    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                    drawDrops(true);
-                sb.end();
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                drawDrops(true);
             m_fbo.end();
 
             spriteBatchShadered.setProjectionMatrix(getCamera().combined);
             spriteBatchShadered.begin();
-                if(!lightVersion)
-                    shader.setUniformf("u_time", time);
                 spriteBatchShadered.draw(m_fboRegion, -gameViewport.offsetX, -gameViewport.offsetY,
-                    m_fboRegion.getRegionWidth()-2*gameViewport.offsetX, m_fboRegion.getRegionHeight()-2*gameViewport.offsetY);
+                        gameViewport.getWorldWidth(), gameViewport.getWorldHeight());
             spriteBatchShadered.end();
         } else {
-            sb.begin();
                 drawDrops(false);
-            sb.end();
         }
 
         sb.begin();
-            if(table!=null)
-                table.setVisible(false);
+            if(winnerWindow !=null)
+                winnerWindow.setVisible(false);
             getRoot().draw(sb, 1);
-            if(table!=null)
-                table.setVisible(true);
+            if(winnerWindow !=null)
+                winnerWindow.setVisible(true);
         sb.end();
 
         if(debugRendererEnabled) {
@@ -643,22 +640,22 @@ public class GameWorld extends Stage {
         }
 
         sb.begin();
-            if(table != null) {
-                table.setPosition(0, 0);
-                table.draw(sb, 1f);
+            if(winnerWindow != null) {
+                winnerWindow.setPosition(0, 0);
+                winnerWindow.draw(sb, 1f);
             }
-            font.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
+            /*font.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
             font.draw(sb, "Drops: "+getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
             if(winHint != null)
-                font.draw(sb, "Hint: "+winHint, 10, Gdx.graphics.getHeight()-60);
+                font.draw(sb, "Hint: "+winHint, 10, Gdx.graphics.getHeight()-60);*/
         sb.end();
 
         if(debugRendererEnabled) {
             RainGame.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            if(table != null)
-                table.drawDebug(RainGame.shapeRenderer);
-            if(tableControl != null)
-                tableControl.drawDebug(RainGame.shapeRenderer);
+            if(winnerWindow != null)
+                winnerWindow.drawDebug(RainGame.shapeRenderer);
+            if(tableUI != null)
+                tableUI.drawDebug(RainGame.shapeRenderer);
             RainGame.shapeRenderer.end();
         }
     }
