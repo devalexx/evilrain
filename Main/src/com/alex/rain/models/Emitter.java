@@ -43,23 +43,22 @@ public class Emitter extends KinematicActor {
         body = physicsWorld.createBody(bodyDef);
         polygonShape.set(new float[] {
                 -getPhysicsWidth() / 2.5f, getPhysicsHeight() / 3, // top
-                -getPhysicsWidth() / 2.5f, getPhysicsHeight() / 2.5f,
-                getPhysicsWidth() / 2.5f, getPhysicsHeight() / 2.5f,
+                -getPhysicsWidth() / 2.5f, getPhysicsHeight() / 2f,
+                getPhysicsWidth() / 2.5f, getPhysicsHeight() / 2f,
                 getPhysicsWidth() / 2.5f, getPhysicsHeight() / 3});
         body.createFixture(fixtureDef);
         polygonShape.set(new float[] {
-                -getPhysicsWidth() / 2.5f, -getPhysicsHeight() / 2.5f, // left
-                -getPhysicsWidth() / 2.5f, getPhysicsHeight() / 2.5f,
+                -getPhysicsWidth() / 2f, -getPhysicsHeight() / 2.5f, // left
+                -getPhysicsWidth() / 2f, getPhysicsHeight() / 2.5f,
                 -getPhysicsWidth() / 3, getPhysicsHeight() / 2.5f,
                 -getPhysicsWidth() / 3, -getPhysicsHeight() / 2.5f});
         body.createFixture(fixtureDef);
         polygonShape.set(new float[] {
                 -getPhysicsWidth() / 2.5f, -getPhysicsHeight() / 3, // bottom
-                -getPhysicsWidth() / 2.5f, -getPhysicsHeight() / 2.5f,
-                getPhysicsWidth() / 2.5f, -getPhysicsHeight() / 2.5f,
+                -getPhysicsWidth() / 2.5f, -getPhysicsHeight() / 2f,
+                getPhysicsWidth() / 2.5f, -getPhysicsHeight() / 2f,
                 getPhysicsWidth() / 2.5f, -getPhysicsHeight() / 3});
         body.createFixture(fixtureDef);
-        body.resetMassData();
 
         polygonShape.dispose();
 

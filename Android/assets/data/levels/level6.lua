@@ -2,7 +2,7 @@ dynActorArray = {}
 
 function onCreate(world)
     world:setWinHint('Put to the right basket')
-    world:setPressingAction(1);
+    world:setPressingAction(2);
 
     ground = luajava.new(Ground)
     ground:addVertex(752, 48)

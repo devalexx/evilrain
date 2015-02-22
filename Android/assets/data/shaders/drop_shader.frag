@@ -10,7 +10,7 @@ uniform sampler2D u_texture;
 
 void main() {
     vec4 c = v_color * texture2D(u_texture, v_texCoords);
-    if(c.a > 0.26)
+    if(c.a > 0.27)
         c.a = 0.3;
     else if(c.a > 0.2) {
         c.a = 0.8;

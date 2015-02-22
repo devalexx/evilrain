@@ -121,7 +121,7 @@ public class GameWorld extends Stage {
 
         //super(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, new SpriteBatch(3000, 10));
         lightVersion = RainGame.isLightVersion();
-        dropsMax = lightVersion ? 1000 : 2000;
+        dropsMax = lightVersion ? 2000 : 2000;
 
         String filename = "data/levels/" + name + ".lua";
 
@@ -229,6 +229,7 @@ public class GameWorld extends Stage {
         ImageButton actionButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("button")));
         controlButtonsTable.left();
         controlButtonsTable.bottom();
+        controlButtonsTable.defaults().width(100).height(100);
         controlButtonsTable.add(arrowUpButton).colspan(3);
         controlButtonsTable.row();
         controlButtonsTable.add(arrowLeftButton);
@@ -351,7 +352,7 @@ public class GameWorld extends Stage {
         }
 
         if(itRain && !wonGame && cloud != null && dropList.size() < dropsMax) {
-            if(time - timeLastDrop > (lightVersion ? 0.09 : 0.05)) {
+            if(time - timeLastDrop > 0.05) {
                 Drop drop = new Drop();
                 Random r = new Random();
                 float offset = r.nextFloat() * cloud.getWidth() * 2/3;
@@ -363,11 +364,11 @@ public class GameWorld extends Stage {
         }
 
         if(itRain && !wonGame && emitter != null && dropList.size() < dropsMax) {
-            if(time - timeLastDrop > (lightVersion ? 0.09 : 0.05)) {
+            if(time - timeLastDrop > 0.01) {
                 Drop drop = new Drop();
                 Random r = new Random();
-                float offset = r.nextFloat() * emitter.getWidth() * 2/3;
-                drop.setPosition(new Vector2(emitter.getPosition().x - emitter.getWidth() / 3 + offset, emitter.getPosition().y));
+                float offset = r.nextFloat() * emitter.getWidth() * 0.1f;
+                drop.setPosition(new Vector2(emitter.getPosition().x/* - emitter.getWidth() / 2*/ + offset, emitter.getPosition().y));
                 drop.setLinearVelocity(new Vector2(100000, 0));
                 add(drop);
                 //drop.getBody().applyForceToCenter(new Vector2(drop.getBody().getMass() * 30 / delta, 0), true);
