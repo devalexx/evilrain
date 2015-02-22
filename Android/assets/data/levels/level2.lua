@@ -1,5 +1,6 @@
 function onCreate(world)
     world:setWinHint('Flood house!!')
+    world:setPressingAction(1);
 
     ground = luajava.new(Ground)
     ground:addVertex(736, 48)
@@ -43,7 +44,7 @@ function onCheck(mArray)
         end
     end
 
-    if count > 50 then
+    if count > 100 then
         return true
     else
         return false

@@ -3,6 +3,7 @@ isContacted = false
 
 function onCreate(world)
     world:setWinHint('Use hammer!')
+    world:setPressingAction(1);
 
     ground = luajava.new(Ground)
     ground:addVertex(752, 48)

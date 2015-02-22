@@ -1,5 +1,6 @@
 function onCreate(world)
     world:setWinHint('Select top left!!!')
+    world:setPressingAction(1);
 
     ground = luajava.new(Ground)
     ground:addVertex(528, 336)
@@ -57,7 +58,7 @@ function onCheck(mArray)
         end
     end
 
-    if has5 > 40 and hasElse == false then
+    if has5 > 20 and hasElse == false then
         return true
     else
         return false

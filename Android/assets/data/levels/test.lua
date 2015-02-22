@@ -1,6 +1,6 @@
 function onCreate(world)
     world:setWinHint('Playground!')
-    world:setPressingAction(1);
+    world:setPressingAction(2);
 
     ground = luajava.new(Ground)
     ground:addVertex(800, 480)
@@ -16,7 +16,7 @@ function onCreate(world)
     world:add(ground)
 
     for i = 0, 75 do
-        for j = 0, 39 do
+        for j = 0, 19 do
             drop = luajava.new(Drop)
             drop:setPosition(luajava.new(Vector2, i * 10 + 20, j * 10 + 20))
             if i <= 30 then

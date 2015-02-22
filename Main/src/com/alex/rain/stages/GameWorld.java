@@ -38,7 +38,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -66,7 +65,6 @@ public class GameWorld extends Stage {
     private World physicsWorld = new World(new Vector2(0, -9.8f), true);
     private ParticleSystem particleSystem;
     private List<SimpleActor> actorList = new ArrayList<SimpleActor>();
-    private List<Actor> uiActorList = new ArrayList<Actor>();
     private ArrayList<Drop> dropList = new ArrayList<Drop>();
     private LuaFunction luaOnCreateFunc;
     private LuaFunction luaOnCheckFunc;
@@ -108,6 +106,7 @@ public class GameWorld extends Stage {
     private List<Drop> selectedDrops;
     private float PARTICLE_RADIUS = 7f;
     private GameViewport gameViewport = new GameViewport();
+    private Label hintLabel;
 
     public GameWorld(String name) {
         setViewport(gameViewport);
@@ -122,7 +121,7 @@ public class GameWorld extends Stage {
 
         //super(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, new SpriteBatch(3000, 10));
         lightVersion = RainGame.isLightVersion();
-        dropsMax = lightVersion ? 1000 : 1000;
+        dropsMax = lightVersion ? 1000 : 2000;
 
         String filename = "data/levels/" + name + ".lua";
 
@@ -188,10 +187,19 @@ public class GameWorld extends Stage {
         tableUI = new Table();
         tableUI.setFillParent(true);
         tableUI.debug();
-        addUI(tableUI);
+        addActor(tableUI);
+
+        hintLabel = new Label("", skin);
+        tableUI.add(hintLabel).left();
 
         Button menuButton = new TextButton("Main Menu", skin);
-        tableUI.add(menuButton);
+        menuButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                showWinnerMenu();
+            }
+        });
+        tableUI.add(menuButton).right().top();
 
         /*if(cloud == null && emitter == null)
             return;*/
@@ -204,17 +212,20 @@ public class GameWorld extends Stage {
 
         Table controlButtonsTable = new Table();
         controlButtonsTable.debug();
-        tableUI.add(controlButtonsTable);
+        tableUI.add(controlButtonsTable).left();
         Sprite arrowLeftSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
         Sprite arrowDownSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
         Sprite arrowRightSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
-        arrowLeftSprite.setRotation(90);
-        arrowDownSprite.setRotation(180);
-        arrowRightSprite.setRotation(-90);
         ImageButton arrowUpButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("arrow")));
         ImageButton arrowDownButton = new ImageButton(new SpriteDrawable(arrowDownSprite));
         ImageButton arrowLeftButton = new ImageButton(new SpriteDrawable(arrowLeftSprite));
         ImageButton arrowRightButton = new ImageButton(new SpriteDrawable(arrowRightSprite));
+        arrowLeftButton.getImage().setOrigin(arrowLeftSprite.getWidth() / 2, arrowLeftSprite.getHeight() / 2);
+        arrowDownButton.getImage().setOrigin(arrowLeftSprite.getWidth() / 2, arrowLeftSprite.getHeight() / 2);
+        arrowRightButton.getImage().setOrigin(arrowLeftSprite.getWidth() / 2, arrowLeftSprite.getHeight() / 2);
+        arrowLeftButton.getImage().setRotation(90);
+        arrowDownButton.getImage().setRotation(180);
+        arrowRightButton.getImage().setRotation(-90);
         ImageButton actionButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("button")));
         controlButtonsTable.left();
         controlButtonsTable.bottom();
@@ -307,11 +318,6 @@ public class GameWorld extends Stage {
             tableUI.toFront();
     }
 
-    public void addUI(Actor actor) {
-        addActor(actor);
-        uiActorList.add(actor);
-    }
-
     public void createWorld() {
         LuaValue luaWorld = CoerceJavaToLua.coerce(this);
         if(luaOnCreateFunc != null)
@@ -369,17 +375,7 @@ public class GameWorld extends Stage {
             }
         }
 
-        if((pressingAction == 1 || pressingAction == 2) && cursorPosition != null) {
-            if(pressingAction == 2) {
-                cursorPosition.scl(WORLD_TO_BOX);
-                selectedDrops = new ArrayList<Drop>();
-                float[] pos = particleSystem.getParticlePositionBufferArray(false);
-                for(int i = 0; i < pos.length; i += 2) {
-                    if(Math.abs(cursorPosition.x - pos[i]) < 1 && Math.abs(cursorPosition.y - pos[i + 1]) < 1)
-                        selectedDrops.add(dropList.get(i / 2));
-                }
-                cursorPosition.scl(BOX_TO_WORLD);
-            }
+        if(pressingAction == 2 && cursorPosition != null) {
             for(Drop d : selectedDrops) {
                 d.particleGroup.applyForce(new Vector2((cursorPosition.x - d.getPosition().x) ,
                         (cursorPosition.y - d.getPosition().y)).nor().scl(0.8f));
@@ -393,12 +389,13 @@ public class GameWorld extends Stage {
 
         winnerWindow = new Window(wonGame ? "Victory!" : "Menu", skin);
         winnerWindow.setSize(GameViewport.WIDTH / 1.5f, GameViewport.HEIGHT / 1.5f);
-        winnerWindow.setPosition(GameViewport.WIDTH / 2f - winnerWindow.getWidth(),
-                GameViewport.HEIGHT / 2f - winnerWindow.getHeight());
+        winnerWindow.setPosition(GameViewport.WIDTH / 2f - winnerWindow.getWidth() / 2f,
+                GameViewport.HEIGHT / 2f - winnerWindow.getHeight() / 2f);
         winnerWindow.setModal(true);
         winnerWindow.setMovable(false);
+        winnerWindow.setKeepWithinStage(false);
         winnerWindow.debug();
-        addUI(winnerWindow);
+        addActor(winnerWindow);
 
         winnerWindow.row().width(400).padTop(10);
 
@@ -452,6 +449,21 @@ public class GameWorld extends Stage {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         cursorPosition = new Vector2(screenX * (float)GameViewport.WIDTH / Gdx.graphics.getWidth(),
                 (Gdx.graphics.getHeight() - screenY) * (float)GameViewport.HEIGHT / Gdx.graphics.getHeight());
+        if(pressingAction == 2) {
+            cursorPosition.scl(WORLD_TO_BOX);
+            selectedDrops = new ArrayList<Drop>();
+            float[] pos = particleSystem.getParticlePositionBufferArray(false);
+            for(int i = 0; i < pos.length; i += 2) {
+                if(Math.abs(cursorPosition.x - pos[i]) < 1 && Math.abs(cursorPosition.y - pos[i + 1]) < 1)
+                    selectedDrops.add(dropList.get(i / 2));
+            }
+            cursorPosition.scl(BOX_TO_WORLD);
+
+            for(Drop d : selectedDrops) {
+                d.particleGroup.applyForce(new Vector2((cursorPosition.x - d.getPosition().x) ,
+                        (cursorPosition.y - d.getPosition().y)).nor().scl(0.8f));
+            }
+        }
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
@@ -476,7 +488,7 @@ public class GameWorld extends Stage {
             return true;
 
         Vector2 cp = getCursorPosition(screenX, screenY);
-        if(pressingAction == 0 && lastCreatedDropPos.dst(cp) > 10) {
+        if(pressingAction == 1 && lastCreatedDropPos.dst(cp) > 10) {
             Drop drop = new Drop();
             Random r = new Random();
             int offset = r.nextInt(10);
@@ -628,29 +640,18 @@ public class GameWorld extends Stage {
         }
 
         sb.begin();
-            if(winnerWindow !=null)
-                winnerWindow.setVisible(false);
             getRoot().draw(sb, 1);
-            if(winnerWindow !=null)
-                winnerWindow.setVisible(true);
         sb.end();
 
         if(debugRendererEnabled) {
             debugRenderer.render(physicsWorld, getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
             particleDebugRendererCircle.render(particleSystem, PARTICLE_RADIUS / 2.5f * BOX_TO_WORLD * gameViewport.scale, getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
             particleDebugRendererDot.render(particleSystem, PARTICLE_RADIUS / 10f * BOX_TO_WORLD * gameViewport.scale, getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
-        }
 
-        sb.begin();
-            if(winnerWindow != null) {
-                winnerWindow.setPosition(0, 0);
-                winnerWindow.draw(sb, 1f);
-            }
-            /*font.draw(sb, "FPS: "+Gdx.graphics.getFramesPerSecond(), 10, Gdx.graphics.getHeight()-20);
-            font.draw(sb, "Drops: "+getDropsNumber(), 10, Gdx.graphics.getHeight()-40);
-            if(winHint != null)
-                font.draw(sb, "Hint: "+winHint, 10, Gdx.graphics.getHeight()-60);*/
-        sb.end();
+            hintLabel.setText((winHint != null ? "Hint: " + winHint + "\n" : "") +
+                    "FPS: " + Gdx.graphics.getFramesPerSecond() + "\n" +
+                    "Drops: " + getDropsNumber());
+        }
 
         if(debugRendererEnabled) {
             RainGame.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -664,6 +665,7 @@ public class GameWorld extends Stage {
 
     public void setWinHint(String winHint) {
         this.winHint = winHint;
+        hintLabel.setText("Hint: " + winHint);
     }
 
     public PolygonSpriteBatch getPolygonSpriteBatch() {
