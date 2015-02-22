@@ -106,15 +106,14 @@ public class GameWorld extends Stage {
     private int pressingAction = 0;
     private Vector2 cursorPosition;
     private List<Drop> selectedDrops;
-    private ParticleSystemDef particleSystemDef;
-    private float PARTICLE_RADIUS = 6f;
+    private float PARTICLE_RADIUS = 7f;
     private GameViewport gameViewport = new GameViewport();
 
     public GameWorld(String name) {
         setViewport(gameViewport);
         getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
-        particleSystemDef = new ParticleSystemDef();
+        ParticleSystemDef particleSystemDef = new ParticleSystemDef();
         particleSystemDef.radius = PARTICLE_RADIUS * GameWorld.WORLD_TO_BOX;
         //particleSystemDef.pressureStrength = 0.4f;
         particleSystemDef.dampingStrength = 0.5f;
@@ -392,7 +391,7 @@ public class GameWorld extends Stage {
         if(winnerWindow != null)
             return;
 
-        winnerWindow = new Window("Title", skin);
+        winnerWindow = new Window(wonGame ? "Victory!" : "Menu", skin);
         winnerWindow.setSize(GameViewport.WIDTH / 1.5f, GameViewport.HEIGHT / 1.5f);
         winnerWindow.setPosition(GameViewport.WIDTH / 2f - winnerWindow.getWidth(),
                 GameViewport.HEIGHT / 2f - winnerWindow.getHeight());
@@ -401,41 +400,41 @@ public class GameWorld extends Stage {
         winnerWindow.debug();
         addUI(winnerWindow);
 
-        winnerWindow.row().width(100).padTop(10);
+        winnerWindow.row().width(400).padTop(10);
 
-        final Label label = new Label(wonGame ? "Victory!" : "Menu", skin);
-        winnerWindow.add(label);
+        final TextButton nextOrContinueButton = new TextButton(!wonGame ? "Continue" : "Next", skin);
+        winnerWindow.add(nextOrContinueButton);
 
         winnerWindow.row().width(400).padTop(10);
 
-        final TextButton button = new TextButton("Next", skin);
-        winnerWindow.add(button);
+        final TextButton restartButton = new TextButton("Restart", skin);
+        winnerWindow.add(restartButton);
 
         winnerWindow.row().width(400).padTop(10);
 
-        final TextButton button2 = new TextButton("Restart", skin);
-        winnerWindow.add(button2);
+        final TextButton mainMenuButton = new TextButton("Back to main menu", skin);
+        winnerWindow.add(mainMenuButton);
 
-        winnerWindow.row().width(400).padTop(10);
-
-        final TextButton button3 = new TextButton("Back to main menu", skin);
-        winnerWindow.add(button3);
-
-        button.addListener(new ClickListener() {
+        nextOrContinueButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                RainGame.getInstance().setLevel("level" + (levelNumber + 1));
+                if(wonGame)
+                    RainGame.getInstance().setLevel("level" + (levelNumber + 1));
+                else {
+                    winnerWindow.remove();
+                    winnerWindow = null;
+                }
             }
         });
 
-        button2.addListener(new ClickListener() {
+        restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 RainGame.getInstance().setLevel("level" + levelNumber);
             }
         });
 
-        button3.addListener(new ClickListener() {
+        mainMenuButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 RainGame.getInstance().setMenu(new MainMenuScreen());
@@ -467,6 +466,9 @@ public class GameWorld extends Stage {
     private Vector2 lastCreatedDropPos = new Vector2();
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        if(winnerWindow != null)
+            return true;
+
         if(cursorPosition != null)
             cursorPosition.set(getCursorPosition(screenX, screenY));
 
