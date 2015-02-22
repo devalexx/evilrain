@@ -73,7 +73,7 @@ public class Box2DSeparatorHelper {
                 area += verticesVec.get(k).x * verticesVec.get(k+1).y - verticesVec.get(k+1).x * verticesVec.get(k).y;
             }
             area *= 0.5f;
-            if(verticesVec.size() == 0 || area < 0.1)
+            if(verticesVec.size() == 0 || Math.abs(area) < 0.01)
                 continue;
             polyShape.set(verticesVec.toArray(new Vector2[verticesVec.size()]));
             fixtureDef.shape=polyShape;
