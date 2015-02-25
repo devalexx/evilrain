@@ -19,6 +19,8 @@ import com.badlogic.gdx.physics.box2d.*;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Emitter extends KinematicActor {
+    boolean autoFire;
+
     public Emitter() {
         sprite = TextureManager.getSpriteFromDefaultAtlas("emitter");
         offset.set(-32, -32);
@@ -70,5 +72,13 @@ public class Emitter extends KinematicActor {
         sprite.setPosition(pos.x + offset.x, pos.y + offset.y);
         sprite.setRotation(rot);
         sprite.draw(batch, parentAlpha);
+    }
+
+    public boolean isAutoFire() {
+        return autoFire;
+    }
+
+    public void setAutoFire(boolean autoFire) {
+        this.autoFire = autoFire;
     }
 }

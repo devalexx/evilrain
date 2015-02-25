@@ -342,6 +342,8 @@ public class GameWorld extends Stage {
             physicsWorld.step(step, 4, 2, 6);
         particleSystem.getParticlePositionBufferArray(true);
 
+        removeUnnecessaryDrops();
+
         super.act(delta);
 
         LuaValue luaDrop = CoerceJavaToLua.coerce(dropList);
@@ -351,35 +353,42 @@ public class GameWorld extends Stage {
             showWinnerMenu();
         }
 
-        if(itRain && !wonGame && cloud != null && dropList.size() < dropsMax) {
-            if(time - timeLastDrop > 0.05) {
-                Drop drop = new Drop();
-                Random r = new Random();
-                float offset = r.nextFloat() * cloud.getWidth() * 2/3;
-                drop.setPosition(new Vector2(cloud.getPosition().x - cloud.getWidth() / 3 + offset, cloud.getPosition().y));
-                add(drop);
-                //drop.getBody().applyForceToCenter(new Vector2(0, -drop.getBody().getMass() * 20 / delta), true);
-                timeLastDrop = time;
-            }
-        }
-
-        if(itRain && !wonGame && emitter != null && dropList.size() < dropsMax) {
-            if(time - timeLastDrop > 0.01) {
-                Drop drop = new Drop();
-                Random r = new Random();
-                float offset = r.nextFloat() * emitter.getWidth() * 0.1f;
-                drop.setPosition(new Vector2(emitter.getPosition().x/* - emitter.getWidth() / 2*/ + offset, emitter.getPosition().y));
-                drop.setLinearVelocity(new Vector2(100000, 0));
-                add(drop);
-                //drop.getBody().applyForceToCenter(new Vector2(drop.getBody().getMass() * 30 / delta, 0), true);
-                timeLastDrop = time;
-            }
+        if((itRain || emitter != null && emitter.isAutoFire()) &&
+                !wonGame && (emitter != null || cloud != null) && dropList.size() < dropsMax &&
+                time - timeLastDrop > 0.05) {
+            Drop drop = new Drop();
+            Random r = new Random();
+            float offset = r.nextFloat() * emitter.getWidth() * 0.1f;
+            drop.setPosition(new Vector2(emitter.getPosition().x + offset, emitter.getPosition().y));
+            add(drop);
+            timeLastDrop = time;
         }
 
         if(pressingAction == 2 && cursorPosition != null) {
             for(Drop d : selectedDrops) {
                 d.particleGroup.applyForce(new Vector2((cursorPosition.x - d.getPosition().x) ,
                         (cursorPosition.y - d.getPosition().y)).nor().scl(0.8f));
+            }
+        }
+    }
+
+    private void removeUnnecessaryDrops() {
+        float[] pos = particleSystem.getParticlePositionBufferArray(false);
+        int minX = (int)(100 * WORLD_TO_BOX);
+        int maxX = (int)(800 * WORLD_TO_BOX);
+        int minY = (int)(100 * WORLD_TO_BOX);
+        for(int i = 0; i < particleSystem.getParticleCount(); i++) {
+            if(pos[i*2] < minX || pos[i*2] > maxX || pos[i*2+1] < minY) {
+                particleSystem.destroyParticle(i);
+                //if(i < dropList.size())
+                Drop removedDrop = dropList.remove(i);
+                if(selectedDrops != null)
+                    selectedDrops.remove(removedDrop);
+
+                for(int j = i; j < dropList.size(); j++) {
+                    Drop drop = dropList.get(j);
+                    drop.decrementIndex();
+                }
             }
         }
     }
@@ -652,6 +661,15 @@ public class GameWorld extends Stage {
             hintLabel.setText((winHint != null ? "Hint: " + winHint + "\n" : "") +
                     "FPS: " + Gdx.graphics.getFramesPerSecond() + "\n" +
                     "Drops: " + getDropsNumber());
+
+            if(selectedDrops != null) {
+                for(Drop drop : selectedDrops) {
+                    RainGame.shapeRenderer.setColor(1, 0, 0, 1);
+                    RainGame.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                        RainGame.shapeRenderer.line(drop.getPosition().x, drop.getPosition().y, cursorPosition.x, cursorPosition.y);
+                    RainGame.shapeRenderer.end();
+                }
+            }
         }
 
         if(debugRendererEnabled) {

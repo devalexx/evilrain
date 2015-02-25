@@ -46,7 +46,8 @@ public abstract class SimpleActor extends Actor {
     }
 
     public void setRotation(float a) {
-        body.setTransform(getPosition(), (float)Math.toRadians(a));
+        if(body != null)
+            body.setTransform(getPosition().cpy().scl(GameWorld.WORLD_TO_BOX), (float)Math.toRadians(a));
         rot = a;
     }
 

@@ -111,4 +111,8 @@ public class Drop extends SimpleActor {
         //pos.scl(GameWorld.BOX_TO_WORLD);
         //particleGroup.applyForce(new Vector2(-10, 0));
     }
+
+    public void decrementIndex() {
+        particleIndex--;
+    }
 }
