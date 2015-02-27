@@ -374,13 +374,12 @@ public class GameWorld extends Stage {
 
     private void removeUnnecessaryDrops() {
         float[] pos = particleSystem.getParticlePositionBufferArray(false);
-        int minX = (int)(100 * WORLD_TO_BOX);
-        int maxX = (int)(800 * WORLD_TO_BOX);
-        int minY = (int)(100 * WORLD_TO_BOX);
-        for(int i = 0; i < particleSystem.getParticleCount(); i++) {
+        int minX = (int)(-GameViewport.WIDTH * 2 * WORLD_TO_BOX);
+        int maxX = (int)(GameViewport.WIDTH * 2 * WORLD_TO_BOX);
+        int minY = (int)(-GameViewport.HEIGHT * WORLD_TO_BOX);
+        for(int i = particleSystem.getParticleCount() - 1; i >= 0; i--) {
             if(pos[i*2] < minX || pos[i*2] > maxX || pos[i*2+1] < minY) {
                 particleSystem.destroyParticle(i);
-                //if(i < dropList.size())
                 Drop removedDrop = dropList.remove(i);
                 if(selectedDrops != null)
                     selectedDrops.remove(removedDrop);
@@ -457,8 +456,7 @@ public class GameWorld extends Stage {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        cursorPosition = new Vector2(screenX * (float)GameViewport.WIDTH / Gdx.graphics.getWidth(),
-                (Gdx.graphics.getHeight() - screenY) * (float)GameViewport.HEIGHT / Gdx.graphics.getHeight());
+        cursorPosition = getCursorPosition(screenX, screenY).cpy();
         if(pressingAction == 2) {
             cursorPosition.scl(WORLD_TO_BOX);
             selectedDrops = new ArrayList<Drop>();
