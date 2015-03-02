@@ -58,6 +58,7 @@ import javax.script.SimpleBindings;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -103,7 +104,7 @@ public class GameWorld extends Stage {
     private Skin skin = ResourceManager.getSkin();
     private int pressingAction = 0;
     private Vector2 cursorPosition;
-    private List<Drop> selectedDrops;
+    private List<Drop> selectedDrops, dropsToCreate = new LinkedList<Drop>(), dropsToDelete = new LinkedList<Drop>();
     private float PARTICLE_RADIUS = 7f;
     private GameViewport gameViewport = new GameViewport();
     private Label hintLabel;
@@ -310,7 +311,7 @@ public class GameWorld extends Stage {
 
         if(actor.getType() == SimpleActor.TYPE.DROP) {
             getRoot().addActorAt(0, actor);
-            dropList.add((Drop)actor);
+            dropList.add((Drop) actor);
         } else {
             addActor(actor);
         }
@@ -331,18 +332,30 @@ public class GameWorld extends Stage {
         final float step = 1 / 60f;
         time += dt;
 
-        /*if(dt < 1/120f)
-            dt = 1/120f;
-        else if(dt > 1/60f)
-            dt = 1/60f;*/
-
-        /*if(liquidForcesEnabled)
-            liquidHelper.applyLiquidConstraint(dt);*/
-        if(physicsEnabled)
-            physicsWorld.step(step, 4, 2, 6);
         particleSystem.getParticlePositionBufferArray(true);
 
         removeUnnecessaryDrops();
+
+        for(Drop drop : dropsToDelete) {
+            int i = dropList.indexOf(drop);
+            particleSystem.destroyParticle(i);
+            Drop removedDrop = dropList.remove(i);
+            if(selectedDrops != null)
+                selectedDrops.remove(removedDrop);
+
+            for(int j = i; j < dropList.size(); j++)
+                dropList.get(j).decrementIndex();
+        }
+        dropsToDelete.clear();
+
+        if(physicsEnabled)
+            physicsWorld.step(step, 4, 2, 6);
+
+        for(Drop drop : dropsToCreate)
+            add(drop);
+        dropsToCreate.clear();
+
+        particleSystem.getParticlePositionBufferArray(true);
 
         super.act(delta);
 
@@ -360,14 +373,14 @@ public class GameWorld extends Stage {
             Random r = new Random();
             float offset = r.nextFloat() * emitter.getWidth() * 0.1f;
             drop.setPosition(new Vector2(emitter.getPosition().x + offset, emitter.getPosition().y));
-            add(drop);
+            dropsToCreate.add(drop);
             timeLastDrop = time;
         }
 
         if(pressingAction == 2 && cursorPosition != null) {
             for(Drop d : selectedDrops) {
                 d.particleGroup.applyForce(new Vector2((cursorPosition.x - d.getPosition().x) ,
-                        (cursorPosition.y - d.getPosition().y)).nor().scl(0.8f));
+                        (cursorPosition.y - d.getPosition().y)).nor().scl(3.8f));
             }
         }
     }
@@ -379,15 +392,7 @@ public class GameWorld extends Stage {
         int minY = (int)(-GameViewport.HEIGHT * WORLD_TO_BOX);
         for(int i = particleSystem.getParticleCount() - 1; i >= 0; i--) {
             if(pos[i*2] < minX || pos[i*2] > maxX || pos[i*2+1] < minY) {
-                particleSystem.destroyParticle(i);
-                Drop removedDrop = dropList.remove(i);
-                if(selectedDrops != null)
-                    selectedDrops.remove(removedDrop);
-
-                for(int j = i; j < dropList.size(); j++) {
-                    Drop drop = dropList.get(j);
-                    drop.decrementIndex();
-                }
+                dropsToDelete.add(dropList.get(i));
             }
         }
     }
@@ -503,7 +508,7 @@ public class GameWorld extends Stage {
             lastCreatedDropPos.set(cp);
             drop.setPosition(lastCreatedDropPos);
             drop.setLinearVelocity(new Vector2(100000, 0));
-            add(drop);
+            dropsToCreate.add(drop);
         }
 
         return false;

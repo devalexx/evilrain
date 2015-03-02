@@ -20,6 +20,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import finnstr.libgdx.liquidfun.*;
 
+import java.util.Arrays;
+
 public class Drop extends SimpleActor {
     private static float RADIUS;
     private static CircleShape circleShape;
@@ -90,12 +92,10 @@ public class Drop extends SimpleActor {
 
     @Override
     public Vector2 getPosition() {
-        /*float[] posArr = particleSystem.getParticlePositionBufferArray(false);
-        if(posArr.length == 0)
-            posArr = particleSystem.getParticlePositionBufferArray(true);*/
+        float posXY[] = Arrays.copyOfRange(particleSystem.getParticlePositionBufferArray(false),
+                particleIndex*2, particleIndex*2 + 2);
         if(particleSystem != null)
-            pos.set(particleSystem.getParticlePositionBufferArray(false)[particleIndex*2],
-                    particleSystem.getParticlePositionBufferArray(false)[particleIndex*2+1]).scl(GameWorld.BOX_TO_WORLD);
+            pos.set(posXY[0], posXY[1]).scl(GameWorld.BOX_TO_WORLD);
 
         return super.getPosition();
     }
