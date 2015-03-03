@@ -61,34 +61,40 @@ import java.util.*;
 import java.util.List;
 
 public class GameWorld extends Stage {
+    public static final float WORLD_TO_BOX = 0.01f;
+    public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
+    public static float PARTICLE_RADIUS = 7f;
+
     private World physicsWorld = new World(new Vector2(0, -9.8f), true);
     private ParticleSystem particleSystem;
-    private List<SimpleActor> actorList = new ArrayList<SimpleActor>();
-    private ArrayList<Drop> dropList = new ArrayList<Drop>();
-    private LuaFunction luaOnCreateFunc;
-    private LuaFunction luaOnCheckFunc;
-    private LuaFunction luaOnBeginContactFunc;
-    private LuaFunction luaOnEndContactFunc;
-    private boolean wonGame;
-    private Table tableUI;
-    private Window winnerWindow;
-    private ShaderProgram shader;
+    private LuaFunction luaOnCreateFunc, luaOnCheckFunc, luaOnBeginContactFunc, luaOnEndContactFunc;
     private Texture backgroundTexture;
     private final Box2DDebugRenderer debugRenderer;
-    private final ParticleDebugRenderer particleDebugRendererCircle;
-    private final ParticleDebugRenderer particleDebugRendererDot;
+    private final ParticleDebugRenderer particleDebugRendererCircle, particleDebugRendererDot;
     private final ParticleRenderer particleRenderer;
-    private boolean debugRendererEnabled;
     private final SpriteBatch spriteBatchShadered;
     private final PolygonSpriteBatch polygonSpriteBatch;
     private FrameBuffer m_fbo;
     private TextureRegion m_fboRegion;
     private final Batch sb;
+    private Skin skin = ResourceManager.getSkin();
+    private GameViewport gameViewport = new GameViewport();
+
+    private List<Drop> selectedDrops, dropsToCreate = new LinkedList<Drop>(), dropsToDelete = new LinkedList<Drop>();
+    private List<SimpleActor> actorList = new ArrayList<SimpleActor>();
+    private ArrayList<Drop> dropList = new ArrayList<Drop>();
+    private Cloud cloud;
+    private Emitter emitter;
+    private Table tableUI;
+    private Window winnerWindow;
+    private ImageButton actionButton, arrowUpButton, arrowDownButton, arrowLeftButton ,arrowRightButton;
+    private Label hintLabel;
+
+    private boolean wonGame;
+    private boolean debugRendererEnabled;
     private float time;
     private float timeLastDrop;
     private boolean itRain;
-    private Cloud cloud;
-    private Emitter emitter;
     private int levelNumber = 0;
     private String winHint;
     private final boolean lightVersion;
@@ -96,16 +102,8 @@ public class GameWorld extends Stage {
     private boolean physicsEnabled = true;
     private boolean liquidForcesEnabled = true;
     private boolean useShader = true;
-    private GameContactListener contactListener;
-    public static final float WORLD_TO_BOX = 0.01f;
-    public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
-    private Skin skin = ResourceManager.getSkin();
     private int pressingAction = 0;
     private Vector2 cursorPosition;
-    private List<Drop> selectedDrops, dropsToCreate = new LinkedList<Drop>(), dropsToDelete = new LinkedList<Drop>();
-    private float PARTICLE_RADIUS = 7f;
-    private GameViewport gameViewport = new GameViewport();
-    private Label hintLabel;
 
     public GameWorld(String name) {
         setViewport(gameViewport);
@@ -153,7 +151,7 @@ public class GameWorld extends Stage {
                 Gdx.files.internal("data/shaders/drop_shader_light.frag").readString() :*/
                 Gdx.files.internal("data/shaders/drop_shader.frag").readString();
 
-        shader = new ShaderProgram(VERTEX, FRAGMENT);
+        ShaderProgram shader = new ShaderProgram(VERTEX, FRAGMENT);
         if(!shader.isCompiled())
             System.out.println(shader.getLog());
 
@@ -172,7 +170,7 @@ public class GameWorld extends Stage {
         particleDebugRendererCircle = new ParticleDebugRenderer(Color.BLUE, 100000);
         particleRenderer = new ParticleRenderer(Color.RED, 100000);
 
-        contactListener = new GameContactListener(luaOnBeginContactFunc, luaOnEndContactFunc);
+        GameContactListener contactListener = new GameContactListener(luaOnBeginContactFunc, luaOnEndContactFunc);
         physicsWorld.setContactListener(contactListener);
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -215,18 +213,23 @@ public class GameWorld extends Stage {
         Sprite arrowLeftSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
         Sprite arrowDownSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
         Sprite arrowRightSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
-        ImageButton arrowUpButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("arrow")));
-        ImageButton arrowDownButton = new ImageButton(new SpriteDrawable(arrowDownSprite));
-        ImageButton arrowLeftButton = new ImageButton(new SpriteDrawable(arrowLeftSprite));
-        ImageButton arrowRightButton = new ImageButton(new SpriteDrawable(arrowRightSprite));
+        actionButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("button")));
+        arrowUpButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("arrow")));
+        arrowDownButton = new ImageButton(new SpriteDrawable(arrowDownSprite));
+        arrowLeftButton = new ImageButton(new SpriteDrawable(arrowLeftSprite));
+        arrowRightButton = new ImageButton(new SpriteDrawable(arrowRightSprite));
+        actionButton.setVisible(false);
+        arrowUpButton.setVisible(false);
+        arrowDownButton.setVisible(false);
+        arrowLeftButton.setVisible(false);
+        arrowRightButton.setVisible(false);
         arrowLeftButton.getImage().setOrigin(arrowLeftSprite.getWidth() / 2, arrowLeftSprite.getHeight() / 2);
         arrowDownButton.getImage().setOrigin(arrowLeftSprite.getWidth() / 2, arrowLeftSprite.getHeight() / 2);
         arrowRightButton.getImage().setOrigin(arrowLeftSprite.getWidth() / 2, arrowLeftSprite.getHeight() / 2);
         arrowLeftButton.getImage().setRotation(90);
         arrowDownButton.getImage().setRotation(180);
         arrowRightButton.getImage().setRotation(-90);
-        ImageButton actionButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("button")));
-        controlButtonsTable.left();
+        controlButtonsTable.setFillParent(true);
         controlButtonsTable.bottom();
         controlButtonsTable.defaults().width(100).height(100);
         controlButtonsTable.add(arrowUpButton).colspan(3);
@@ -234,7 +237,7 @@ public class GameWorld extends Stage {
         controlButtonsTable.add(arrowLeftButton);
         controlButtonsTable.add(arrowDownButton);
         controlButtonsTable.add(arrowRightButton);
-        controlButtonsTable.add(actionButton);
+        controlButtonsTable.add(actionButton).expandX().right();
         arrowLeftButton.addListener(new ClickListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -302,14 +305,21 @@ public class GameWorld extends Stage {
         actor.prepareActor();
         actorList.add(actor);
 
-        if(actor.getType() == SimpleActor.TYPE.CLOUD)
+        if(actor.getType() == SimpleActor.TYPE.CLOUD) {
             cloud = (Cloud)actor;
-        else if(actor.getType() == SimpleActor.TYPE.EMITTER)
+            actionButton.setVisible(true);
+            arrowLeftButton.setVisible(true);
+            arrowRightButton.setVisible(true);
+        } else if(actor.getType() == SimpleActor.TYPE.EMITTER) {
             emitter = (Emitter)actor;
+            actionButton.setVisible(true);
+            arrowUpButton.setVisible(true);
+            arrowDownButton.setVisible(true);
+        }
 
         if(actor.getType() == SimpleActor.TYPE.DROP) {
             getRoot().addActorAt(0, actor);
-            dropList.add((Drop) actor);
+            dropList.add((Drop)actor);
         } else {
             addActor(actor);
         }
@@ -558,7 +568,7 @@ public class GameWorld extends Stage {
         if(keyCode == Input.Keys.LEFT) {
             if(cloud != null) {
                 if(pressed) {
-                    cloud.setLinearVelocity(new Vector2(-20, 0));
+                    cloud.setLinearVelocity(new Vector2(-100, 0));
                     cloud.setDirection(1);
                 } else {
                     cloud.setLinearVelocity(new Vector2(0, 0));
@@ -568,7 +578,7 @@ public class GameWorld extends Stage {
         } else if(keyCode == Input.Keys.RIGHT) {
             if(cloud != null) {
                 if(pressed) {
-                    cloud.setLinearVelocity(new Vector2(20, 0));
+                    cloud.setLinearVelocity(new Vector2(100, 0));
                     cloud.setDirection(2);
                 } else {
                     cloud.setLinearVelocity(new Vector2(0, 0));
@@ -578,14 +588,14 @@ public class GameWorld extends Stage {
         } else if(keyCode == Input.Keys.UP) {
             if(emitter != null) {
                 if(pressed)
-                    emitter.setLinearVelocity(new Vector2(0, 20));
+                    emitter.setLinearVelocity(new Vector2(0, 100));
                 else
                     emitter.setLinearVelocity(new Vector2(0, 0));
             }
         } else if(keyCode == Input.Keys.DOWN) {
             if(emitter != null) {
                 if(pressed)
-                    emitter.setLinearVelocity(new Vector2(0, -20));
+                    emitter.setLinearVelocity(new Vector2(0, -100));
                 else
                     emitter.setLinearVelocity(new Vector2(0, 0));
             }
