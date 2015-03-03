@@ -34,7 +34,7 @@ function onCreate(world)
     world:add(cloud)
 end
 
-function onCheck(mArray)
+function onCheck()
     for i = 1, #dynActorArray do
         if dynActorArray[i]:getRotation() > -30 and dynActorArray[i]:getRotation() < 30 then
             return false

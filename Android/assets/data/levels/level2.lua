@@ -33,14 +33,12 @@ function onCreate(world)
     dynamicActor:setPosition(luajava.new(Vector2, 200, 150))
 end
 
-function onCheck(mArray)
+function onCheck(dropsPosArray, dropsCount)
     count = 0
-    mArray:size()
-    for i = 0, mArray:size() - 1 do
-        if mArray:get(i):getStringType() == "DROP" then
-            if mArray:get(i):getPosition().y < 200 then
-                count = count + 1
-            end
+    for i = 0, dropsCount - 1 do
+        print(i, dropsCount, Array:getLength(dropsPosArray))
+        if Array:get(dropsPosArray, i * 2 + 1) < 200 then
+            count = count + 1
         end
     end
 

@@ -4,7 +4,7 @@ function onCreate(world)
     world:setWinHint('Put to the right basket')
     world:setPressingAction(2);
 
-    ground = luajava.new(Ground)
+    local ground = luajava.new(Ground)
     ground:addVertex(752, 48)
     ground:addVertex(736, 352)
     ground:addVertex(656, 352)
@@ -21,7 +21,7 @@ function onCreate(world)
 
     for i = 10, 11 do
         for j = 10, 11 do
-            drop = luajava.new(Drop)
+            local drop = luajava.new(Drop)
             drop:setPosition(luajava.new(Vector2, i * 10 + 20, j * 10 + 20))
             if i < 30 then
                 drop:setColor(Color.GREEN)
@@ -31,12 +31,10 @@ function onCreate(world)
     end
 end
 
-function onCheck(mArray)
-    for i = 0, mArray:size() - 1 do
-        if mArray:get(i):getStringType() == "DROP" then
-            if mArray:get(i):getPosition().x < 400 then
-                return false
-            end
+function onCheck(dropsPosArray, dropsCount)
+    for i = 0, dropsCount - 1 do
+        if Array:get(dropsPosArray, i * 2) < 400 then
+            return false
         end
     end
 

@@ -13,3 +13,4 @@ Emitter = luajava.bindClass("com.alex.rain.models.Emitter")
 Vector2 = luajava.bindClass("com.badlogic.gdx.math.Vector2")
 
 Color = luajava.bindClass("com.badlogic.gdx.graphics.Color")
+Array = luajava.bindClass("java.lang.reflect.Array")

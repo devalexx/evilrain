@@ -2,7 +2,7 @@ function onCreate(world)
     world:setWinHint('Select top left!!!')
     world:setPressingAction(1);
 
-    ground = luajava.new(Ground)
+    local ground = luajava.new(Ground)
     ground:addVertex(528, 336)
     ground:addVertex(200, 336)
     ground:addVertex(200, 64)
@@ -42,23 +42,16 @@ function onCreate(world)
     world:add(ground)
 end
 
-function onCheck(mArray)
-    has5 = 0
-    hasElse = false
-
-    mArray:size()
-    for i = 0, mArray:size() - 1 do
-        if mArray:get(i):getStringType() == "DROP" then
-            if mArray:get(i):getPosition().x < 303 and mArray:get(i):getPosition().y > 241
-                    and mArray:get(i):getPosition().x > 148 and mArray:get(i):getPosition().y < 388  then
-                has5 = has5 + 1
-            else
-                hasElse = true
-            end
+function onCheck(dropsPosArray, dropsCount)
+    for i = 0, dropsCount - 1 do
+        local x = Array:get(dropsPosArray, i * 2)
+        local y = Array:get(dropsPosArray, i * 2 + 1)
+        if x > 303 or x < 148 or y > 388 or y < 241 then
+            return false
         end
     end
 
-    if has5 > 20 and hasElse == false then
+    if dropsCount > 10 then
         return true
     else
         return false

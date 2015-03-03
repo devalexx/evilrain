@@ -57,10 +57,8 @@ import javax.script.ScriptEngine;
 import javax.script.SimpleBindings;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 public class GameWorld extends Stage {
     private World physicsWorld = new World(new Vector2(0, -9.8f), true);
@@ -359,9 +357,15 @@ public class GameWorld extends Stage {
 
         super.act(delta);
 
-        LuaValue luaDrop = CoerceJavaToLua.coerce(dropList);
-        LuaValue retvals = luaOnCheckFunc.call(luaDrop);
-        if(retvals.toboolean(1) && !wonGame) {
+        float[] src = particleSystem.getParticlePositionBufferArray(false);
+        float[] dst = new float[src.length];
+        for (int i = 0; i < src.length; i++)
+            dst[i] = src[i] * BOX_TO_WORLD;
+
+        LuaValue luaDropsPosArray = CoerceJavaToLua.coerce(dst);
+        LuaValue luaDropsCount = CoerceJavaToLua.coerce(particleSystem.getParticleCount());
+        LuaValue retVal = luaOnCheckFunc.call(luaDropsPosArray, luaDropsCount);
+        if(retVal.toboolean(1) && !wonGame) {
             wonGame = true;
             showWinnerMenu();
         }
@@ -371,8 +375,9 @@ public class GameWorld extends Stage {
                 time - timeLastDrop > 0.05) {
             Drop drop = new Drop();
             Random r = new Random();
-            float offset = r.nextFloat() * emitter.getWidth() * 0.1f;
-            drop.setPosition(new Vector2(emitter.getPosition().x + offset, emitter.getPosition().y));
+            SimpleActor actor = cloud != null ? cloud : emitter;
+            float offset = r.nextFloat() * actor.getWidth() * 0.1f;
+            drop.setPosition(new Vector2(actor.getPosition().x + offset, actor.getPosition().y));
             dropsToCreate.add(drop);
             timeLastDrop = time;
         }
