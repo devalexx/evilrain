@@ -63,7 +63,7 @@ import java.util.List;
 public class GameWorld extends Stage {
     public static final float WORLD_TO_BOX = 0.01f;
     public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
-    public static float PARTICLE_RADIUS = 7f;
+    public static float PARTICLE_RADIUS = 6f;
 
     private World physicsWorld = new World(new Vector2(0, -9.8f), true);
     private ParticleSystem particleSystem;

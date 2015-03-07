@@ -14,61 +14,22 @@
 package com.alex.rain.screens;
 
 import com.alex.rain.RainGame;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
-public class LevelsMenu implements Screen {
-    private Stage stage;
-
-    @Override
-    public void render(float delta) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
-
-        //Table.drawDebug(stage);
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        stage.getViewport().setScreenSize(width, height);
-    }
-
-    @Override
-    public void show() {
-        stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
+public class LevelsMenuScreen extends BasicUIScreen {
+    public LevelsMenuScreen() {
+        super();
 
         final Table table = new Table();
-        table.setFillParent(true);
-        stage.addActor(table);
-
-        Skin skin = new Skin();
-
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.WHITE);
-        pixmap.fill();
-        skin.add("white", new Texture(pixmap));
-
-        skin.add("default", new BitmapFont());
-
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
-        textButtonStyle.font = skin.getFont("default");
-        skin.add("default", textButtonStyle);
+        ScrollPane scrollPane = new ScrollPane(table);
+        mainUI = scrollPane;
+        scrollPane.debugAll();
+        scrollPane.setFillParent(true);
+        stage.addActor(scrollPane);
 
         table.row().width(400).padTop(10);
 
@@ -77,7 +38,7 @@ public class LevelsMenu implements Screen {
 
         table.row().width(400).padTop(10);
 
-        for(int i = 1; i < 7; i++) {
+        for(int i = 1; i < 8; i++) {
             final TextButton button1 = new TextButton("Level " + String.valueOf(i), skin);
             table.add(button1);
 
@@ -108,22 +69,5 @@ public class LevelsMenu implements Screen {
                 RainGame.getInstance().setScreen(new MainMenuScreen());
             }
         });
-    }
-
-    @Override
-    public void hide() {
-    }
-
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
-    public void dispose() {
-        stage.dispose();
     }
 }

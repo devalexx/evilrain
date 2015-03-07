@@ -15,6 +15,7 @@ package com.alex.rain;
 
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.screens.GameScreen;
+import com.alex.rain.screens.SplashScreen;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
@@ -49,14 +50,13 @@ public class RainGame extends Game {
         lightVersion = Gdx.app.getType() != Application.ApplicationType.Desktop;
         TextureManager.getAtlas("pack.atlas");
 
-        GameWorld gameWorld = new GameWorld("level2");
+        /*GameWorld gameWorld = new GameWorld("level1");
         gameWorld.createWorld();
         stage = gameWorld;
         Gdx.input.setInputProcessor(stage);
 
-        screen = new GameScreen(gameWorld);
-        setScreen(screen);
-        //setScreen(new MainMenuScreen());
+        screen = new GameScreen(gameWorld);*/
+        setScreen(new SplashScreen());
         Gdx.gl.glClearColor(0, 0, 0, 0);
     }
 
