@@ -14,9 +14,11 @@
 package com.alex.rain.screens;
 
 import com.alex.rain.RainGame;
+import com.alex.rain.managers.I18nManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -31,21 +33,24 @@ public class MainMenuScreen extends BasicUIScreen {
         table.setFillParent(true);
         stage.addActor(table);
 
+        Label gameLabel = new Label(I18nManager.getString("GAME_NAME"), skin);
+        table.add(gameLabel);
+
         table.row().width(400).padTop(10);
 
-        final TextButton button = new TextButton("Play", skin);
+        final TextButton button = new TextButton(I18nManager.getString("START_GAME"), skin);
         table.add(button);
         button.setPosition(0, -100);
 
         table.row().width(400).padTop(10);
 
-        final TextButton button2 = new TextButton("Options", skin);
+        final TextButton button2 = new TextButton(I18nManager.getString("OPTIONS"), skin);
         table.add(button2);
         button2.setPosition(0, 0);
 
         table.row().width(400).padTop(10);
 
-        final TextButton button3 = new TextButton("Exit", skin);
+        final TextButton button3 = new TextButton(I18nManager.getString("QUIT"), skin);
         table.add(button3);
         button3.setPosition(0, 100);
 
@@ -59,7 +64,7 @@ public class MainMenuScreen extends BasicUIScreen {
         button2.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                //RainGame.getInstance().setScreen(new LevelsMenuScreen());
+                //RainGame.getInstance().setScreen(new OptionsMenuScreen());
             }
         });
 

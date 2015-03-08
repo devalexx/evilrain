@@ -14,7 +14,9 @@
 package com.alex.rain.screens;
 
 import com.alex.rain.RainGame;
+import com.alex.rain.managers.I18nManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -25,24 +27,29 @@ public class LevelsMenuScreen extends BasicUIScreen {
         super();
 
         final Table table = new Table();
-        ScrollPane scrollPane = new ScrollPane(table);
-        mainUI = scrollPane;
-        scrollPane.debugAll();
-        scrollPane.setFillParent(true);
-        stage.addActor(scrollPane);
+        final Table scrollPaneTable = new Table();
+        scrollPaneTable.defaults().width(400).padTop(10);
+        ScrollPane scrollPane = new ScrollPane(scrollPaneTable, skin);
+        mainUI = table;
+        table.setFillParent(true);
+        scrollPane.setFadeScrollBars(false);
+        stage.addActor(table);
 
-        table.row().width(400).padTop(10);
+        final TextButton buttonBackTop = new TextButton(I18nManager.getString("BACK"), skin);
+        table.add(buttonBackTop).left().width(200);
 
-        final TextButton button0 = new TextButton("Test", skin);
-        table.add(button0);
+        Label gameLabel = new Label(I18nManager.getString("LEVELS"), skin);
+        table.add(gameLabel).left();
 
-        table.row().width(400).padTop(10);
+        table.row();
+
+        table.add(scrollPane).colspan(2).expandX().fill();
 
         for(int i = 1; i < 8; i++) {
-            final TextButton button1 = new TextButton("Level " + String.valueOf(i), skin);
-            table.add(button1);
+            final TextButton button1 = new TextButton(I18nManager.getString("LEVEL") + " " + String.valueOf(i), skin);
+            scrollPaneTable.add(button1);
 
-            table.row().width(400).padTop(10);
+            scrollPaneTable.row();
 
             final String level = "level" + String.valueOf(i);
             button1.addListener(new ChangeListener() {
@@ -53,8 +60,8 @@ public class LevelsMenuScreen extends BasicUIScreen {
             });
         }
 
-        final TextButton buttonB = new TextButton("Back", skin);
-        table.add(buttonB);
+        final TextButton button0 = new TextButton(I18nManager.getString("TEST") + " " + I18nManager.getString("LEVEL"), skin);
+        scrollPaneTable.add(button0).padBottom(10);
 
         button0.addListener(new ChangeListener() {
             @Override
@@ -63,9 +70,9 @@ public class LevelsMenuScreen extends BasicUIScreen {
             }
         });
 
-        buttonB.addListener(new ChangeListener() {
+        buttonBackTop.addListener(new ChangeListener() {
             @Override
-            public void changed (ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event, Actor actor) {
                 RainGame.getInstance().setScreen(new MainMenuScreen());
             }
         });

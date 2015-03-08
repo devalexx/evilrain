@@ -67,10 +67,10 @@ default-pane-noborder
   index: -1
 default-rect
   rotate: false
-  xy: 38, 25
-  size: 3, 3
+  xy: 38, 23
+  size: 5, 5
   split: 1, 1, 1, 1
-  orig: 3, 3
+  orig: 5, 5
   offset: 0, 0
   index: -1
 default-rect-down
