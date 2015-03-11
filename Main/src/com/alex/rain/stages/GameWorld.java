@@ -17,10 +17,7 @@ import com.alex.rain.RainGame;
 import com.alex.rain.listeners.GameContactListener;
 import com.alex.rain.managers.ResourceManager;
 import com.alex.rain.managers.TextureManager;
-import com.alex.rain.models.Cloud;
-import com.alex.rain.models.Drop;
-import com.alex.rain.models.Emitter;
-import com.alex.rain.models.SimpleActor;
+import com.alex.rain.models.*;
 import com.alex.rain.renderer.ParticleRenderer;
 import com.alex.rain.screens.MainMenuScreen;
 import com.alex.rain.viewports.GameViewport;
@@ -34,6 +31,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -89,6 +87,7 @@ public class GameWorld extends Stage {
     private Window winnerWindow;
     private ImageButton actionButton, arrowUpButton, arrowDownButton, arrowLeftButton ,arrowRightButton;
     private Label hintLabel;
+    private List<Zone> drawingZones = new LinkedList<Zone>();
 
     private boolean wonGame;
     private boolean debugRendererEnabled;
@@ -104,6 +103,8 @@ public class GameWorld extends Stage {
     private boolean useShader = true;
     private int pressingAction = 0;
     private Vector2 cursorPosition;
+    private boolean drawingDrops;
+    private boolean keepDropsForever = false;
 
     public GameWorld(String name) {
         setViewport(gameViewport);
@@ -342,7 +343,7 @@ public class GameWorld extends Stage {
 
         particleSystem.getParticlePositionBufferArray(true);
 
-        removeUnnecessaryDrops();
+        deleteUnnecessaryDrops();
 
         for(Drop drop : dropsToDelete) {
             int i = dropList.indexOf(drop);
@@ -380,16 +381,38 @@ public class GameWorld extends Stage {
             showWinnerMenu();
         }
 
-        if((itRain || emitter != null && emitter.isAutoFire()) &&
-                !wonGame && (emitter != null || cloud != null) && dropList.size() < dropsMax &&
-                time - timeLastDrop > 0.05) {
-            Drop drop = new Drop();
-            Random r = new Random();
-            SimpleActor actor = cloud != null ? cloud : emitter;
-            float offset = r.nextFloat() * actor.getWidth() * 0.1f;
-            drop.setPosition(new Vector2(actor.getPosition().x + offset, actor.getPosition().y));
-            dropsToCreate.add(drop);
-            timeLastDrop = time;
+        if(dropList.size() < dropsMax && winnerWindow == null) {
+            if((itRain || emitter != null && emitter.isAutoFire()) &&
+                    !wonGame && (emitter != null || cloud != null) &&
+                    time - timeLastDrop > 0.05) {
+                Drop drop = new Drop();
+                Random r = new Random();
+                SimpleActor actor = cloud != null ? cloud : emitter;
+                float offset = r.nextFloat() * actor.getWidth() * 0.1f;
+                drop.setPosition(new Vector2(actor.getPosition().x + offset, actor.getPosition().y));
+                dropsToCreate.add(drop);
+                timeLastDrop = time;
+            }
+
+            if(drawingDrops && time - timeLastDrop > 0.04) {
+                boolean inZone = drawingZones.isEmpty();
+                for(Zone zone : drawingZones) {
+                    if(zone.rectangle.contains(cursorPosition)) {
+                        inZone = true;
+                        break;
+                    }
+                }
+
+                if(inZone) {
+                    Drop drop = new Drop();
+                    Random r = new Random();
+                    int offset = r.nextInt(20);
+                    drop.setPosition(cursorPosition.cpy().add(offset, offset));
+                    drop.setLinearVelocity(new Vector2(100000, 0));
+                    dropsToCreate.add(drop);
+                    timeLastDrop = time;
+                }
+            }
         }
 
         if(pressingAction == 2 && cursorPosition != null) {
@@ -400,7 +423,14 @@ public class GameWorld extends Stage {
         }
     }
 
-    private void removeUnnecessaryDrops() {
+    public void setKeepDropsForever(boolean state) {
+        keepDropsForever = state;
+    }
+
+    private void deleteUnnecessaryDrops() {
+        if(keepDropsForever)
+            return;
+
         float[] pos = particleSystem.getParticlePositionBufferArray(false);
         int minX = (int)(-GameViewport.WIDTH * 2 * WORLD_TO_BOX);
         int maxX = (int)(GameViewport.WIDTH * 2 * WORLD_TO_BOX);
@@ -491,6 +521,8 @@ public class GameWorld extends Stage {
                 d.particleGroup.applyForce(new Vector2((cursorPosition.x - d.getPosition().x) ,
                         (cursorPosition.y - d.getPosition().y)).nor().scl(0.8f));
             }
+        } else if(pressingAction == 1) {
+            drawingDrops = true;
         }
         return super.touchDown(screenX, screenY, pointer, button);
     }
@@ -499,11 +531,11 @@ public class GameWorld extends Stage {
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         cursorPosition = null;
         selectedDrops = null;
+        drawingDrops = false;
         //return super.touchUp(screenX, Gdx.graphics.getHeight() - screenY, pointer, button);
         return super.touchUp(screenX, screenY, pointer, button);
     }
 
-    private Vector2 lastCreatedDropPos = new Vector2();
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if(winnerWindow != null)
@@ -514,17 +546,6 @@ public class GameWorld extends Stage {
 
         if(wonGame || cloud != null || emitter != null || dropList.size() > dropsMax)
             return true;
-
-        Vector2 cp = getCursorPosition(screenX, screenY);
-        if(pressingAction == 1 && lastCreatedDropPos.dst(cp) > 10) {
-            Drop drop = new Drop();
-            Random r = new Random();
-            int offset = r.nextInt(10);
-            lastCreatedDropPos.set(cp);
-            drop.setPosition(lastCreatedDropPos);
-            drop.setLinearVelocity(new Vector2(100000, 0));
-            dropsToCreate.add(drop);
-        }
 
         return false;
     }
@@ -667,6 +688,16 @@ public class GameWorld extends Stage {
                 drawDrops(false);
         }
 
+        for(Zone zone : drawingZones) {
+            RainGame.shapeRenderer.setColor(zone.color);
+            RainGame.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                RainGame.shapeRenderer.line(zone.rectangle.x, zone.rectangle.y, zone.rectangle.x, zone.rectangle.y + zone.rectangle.height);
+                RainGame.shapeRenderer.line(zone.rectangle.x, zone.rectangle.y + zone.rectangle.height, zone.rectangle.x + zone.rectangle.width, zone.rectangle.y + zone.rectangle.height);
+                RainGame.shapeRenderer.line(zone.rectangle.x + zone.rectangle.width, zone.rectangle.y, zone.rectangle.x + zone.rectangle.width, zone.rectangle.y + zone.rectangle.height);
+                RainGame.shapeRenderer.line(zone.rectangle.x, zone.rectangle.y, zone.rectangle.x + zone.rectangle.width, zone.rectangle.y);
+            RainGame.shapeRenderer.end();
+        }
+
         sb.begin();
             getRoot().draw(sb, 1);
         sb.end();
@@ -719,5 +750,13 @@ public class GameWorld extends Stage {
         physicsWorld.dispose();
 
         super.dispose();
+    }
+
+    public void addDrawingZone(float x, float y, float width, float height) {
+        addDrawingZone(x, y, width, height, 0, 0, 1);
+    }
+
+    public void addDrawingZone(float x, float y, float width, float height, float r, float g, float b) {
+        drawingZones.add(new Zone(new Rectangle(x, y, width, height), new Color(r, g, b, 1)));
     }
 }

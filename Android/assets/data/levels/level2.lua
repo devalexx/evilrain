@@ -31,18 +31,19 @@ function onCreate(world)
     dynamicActor:setSpriteBox(200, 100)
     world:add(dynamicActor)
     dynamicActor:setPosition(luajava.new(Vector2, 200, 150))
+
+    world:addDrawingZone(500, 320, 200, 150)
 end
 
 function onCheck(dropsPosArray, dropsCount)
     count = 0
     for i = 0, dropsCount - 1 do
-        print(i, dropsCount, Array:getLength(dropsPosArray))
         if Array:get(dropsPosArray, i * 2 + 1) < 200 then
             count = count + 1
         end
     end
 
-    if count > 100 then
+    if count > 150 then
         return true
     else
         return false

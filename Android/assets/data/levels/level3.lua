@@ -1,5 +1,6 @@
 function onCreate(world)
     world:setWinHint('Select top left!!!')
+    world:setKeepDropsForever(true)
     world:setPressingAction(1);
 
     local ground = luajava.new(Ground)

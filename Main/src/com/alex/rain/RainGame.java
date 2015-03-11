@@ -27,7 +27,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class RainGame extends Game {
-    Screen screen;
     Stage stage;
     static RainGame instance = new RainGame();
     static float time;
@@ -50,13 +49,13 @@ public class RainGame extends Game {
         lightVersion = Gdx.app.getType() != Application.ApplicationType.Desktop;
         TextureManager.getAtlas("pack.atlas");
 
-        /*GameWorld gameWorld = new GameWorld("level1");
+        GameWorld gameWorld = new GameWorld("level4");
         gameWorld.createWorld();
         stage = gameWorld;
         Gdx.input.setInputProcessor(stage);
 
-        screen = new GameScreen(gameWorld);*/
-        setScreen(new SplashScreen());
+        setScreen(new GameScreen(gameWorld));
+        //setScreen(new SplashScreen());
         Gdx.gl.glClearColor(0, 0, 0, 0);
     }
 

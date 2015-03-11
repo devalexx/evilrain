@@ -16,18 +16,20 @@ function onCreate(world)
     ground:addVertex(32, 32)
     world:add(ground)
 
-    local dynamicActor = luajava.new(Hammer)
+    dynamicActor = luajava.new(Hammer)
     world:add(dynamicActor)
-    dynamicActor:setPosition(luajava.new(Vector2, 600, 300))
+    dynamicActor:setPosition(luajava.new(Vector2, 630, 300))
     table.insert(dynActorArray, dynamicActor)
 
-    local dynamicActorTmp = luajava.new(Home)
+    dynamicActorTmp = luajava.new(Home)
     dynamicActorTmp:setBodyBox(20, 100)
     dynamicActorTmp:setSpriteBox(20, 100)
     world:add(dynamicActorTmp)
-    dynamicActorTmp:setPosition(luajava.new(Vector2, 450, 200))
+    dynamicActorTmp:setPosition(luajava.new(Vector2, 470, 200))
 
     table.insert(dynActorArray, dynamicActorTmp)
+
+    world:addDrawingZone(0, 350, 800, 150)
 end
 
 function onCheck()
