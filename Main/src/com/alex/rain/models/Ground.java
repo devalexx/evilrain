@@ -62,6 +62,8 @@ public class Ground extends SimpleActor {
 
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
+        super.createPhysicsActor(particleSystem, physicsWorld);
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
 

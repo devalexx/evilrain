@@ -20,7 +20,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.physics.box2d.*;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
-public class Cloud extends KinematicActor {
+public class Cloud extends ControlledActor {
     Animation animation;
     TextureRegion leftTextureRegion;
     TextureRegion rightTextureRegion;
@@ -55,6 +55,8 @@ public class Cloud extends KinematicActor {
 
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
+        super.createPhysicsActor(particleSystem, physicsWorld);
+
         PolygonShape polygonShape = new PolygonShape();
         //polygonShape.setAsBox(getPhysicsWidth() / 2.5f, getPhysicsHeight() / 10);
 

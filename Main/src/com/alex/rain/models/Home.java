@@ -28,6 +28,8 @@ public class Home extends DynamicActor {
 
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
+        super.createPhysicsActor(particleSystem, physicsWorld);
+
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 2);
         offset.set(-getWidth() / 2, -getHeight() / 2);

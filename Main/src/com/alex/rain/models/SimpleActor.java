@@ -30,6 +30,7 @@ public abstract class SimpleActor extends Actor {
     protected Vector2 linVel = new Vector2();
     protected Sprite sprite;
     protected Texture texture;
+    protected World physicsWorld;
 
     public enum TYPE {
         NONE,
@@ -39,7 +40,9 @@ public abstract class SimpleActor extends Actor {
         EMITTER
     }
 
-    public abstract void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld);
+    public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
+        this.physicsWorld = physicsWorld;
+    }
 
     public void prepareActor() {
 
@@ -124,4 +127,6 @@ public abstract class SimpleActor extends Actor {
     public float getPhysicsHeight() {
         return getHeight() * GameWorld.WORLD_TO_BOX;
     }
+
+    public void preAct(float delta) {};
 }

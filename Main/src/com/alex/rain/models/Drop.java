@@ -39,6 +39,8 @@ public class Drop extends SimpleActor {
 
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
+        super.createPhysicsActor(particleSystem, physicsWorld);
+
         this.particleSystem = particleSystem;
 
         ParticleDef particleDef = new ParticleDef();

@@ -357,6 +357,9 @@ public class GameWorld extends Stage {
         }
         dropsToDelete.clear();
 
+        for(SimpleActor sa : actorList)
+            sa.preAct(delta);
+
         if(physicsEnabled)
             physicsWorld.step(step, 4, 2, 6);
 
@@ -384,7 +387,7 @@ public class GameWorld extends Stage {
         if(dropList.size() < dropsMax && winnerWindow == null) {
             if((itRain || emitter != null && emitter.isAutoFire()) &&
                     !wonGame && (emitter != null || cloud != null) &&
-                    time - timeLastDrop > 0.05) {
+                    time - timeLastDrop > 0.01) {
                 Drop drop = new Drop();
                 Random r = new Random();
                 SimpleActor actor = cloud != null ? cloud : emitter;

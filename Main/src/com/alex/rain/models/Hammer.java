@@ -29,6 +29,8 @@ public class Hammer extends DynamicActor {
 
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
+        super.createPhysicsActor(particleSystem, physicsWorld);
+
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.setAsBox(getPhysicsWidth() / 7, getPhysicsHeight() / 2);
         offset.set(-getWidth() / 2, -getHeight() / 2);

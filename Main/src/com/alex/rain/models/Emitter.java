@@ -18,7 +18,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.physics.box2d.*;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
-public class Emitter extends KinematicActor {
+public class Emitter extends ControlledActor {
     boolean autoFire;
 
     public Emitter() {
@@ -30,6 +30,8 @@ public class Emitter extends KinematicActor {
 
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
+        super.createPhysicsActor(particleSystem, physicsWorld);
+
         PolygonShape polygonShape = new PolygonShape();
         //polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 2);
         offset.set(-getWidth() / 2, -getHeight() / 2);
