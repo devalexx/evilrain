@@ -421,7 +421,7 @@ public class GameWorld extends Stage {
         if(pressingAction == 2 && cursorPosition != null) {
             for(Drop d : selectedDrops) {
                 d.particleGroup.applyForce(new Vector2((cursorPosition.x - d.getPosition().x) ,
-                        (cursorPosition.y - d.getPosition().y)).nor().scl(3.8f));
+                        (cursorPosition.y - d.getPosition().y)).nor().scl(0.8f));
             }
         }
     }

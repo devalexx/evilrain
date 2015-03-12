@@ -5,33 +5,50 @@ function onCreate(world)
     world:setPressingAction(2);
 
     local ground = luajava.new(Ground)
-    ground:addVertex(752, 48)
-    ground:addVertex(736, 352)
-    ground:addVertex(656, 352)
-    ground:addVertex(648, 136)
-    ground:addVertex(400, 136)
-    ground:addVertex(384, 280)
-    ground:addVertex(272, 280)
-    ground:addVertex(256, 112)
-    ground:addVertex(56, 120)
-    ground:addVertex(48, 368)
-    ground:addVertex(16, 368)
-    ground:addVertex(8, 32)
+    ground:addVertex(776, 24)
+    ground:addVertex(768, 344)
+    ground:addVertex(744, 344)
+    ground:addVertex(728, 168)
+    ground:addVertex(656, 96)
+    ground:addVertex(560, 96)
+    ground:addVertex(512, 248)
+    ground:addVertex(480, 248)
+    ground:addVertex(480, 24)
     world:add(ground)
 
-    for i = 10, 11 do
-        for j = 10, 11 do
+    ground = luajava.new(Ground)
+    ground:addVertex(224, 40)
+    ground:addVertex(336, 72)
+    ground:addVertex(384, 160)
+    ground:addVertex(328, 272)
+    ground:addVertex(352, 168)
+    ground:addVertex(296, 88)
+    ground:addVertex(144, 88)
+    ground:addVertex(112, 176)
+    ground:addVertex(144, 264)
+    ground:addVertex(80, 176)
+    ground:addVertex(96, 64)
+    world:add(ground)
+
+    counter = 0
+    for i = 15, 25 do
+        for j = 9, 18 do
             local drop = luajava.new(Drop)
             drop:setPosition(luajava.new(Vector2, i * 10 + 20, j * 10 + 20))
-            if i < 30 then
+            if i < 20 then
                 drop:setColor(Color.GREEN)
             end
+            counter = counter + 1
             world:add(drop)
         end
     end
 end
 
 function onCheck(dropsPosArray, dropsCount)
+    if dropsCount ~= counter then
+        return false
+    end
+
     for i = 0, dropsCount - 1 do
         if Array:get(dropsPosArray, i * 2) < 400 then
             return false
