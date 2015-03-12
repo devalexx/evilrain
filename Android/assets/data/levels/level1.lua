@@ -32,6 +32,7 @@ function onCreate(world)
     local cloud = luajava.new(Cloud)
     cloud:setPosition(luajava.new(Vector2, 50, 420))
     world:add(cloud)
+    cloud:setMinMaxPosRectangle(0, 300, 800, 200)
 end
 
 function onCheck()
