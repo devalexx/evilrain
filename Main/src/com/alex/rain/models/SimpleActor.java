@@ -75,6 +75,9 @@ public abstract class SimpleActor extends Actor {
     }
 
     public Vector2 getLinearVelocity() {
+        linVel = body.getLinearVelocity();
+        linVel.scl(GameWorld.BOX_TO_WORLD);
+
         return linVel;
     }
 
@@ -82,9 +85,7 @@ public abstract class SimpleActor extends Actor {
     public void act(float delta) {
         pos = body.getPosition();
         rot = (float)Math.toDegrees(body.getAngle());
-        linVel = body.getLinearVelocity();
         pos.scl(GameWorld.BOX_TO_WORLD);
-        linVel.scl(GameWorld.BOX_TO_WORLD);
     }
 
     public void applyForceToCenter(Vector2 vec) {
@@ -128,5 +129,5 @@ public abstract class SimpleActor extends Actor {
         return getHeight() * GameWorld.WORLD_TO_BOX;
     }
 
-    public void preAct(float delta) {};
+    public void preAct(float delta) {}
 }

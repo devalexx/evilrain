@@ -62,6 +62,9 @@ public class GameWorld extends Stage {
     public static final float WORLD_TO_BOX = 0.01f;
     public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
     public static float PARTICLE_RADIUS = 6f;
+    public static int MIN_DROP_X_POS = (int)(-GameViewport.WIDTH * 2 * WORLD_TO_BOX);
+    public static int MAX_DROP_X_POS = (int)(GameViewport.WIDTH * 2 * WORLD_TO_BOX);
+    public static int MIN_DROP_Y_POS = (int)(-GameViewport.HEIGHT * WORLD_TO_BOX);
 
     private World physicsWorld = new World(new Vector2(0, -9.8f), true);
     private ParticleSystem particleSystem;
@@ -88,6 +91,7 @@ public class GameWorld extends Stage {
     private ImageButton actionButton, arrowUpButton, arrowDownButton, arrowLeftButton ,arrowRightButton;
     private Label hintLabel;
     private List<Zone> drawingZones = new LinkedList<Zone>();
+    private float[] dropsXYPositions;
 
     private boolean wonGame;
     private boolean debugRendererEnabled;
@@ -113,13 +117,14 @@ public class GameWorld extends Stage {
         ParticleSystemDef particleSystemDef = new ParticleSystemDef();
         particleSystemDef.radius = PARTICLE_RADIUS * GameWorld.WORLD_TO_BOX;
         //particleSystemDef.pressureStrength = 0.4f;
-        particleSystemDef.dampingStrength = 0.5f;
+        particleSystemDef.dampingStrength = 0.2f;
 
         particleSystem = new ParticleSystem(physicsWorld, particleSystemDef);
 
         //super(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, new SpriteBatch(3000, 10));
         lightVersion = RainGame.isLightVersion();
         dropsMax = lightVersion ? 2000 : 2000;
+        dropsXYPositions = new float[dropsMax * 2];
 
         String filename = "data/levels/" + name + ".lua";
 
@@ -333,50 +338,52 @@ public class GameWorld extends Stage {
         LuaValue luaWorld = CoerceJavaToLua.coerce(this);
         if(luaOnCreateFunc != null)
             luaOnCreateFunc.call(luaWorld);
+
+        particleSystem.getParticlePositionBufferArray(true);
     }
 
     @Override
     public void act(float delta) {
-        final float dt = Gdx.graphics.getDeltaTime();
         final float step = 1 / 60f;
-        time += dt;
-
-        particleSystem.getParticlePositionBufferArray(true);
+        time += Gdx.graphics.getDeltaTime();
 
         deleteUnnecessaryDrops();
 
-        for(Drop drop : dropsToDelete) {
-            int i = dropList.indexOf(drop);
-            particleSystem.destroyParticle(i);
-            Drop removedDrop = dropList.remove(i);
+        for(int i = 0, dropsToDeleteSize = dropsToDelete.size(); i < dropsToDeleteSize; i++) {
+            Drop drop = dropsToDelete.get(i);
+            int idx = dropList.indexOf(drop);
+            particleSystem.destroyParticle(idx);
+            Drop removedDrop = dropList.remove(idx);
             if(selectedDrops != null)
                 selectedDrops.remove(removedDrop);
 
-            for(int j = i; j < dropList.size(); j++)
+            for(int j = idx; j < dropList.size(); j++)
                 dropList.get(j).decrementIndex();
         }
         dropsToDelete.clear();
 
-        for(SimpleActor sa : actorList)
+        for(int i = 0, actorListSize = actorList.size(); i < actorListSize; i++) {
+            SimpleActor sa = actorList.get(i);
             sa.preAct(delta);
+        }
 
         if(physicsEnabled)
             physicsWorld.step(step, 4, 2, 6);
 
-        for(Drop drop : dropsToCreate)
+        for(int i = 0, dropsToCreateSize = dropsToCreate.size(); i < dropsToCreateSize; i++) {
+            Drop drop = dropsToCreate.get(i);
             add(drop);
+        }
         dropsToCreate.clear();
 
-        particleSystem.getParticlePositionBufferArray(true);
+        float[] src = particleSystem.getParticlePositionBufferArray(true);
 
         super.act(delta);
 
-        float[] src = particleSystem.getParticlePositionBufferArray(false);
-        float[] dst = new float[src.length];
-        for (int i = 0; i < src.length; i++)
-            dst[i] = src[i] * BOX_TO_WORLD;
+        for(int i = 0; i < src.length; i++)
+            dropsXYPositions[i] = src[i] * BOX_TO_WORLD;
 
-        LuaValue luaDropsPosArray = CoerceJavaToLua.coerce(dst);
+        LuaValue luaDropsPosArray = CoerceJavaToLua.coerce(dropsXYPositions);
         LuaValue luaDropsCount = CoerceJavaToLua.coerce(particleSystem.getParticleCount());
         LuaValue retVal = luaOnCheckFunc.call(luaDropsPosArray, luaDropsCount);
         if(retVal.toboolean(1) && !wonGame) {
@@ -419,9 +426,11 @@ public class GameWorld extends Stage {
         }
 
         if(pressingAction == 2 && cursorPosition != null) {
-            for(Drop d : selectedDrops) {
-                d.particleGroup.applyForce(new Vector2((cursorPosition.x - d.getPosition().x) ,
-                        (cursorPosition.y - d.getPosition().y)).nor().scl(0.8f));
+            for(int i = 0, selectedDropsSize = selectedDrops.size(); i < selectedDropsSize; i++) {
+                Drop d = selectedDrops.get(i);
+                Vector2 pos = d.getPosition();
+                d.particleGroup.applyForce(new Vector2((cursorPosition.x - pos.x),
+                        (cursorPosition.y - pos.y)).scl(0.01f));
             }
         }
     }
@@ -435,14 +444,9 @@ public class GameWorld extends Stage {
             return;
 
         float[] pos = particleSystem.getParticlePositionBufferArray(false);
-        int minX = (int)(-GameViewport.WIDTH * 2 * WORLD_TO_BOX);
-        int maxX = (int)(GameViewport.WIDTH * 2 * WORLD_TO_BOX);
-        int minY = (int)(-GameViewport.HEIGHT * WORLD_TO_BOX);
-        for(int i = particleSystem.getParticleCount() - 1; i >= 0; i--) {
-            if(pos[i*2] < minX || pos[i*2] > maxX || pos[i*2+1] < minY) {
+        for(int i = particleSystem.getParticleCount() - 1; i >= 0; i--)
+            if(pos[i*2] < MIN_DROP_X_POS || pos[i*2] > MAX_DROP_X_POS || pos[i*2+1] < MIN_DROP_Y_POS)
                 dropsToDelete.add(dropList.get(i));
-            }
-        }
     }
 
     private void showWinnerMenu() {
@@ -519,11 +523,6 @@ public class GameWorld extends Stage {
                     selectedDrops.add(dropList.get(i / 2));
             }
             cursorPosition.scl(BOX_TO_WORLD);
-
-            for(Drop d : selectedDrops) {
-                d.particleGroup.applyForce(new Vector2((cursorPosition.x - d.getPosition().x) ,
-                        (cursorPosition.y - d.getPosition().y)).nor().scl(0.8f));
-            }
         } else if(pressingAction == 1) {
             drawingDrops = true;
         }

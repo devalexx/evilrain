@@ -17,10 +17,14 @@ import com.alex.rain.RainGame;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
-import finnstr.libgdx.liquidfun.*;
-
-import java.util.Arrays;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
+import finnstr.libgdx.liquidfun.ParticleDef;
+import finnstr.libgdx.liquidfun.ParticleGroup;
+import finnstr.libgdx.liquidfun.ParticleGroupDef;
+import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Drop extends SimpleActor {
     private static float RADIUS;
@@ -94,25 +98,16 @@ public class Drop extends SimpleActor {
 
     @Override
     public Vector2 getPosition() {
-        float posXY[] = Arrays.copyOfRange(particleSystem.getParticlePositionBufferArray(false),
-                particleIndex*2, particleIndex*2 + 2);
+        float posArr[] = particleSystem.getParticlePositionBufferArray(false);
         if(particleSystem != null)
-            pos.set(posXY[0], posXY[1]).scl(GameWorld.BOX_TO_WORLD);
+            return pos.set(posArr[particleIndex * 2] * GameWorld.BOX_TO_WORLD,
+                    posArr[particleIndex * 2 + 1] * GameWorld.BOX_TO_WORLD);
 
-        return super.getPosition();
+        return pos;
     }
 
     @Override
-    public void act(float delta) {
-        /*pos = body.getPosition();
-        rot = (float)Math.toDegrees(body.getAngle());
-        linVel = body.getLinearVelocity();
-        pos.scl(GameWorld.BOX_TO_WORLD);
-        linVel.scl(GameWorld.BOX_TO_WORLD);*/
-        //pos = new Vector2(particleSystem.getParticlePositionBufferX()[particleIndex], particleSystem.getParticlePositionBufferY()[particleIndex]);
-        //pos.scl(GameWorld.BOX_TO_WORLD);
-        //particleGroup.applyForce(new Vector2(-10, 0));
-    }
+    public void act(float delta) {}
 
     public void decrementIndex() {
         particleIndex--;

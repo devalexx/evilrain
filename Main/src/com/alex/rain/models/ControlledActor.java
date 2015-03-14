@@ -14,7 +14,6 @@
 package com.alex.rain.models;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 
 public abstract class ControlledActor extends KinematicActor {
     Rectangle minMaxPosRectangle;
@@ -29,7 +28,7 @@ public abstract class ControlledActor extends KinematicActor {
 
     @Override
     public void preAct(float delta) {
-        if(isInMinMaxPosRectangle() || linVel.len() == 0)
+        if(linVel.x == 0 && linVel.y == 0 || isInMinMaxPosRectangle())
             return;
 
         if(linVel.x < 0 && pos.x < minMaxPosRectangle.x ||
