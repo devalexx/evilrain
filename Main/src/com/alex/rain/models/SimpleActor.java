@@ -68,6 +68,12 @@ public abstract class SimpleActor extends Actor {
         return pos;
     }
 
+    public void setLinearVelocity(float x, float y) {
+        if(body != null)
+            body.setLinearVelocity(x * GameWorld.WORLD_TO_BOX, y * GameWorld.WORLD_TO_BOX);
+        linVel.set(x, y);
+    }
+
     public void setLinearVelocity(Vector2 vec) {
         if(body != null)
             body.setLinearVelocity(vec.cpy().scl(GameWorld.WORLD_TO_BOX));
@@ -130,4 +136,9 @@ public abstract class SimpleActor extends Actor {
     }
 
     public void preAct(float delta) {}
+
+    public void setUseParticleBodyContactListener(boolean state) {
+        if(body != null)
+            body.setUseParticleBodyContactListener(state);
+    }
 }

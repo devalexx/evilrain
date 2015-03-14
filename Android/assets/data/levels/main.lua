@@ -9,6 +9,7 @@ Home = luajava.bindClass("com.alex.rain.models.Home")
 Hammer = luajava.bindClass("com.alex.rain.models.Hammer")
 Cloud = luajava.bindClass("com.alex.rain.models.Cloud")
 Emitter = luajava.bindClass("com.alex.rain.models.Emitter")
+Ball = luajava.bindClass("com.alex.rain.models.Ball")
 -- System Classes
 Vector2 = luajava.bindClass("com.badlogic.gdx.math.Vector2")
 

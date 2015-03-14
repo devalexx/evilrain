@@ -14,6 +14,7 @@
 package com.alex.rain.models;
 
 import com.alex.rain.managers.TextureManager;
+import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -41,6 +42,7 @@ public class Home extends DynamicActor {
         fixtureDef.friction = 1f;
 
         BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(pos.cpy().scl(GameWorld.WORLD_TO_BOX));
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = physicsWorld.createBody(bodyDef);
         body.createFixture(fixtureDef);

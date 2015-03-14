@@ -15,42 +15,37 @@ package com.alex.rain.models;
 
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.stages.GameWorld;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
-public class Hammer extends DynamicActor {
-    public Hammer() {
-        sprite = TextureManager.getSpriteFromDefaultAtlas("hammer");
-        setBodyBox(128, 128);
+public class Ball extends DynamicActor {
+    public Ball() {
+        sprite = TextureManager.getSpriteFromDefaultAtlas("button");
+        setBodyBox(20, 20);
+        setSpriteBox(40, 40);
     }
 
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
         super.createPhysicsActor(particleSystem, physicsWorld);
 
-        PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(getPhysicsWidth() / 7, getPhysicsHeight() / 2);
-        offset.set(-getWidth() / 2, -getHeight() / 2);
-        sprite.setOrigin(getWidth() / 2, getHeight() / 2);
+        offset.set(-getWidth(), -getHeight());
+        sprite.setOrigin(getWidth(), getHeight());
+        CircleShape polygonShape = new CircleShape();
+        polygonShape.setRadius(getPhysicsWidth());
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
-        fixtureDef.density = 1;
-        fixtureDef.friction = 10.4f;
+        fixtureDef.density = 0.1f;
+        fixtureDef.friction = 1f;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(pos.cpy().scl(GameWorld.WORLD_TO_BOX));
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = physicsWorld.createBody(bodyDef);
-        body.createFixture(fixtureDef);
-
-        polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 7,
-                new Vector2(0, getPhysicsHeight() / 3), 0);
-
         body.createFixture(fixtureDef);
         body.resetMassData();
 

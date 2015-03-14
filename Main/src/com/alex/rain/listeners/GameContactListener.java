@@ -13,21 +13,28 @@
  ******************************************************************************/
 package com.alex.rain.listeners;
 
+import com.alex.rain.models.SimpleActor;
 import com.badlogic.gdx.physics.box2d.*;
 import finnstr.libgdx.liquidfun.ParticleBodyContact;
+import finnstr.libgdx.liquidfun.ParticleBodyContactListener;
 import finnstr.libgdx.liquidfun.ParticleContact;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
-public class GameContactListener implements ContactListener {
+import java.util.HashMap;
+
+public class GameContactListener implements ContactListener, ParticleBodyContactListener {
     LuaFunction luaOnBeginContactFunc;
     LuaFunction luaOnEndContactFunc;
+    HashMap<Long, SimpleActor> actorsMap;
 
-    public GameContactListener(LuaFunction luaOnBeginContactFunc, LuaFunction luaOnEndContactFunc) {
+    public GameContactListener(LuaFunction luaOnBeginContactFunc, LuaFunction luaOnEndContactFunc,
+            HashMap<Long, SimpleActor> actorsMap) {
         this.luaOnBeginContactFunc = luaOnBeginContactFunc;
         this.luaOnEndContactFunc = luaOnEndContactFunc;
+        this.actorsMap = actorsMap;
     }
 
     @Override
@@ -74,5 +81,14 @@ public class GameContactListener implements ContactListener {
 
     @Override
     public void postSolve (Contact contact, ContactImpulse impulse){
+    }
+
+    @Override
+    public void beginContact(long bodyAddr, int index) {
+        if(luaOnBeginContactFunc == null)
+            return;
+
+        LuaValue luaContact = CoerceJavaToLua.coerce(actorsMap.get(bodyAddr));
+        luaOnBeginContactFunc.call(luaContact);
     }
 }

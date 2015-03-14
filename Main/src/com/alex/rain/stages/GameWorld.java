@@ -84,6 +84,7 @@ public class GameWorld extends Stage {
     private List<Drop> selectedDrops, dropsToCreate = new LinkedList<Drop>(), dropsToDelete = new LinkedList<Drop>();
     private List<SimpleActor> actorList = new ArrayList<SimpleActor>();
     private ArrayList<Drop> dropList = new ArrayList<Drop>();
+    private final HashMap<Long, SimpleActor> actorsMap = new HashMap<>();
     private Cloud cloud;
     private Emitter emitter;
     private Table tableUI;
@@ -176,8 +177,9 @@ public class GameWorld extends Stage {
         particleDebugRendererCircle = new ParticleDebugRenderer(Color.BLUE, 100000);
         particleRenderer = new ParticleRenderer(Color.RED, 100000);
 
-        GameContactListener contactListener = new GameContactListener(luaOnBeginContactFunc, luaOnEndContactFunc);
+        GameContactListener contactListener = new GameContactListener(luaOnBeginContactFunc, luaOnEndContactFunc, actorsMap);
         physicsWorld.setContactListener(contactListener);
+        //physicsWorld.setParticleBodyContactListener(contactListener);
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
@@ -310,6 +312,8 @@ public class GameWorld extends Stage {
         actor.createPhysicsActor(particleSystem, physicsWorld);
         actor.prepareActor();
         actorList.add(actor);
+        if(actor.getBody() != null)
+            actorsMap.put(actor.getBody().getAddress(), actor);
 
         if(actor.getType() == SimpleActor.TYPE.CLOUD) {
             cloud = (Cloud)actor;
