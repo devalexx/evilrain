@@ -1,8 +1,5 @@
-dynActorArray = {}
-
 function onCreate(world)
     world:setWinHint('Hide ball')
-    world:setPressingAction(2)
 
     local ground = luajava.new(Ground)
     ground:addVertex(352, 16)

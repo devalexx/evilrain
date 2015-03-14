@@ -34,8 +34,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
+import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -59,6 +63,13 @@ import java.util.*;
 import java.util.List;
 
 public class GameWorld extends Stage {
+    enum TouchType {
+        NONE,
+        DRAWING,
+        PICKING_DROPS,
+        PICKING_BODIES
+    }
+
     public static final float WORLD_TO_BOX = 0.01f;
     public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
     public static float PARTICLE_RADIUS = 6f;
@@ -93,6 +104,8 @@ public class GameWorld extends Stage {
     private Label hintLabel;
     private List<Zone> drawingZones = new LinkedList<Zone>();
     private float[] dropsXYPositions;
+    private Body groundBody;
+    private MouseJoint mouseJoint;
 
     private boolean wonGame;
     private boolean debugRendererEnabled;
@@ -106,7 +119,7 @@ public class GameWorld extends Stage {
     private boolean physicsEnabled = true;
     private boolean liquidForcesEnabled = true;
     private boolean useShader = true;
-    private int pressingAction = 0;
+    private TouchType pressingAction = TouchType.NONE;
     private Vector2 cursorPosition;
     private boolean drawingDrops;
     private boolean keepDropsForever = false;
@@ -322,9 +335,11 @@ public class GameWorld extends Stage {
             arrowRightButton.setVisible(true);
         } else if(actor.getType() == SimpleActor.TYPE.EMITTER) {
             emitter = (Emitter)actor;
-            actionButton.setVisible(true);
-            arrowUpButton.setVisible(true);
-            arrowDownButton.setVisible(true);
+            if(((ControlledActor)actor).hasControl()) {
+                actionButton.setVisible(true);
+                arrowUpButton.setVisible(true);
+                arrowDownButton.setVisible(true);
+            }
         }
 
         if(actor.getType() == SimpleActor.TYPE.DROP) {
@@ -429,7 +444,7 @@ public class GameWorld extends Stage {
             }
         }
 
-        if(pressingAction == 2 && cursorPosition != null) {
+        if(pressingAction == TouchType.PICKING_DROPS && cursorPosition != null) {
             for(int i = 0, selectedDropsSize = selectedDrops.size(); i < selectedDropsSize; i++) {
                 Drop d = selectedDrops.get(i);
                 Vector2 pos = d.getPosition();
@@ -518,7 +533,7 @@ public class GameWorld extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         cursorPosition = getCursorPosition(screenX, screenY).cpy();
-        if(pressingAction == 2) {
+        if(pressingAction == TouchType.PICKING_DROPS) {
             cursorPosition.scl(WORLD_TO_BOX);
             selectedDrops = new ArrayList<Drop>();
             float[] pos = particleSystem.getParticlePositionBufferArray(false);
@@ -527,8 +542,33 @@ public class GameWorld extends Stage {
                     selectedDrops.add(dropList.get(i / 2));
             }
             cursorPosition.scl(BOX_TO_WORLD);
-        } else if(pressingAction == 1) {
+        } else if(pressingAction == TouchType.DRAWING) {
             drawingDrops = true;
+        } else if(pressingAction == TouchType.PICKING_BODIES) {
+            SimpleActor targetActor = null;
+            for(SimpleActor actor : actorList) {
+                if(actor instanceof DynamicActor && actor.isInAABB(cursorPosition)) {
+                    targetActor = actor;
+                    break;
+                }
+            }
+
+            if(targetActor != null) {
+                cursorPosition.scl(WORLD_TO_BOX);
+                BodyDef groundBodyDef = new BodyDef();
+                groundBodyDef.position.set(cursorPosition);
+                groundBody = physicsWorld.createBody(groundBodyDef);
+                MouseJointDef mouseJointDef = new MouseJointDef();
+                mouseJointDef.bodyA = groundBody;
+                mouseJointDef.bodyB = targetActor.getBody();
+                mouseJointDef.dampingRatio = 0.2f;
+                mouseJointDef.frequencyHz = 30;
+                mouseJointDef.maxForce = 200.0f * targetActor.getBody().getMass();
+                mouseJointDef.collideConnected= true;
+                mouseJointDef.target.set(cursorPosition);
+                mouseJoint = (MouseJoint)physicsWorld.createJoint(mouseJointDef);
+                cursorPosition.scl(BOX_TO_WORLD);
+            }
         }
         return super.touchDown(screenX, screenY, pointer, button);
     }
@@ -538,7 +578,12 @@ public class GameWorld extends Stage {
         cursorPosition = null;
         selectedDrops = null;
         drawingDrops = false;
-        //return super.touchUp(screenX, Gdx.graphics.getHeight() - screenY, pointer, button);
+        if(mouseJoint != null) {
+            physicsWorld.destroyJoint(mouseJoint);
+            physicsWorld.destroyBody(groundBody);
+            mouseJoint = null;
+            groundBody = null;
+        }
         return super.touchUp(screenX, screenY, pointer, button);
     }
 
@@ -549,6 +594,12 @@ public class GameWorld extends Stage {
 
         if(cursorPosition != null)
             cursorPosition.set(getCursorPosition(screenX, screenY));
+
+        if(mouseJoint != null) {
+            cursorPosition.scl(WORLD_TO_BOX);
+            mouseJoint.setTarget(cursorPosition);
+            cursorPosition.scl(BOX_TO_WORLD);
+        }
 
         if(wonGame || cloud != null || emitter != null || dropList.size() > dropsMax)
             return true;
@@ -747,7 +798,7 @@ public class GameWorld extends Stage {
     }
 
     public void setPressingAction(int action) {
-        pressingAction = action;
+        pressingAction = TouchType.values()[action];
     }
 
     @Override

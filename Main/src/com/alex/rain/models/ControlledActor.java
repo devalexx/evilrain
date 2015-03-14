@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public abstract class ControlledActor extends KinematicActor {
     Rectangle minMaxPosRectangle;
+    boolean hasControl = true;
 
     public void setMinMaxPosRectangle(float x, float y, float width, float height) {
         minMaxPosRectangle = new Rectangle(x, y, width, height);
@@ -39,5 +40,13 @@ public abstract class ControlledActor extends KinematicActor {
             linVel.y = 0;
 
         setLinearVelocity(linVel);
+    }
+
+    public boolean hasControl() {
+        return hasControl;
+    }
+
+    public void setHasControl(boolean hasControl) {
+        this.hasControl = hasControl;
     }
 }

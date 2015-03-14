@@ -15,6 +15,7 @@ package com.alex.rain.models;
 
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.stages.GameWorld;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -34,12 +35,12 @@ public class Ball extends DynamicActor {
 
         offset.set(-getWidth(), -getHeight());
         sprite.setOrigin(getWidth(), getHeight());
-        CircleShape polygonShape = new CircleShape();
-        polygonShape.setRadius(getPhysicsWidth());
+        CircleShape circleShape = new CircleShape();
+        circleShape.setRadius(getPhysicsWidth());
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = polygonShape;
-        fixtureDef.density = 0.1f;
+        fixtureDef.shape = circleShape;
+        fixtureDef.density = 0.3f;
         fixtureDef.friction = 1f;
 
         BodyDef bodyDef = new BodyDef();
@@ -49,6 +50,13 @@ public class Ball extends DynamicActor {
         body.createFixture(fixtureDef);
         body.resetMassData();
 
-        polygonShape.dispose();
+        circleShape.dispose();
+    }
+
+    @Override
+    public boolean isInAABB(Vector2 v) {
+        Vector2 tmp = new Vector2(v);
+        tmp.sub(pos);
+        return tmp.len() < getWidth();
     }
 }

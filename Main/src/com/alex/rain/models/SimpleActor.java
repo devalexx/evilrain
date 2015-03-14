@@ -16,6 +16,7 @@ package com.alex.rain.models;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -66,6 +67,14 @@ public abstract class SimpleActor extends Actor {
 
     public Vector2 getPosition() {
         return pos;
+    }
+
+    public float getX() {
+        return pos.x;
+    }
+
+    public float getY() {
+        return pos.y;
     }
 
     public void setLinearVelocity(float x, float y) {
@@ -140,5 +149,10 @@ public abstract class SimpleActor extends Actor {
     public void setUseParticleBodyContactListener(boolean state) {
         if(body != null)
             body.setUseParticleBodyContactListener(state);
+    }
+
+    public boolean isInAABB(Vector2 v) {
+        Rectangle r = new Rectangle(getX(), getY(), getWidth(), getHeight());
+        return r.contains(v);
     }
 }

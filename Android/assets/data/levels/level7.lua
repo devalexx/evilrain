@@ -1,8 +1,6 @@
-dynActorArray = {}
-
 function onCreate(world)
-    world:setWinHint('Put to the right basket')
-    world:setPressingAction(2);
+    world:setWinHint('Direct the flow to another exit')
+    world:setPressingAction(3);
 
     local ground = luajava.new(Ground)
     ground:addVertex(792, 0)
@@ -26,18 +24,36 @@ function onCreate(world)
 
     local ground = luajava.new(Ground)
     ground:addVertex(152, 224)
-    ground:addVertex(376, 328)
+    ground:addVertex(650, 450)
     ground:addVertex(152, 272)
     ground:addVertex(0, 344)
     world:add(ground)
 
     local emitterActor = luajava.new(Emitter)
+    emitterActor:setHasControl(false)
     world:add(emitterActor)
-    emitterActor:setPosition(luajava.new(Vector2, 700, 420))
+    emitterActor:setPosition(luajava.new(Vector2, 750, 400))
     emitterActor:setAutoFire(true)
     emitterActor:setRotation(180)
+
+    ball = luajava.new(Ball)
+    ball:setPosition(luajava.new(Vector2, 300, 420))
+    world:add(ball)
 end
 
-function onCheck()
-    return false
+function onCheck(dropsPosArray, dropsCount)
+    local counter = 0
+    for i = 0, dropsCount - 1 do
+        local x = Array:get(dropsPosArray, i * 2)
+        local y = Array:get(dropsPosArray, i * 2 + 1)
+        if x < 0 and y > 200 then
+            counter = counter + 1
+        end
+    end
+
+    if counter > 10 then
+        return true
+    else
+        return false
+    end
 end
