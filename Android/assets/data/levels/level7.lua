@@ -19,14 +19,14 @@ function onCreate(world)
     ground:addVertex(56, 60)
     ground:addVertex(112, 100)
     ground:addVertex(56, 200)
-    ground:addVertex(0, 250)
+    ground:addVertex(0, 220)
     world:add(ground)
 
     local ground = luajava.new(Ground)
-    ground:addVertex(152, 224)
+    ground:addVertex(192, 184)
     ground:addVertex(650, 450)
     ground:addVertex(152, 272)
-    ground:addVertex(0, 344)
+    ground:addVertex(50, 344)
     world:add(ground)
 
     local emitterActor = luajava.new(Emitter)
@@ -41,15 +41,8 @@ function onCreate(world)
     world:add(ball)
 end
 
-function onCheck(dropsPosArray, dropsCount)
-    local counter = 0
-    for i = 0, dropsCount - 1 do
-        local x = Array:get(dropsPosArray, i * 2)
-        local y = Array:get(dropsPosArray, i * 2 + 1)
-        if x < 0 and y > 200 then
-            counter = counter + 1
-        end
-    end
+function onCheck(world, dropsCount)
+    local counter = world:dropsInRect(-100, 200, 100, 200)
 
     if counter > 10 then
         return true

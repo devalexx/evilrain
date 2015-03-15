@@ -35,13 +35,8 @@ function onCreate(world)
     world:addDrawingZone(500, 320, 200, 150)
 end
 
-function onCheck(dropsPosArray, dropsCount)
-    count = 0
-    for i = 0, dropsCount - 1 do
-        if Array:get(dropsPosArray, i * 2 + 1) < 200 then
-            count = count + 1
-        end
-    end
+function onCheck(world)
+    count = world:dropsBelowY(200)
 
     if count > 150 then
         return true

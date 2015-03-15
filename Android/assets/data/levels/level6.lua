@@ -44,15 +44,13 @@ function onCreate(world)
     end
 end
 
-function onCheck(dropsPosArray, dropsCount)
+function onCheck(world, dropsCount)
     if dropsCount ~= counter then
         return false
     end
 
-    for i = 0, dropsCount - 1 do
-        if Array:get(dropsPosArray, i * 2) < 400 then
-            return false
-        end
+    if world:dropsBelowX(400) > 0 then
+        return false
     end
 
     return true

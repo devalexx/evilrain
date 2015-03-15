@@ -43,16 +43,11 @@ function onCreate(world)
     world:add(ground)
 end
 
-function onCheck(dropsPosArray, dropsCount)
-    for i = 0, dropsCount - 1 do
-        local x = Array:get(dropsPosArray, i * 2)
-        local y = Array:get(dropsPosArray, i * 2 + 1)
-        if x > 303 or x < 148 or y > 388 or y < 241 then
-            return false
-        end
-    end
+function onCheck(world, dropsCount)
+    local count = world:dropsInRect(148, 241, 155, 147)
+    print(dropsCount, count)
 
-    if dropsCount > 10 then
+    if count > 10 and count == dropsCount then
         return true
     else
         return false

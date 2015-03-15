@@ -402,9 +402,9 @@ public class GameWorld extends Stage {
         for(int i = 0; i < src.length; i++)
             dropsXYPositions[i] = src[i] * BOX_TO_WORLD;
 
-        LuaValue luaDropsPosArray = CoerceJavaToLua.coerce(dropsXYPositions);
         LuaValue luaDropsCount = CoerceJavaToLua.coerce(particleSystem.getParticleCount());
-        LuaValue retVal = luaOnCheckFunc.call(luaDropsPosArray, luaDropsCount);
+        LuaValue luaWorld = CoerceJavaToLua.coerce(this);
+        LuaValue retVal = luaOnCheckFunc.call(luaWorld/*luaDropsPosArray*/, luaDropsCount);
         if(retVal.toboolean(1) && !wonGame) {
             wonGame = true;
             showWinnerMenu();
@@ -815,5 +815,82 @@ public class GameWorld extends Stage {
 
     public void addDrawingZone(float x, float y, float width, float height, float r, float g, float b) {
         drawingZones.add(new Zone(new Rectangle(x, y, width, height), new Color(r, g, b, 1)));
+    }
+
+    public int dropsInRect(float x, float y, float width, float height) {
+        float xy[] = dropsXYPositions;
+        int count = 0;
+        for(int i = 0, max = particleSystem.getParticleCount(); i < max; i++) {
+            float dx = xy[i * 2];
+            float dy = xy[i * 2 + 1];
+            if(dx > x && dx < x + width && dy > y && dy < y + height)
+                count++;
+        }
+
+        return count;
+    }
+
+    public int dropsAboveX(float x) {
+        return dropsAboveX(x, 0);
+    }
+
+    public int dropsAboveX(float x, int maxCount) {
+        float xy[] = dropsXYPositions;
+        int count = 0;
+        for(int i = 0, max = particleSystem.getParticleCount(); i < max; i++) {
+            float dx = xy[i * 2];
+            if(dx > x)
+                count++;
+        }
+
+        return count;
+    }
+
+    public int dropsBelowX(float x) {
+        return dropsBelowX(x, 0);
+    }
+
+    public int dropsBelowX(float x, int maxCount) {
+        float xy[] = dropsXYPositions;
+        int count = 0;
+        for(int i = 0, max = particleSystem.getParticleCount(); i < max; i++) {
+            float dx = xy[i * 2];
+            if(dx < x)
+                count++;
+        }
+
+        return count;
+    }
+
+    public int dropsAboveY(float y) {
+        return dropsAboveY(y, 0);
+    }
+
+    public int dropsAboveY(float y, int maxCount) {
+        float xy[] = dropsXYPositions;
+        int count = 0;
+        for(int i = 0, max = particleSystem.getParticleCount(); i < max; i++) {
+            float dy = xy[i * 2 + 1];
+            if(dy > y)
+                count++;
+        }
+
+        return count;
+    }
+
+    public int dropsBelowY(float y) {
+        return dropsBelowY(y, 0);
+    }
+
+    public int dropsBelowY(float y, int maxCount) {
+        float xy[] = dropsXYPositions;
+        int count = 0;
+        for(int i = 0, max = particleSystem.getParticleCount(); i < max; i++) {
+            float dy = xy[i * 2 + 1];
+            if(dy < y)
+                count++;
+        }
+
+        return count;
     }
 }
