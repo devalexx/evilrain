@@ -15,12 +15,17 @@ package com.alex.rain.screens;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.managers.I18nManager;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+
+import java.io.File;
+import java.io.FilenameFilter;
 
 public class LevelsMenuScreen extends BasicUIScreen {
     public LevelsMenuScreen() {
@@ -45,7 +50,14 @@ public class LevelsMenuScreen extends BasicUIScreen {
 
         table.add(scrollPane).colspan(2).expandX().fill();
 
-        for(int i = 1; i < 8; i++) {
+        FileHandle[] levels = Gdx.files.internal("data/levels").list(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.startsWith("level");
+            }
+        });
+
+        for(int i = 1; i < levels.length + 1; i++) {
             final TextButton button1 = new TextButton(I18nManager.getString("LEVEL") + " " + String.valueOf(i), skin);
             scrollPaneTable.add(button1);
 
