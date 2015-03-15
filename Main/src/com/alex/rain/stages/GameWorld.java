@@ -19,6 +19,7 @@ import com.alex.rain.managers.ResourceManager;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.models.*;
 import com.alex.rain.renderer.ParticleRenderer;
+import com.alex.rain.screens.LevelsMenuScreen;
 import com.alex.rain.screens.MainMenuScreen;
 import com.alex.rain.viewports.GameViewport;
 import com.badlogic.gdx.Gdx;
@@ -494,7 +495,7 @@ public class GameWorld extends Stage {
 
         winnerWindow.row().width(400).padTop(10);
 
-        final TextButton mainMenuButton = new TextButton("Back to main menu", skin);
+        final TextButton mainMenuButton = new TextButton("Back to levels", skin);
         winnerWindow.add(mainMenuButton);
 
         nextOrContinueButton.addListener(new ClickListener() {
@@ -519,7 +520,7 @@ public class GameWorld extends Stage {
         mainMenuButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                RainGame.getInstance().setMenu(new MainMenuScreen());
+                RainGame.getInstance().setMenu(new LevelsMenuScreen());
             }
         });
 
