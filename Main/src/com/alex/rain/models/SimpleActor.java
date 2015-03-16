@@ -41,7 +41,8 @@ public abstract class SimpleActor extends Actor {
         EMITTER,
         HOUSE,
         HAMMER,
-        BALL
+        BALL,
+        TRIGGER
     }
 
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {

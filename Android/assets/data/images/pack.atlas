@@ -6,23 +6,30 @@ filter: Nearest,Nearest
 repeat: none
 arrow
   rotate: false
-  xy: 934, 934
+  xy: 604, 274
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 background
   rotate: false
-  xy: 804, 746
+  xy: 670, 318
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
 button
   rotate: false
-  xy: 838, 804
+  xy: 804, 626
   size: 64, 64
   orig: 64, 64
+  offset: 0, 0
+  index: -1
+cloud
+  rotate: false
+  xy: 2, 138
+  size: 600, 200
+  orig: 600, 200
   offset: 0, 0
   index: -1
 drop
@@ -34,49 +41,43 @@ drop
   index: -1
 emitter
   rotate: false
-  xy: 934, 868
+  xy: 934, 756
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+game_button_off
+  rotate: false
+  xy: 36, 72
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+game_button_on
+  rotate: false
+  xy: 604, 208
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 grass
   rotate: false
-  xy: 2, 518
-  size: 800, 480
-  orig: 800, 480
-  offset: 0, 0
-  index: -1
-grass2
-  rotate: false
-  xy: 2, 36
+  xy: 2, 340
   size: 800, 480
   orig: 800, 480
   offset: 0, 0
   index: -1
 hammer
   rotate: false
-  xy: 804, 870
+  xy: 804, 692
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 home1
   rotate: false
-  xy: 804, 768
+  xy: 2, 36
   size: 32, 100
   orig: 32, 100
-  offset: 0, 0
-  index: -1
-
-pack2.png
-size: 1024,256
-format: RGBA8888
-filter: Nearest,Nearest
-repeat: none
-cloud
-  rotate: false
-  xy: 2, 2
-  size: 600, 200
-  orig: 600, 200
   offset: 0, 0
   index: -1

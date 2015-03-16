@@ -548,7 +548,7 @@ public class GameWorld extends Stage {
         } else if(pressingAction == TouchType.PICKING_BODIES) {
             SimpleActor targetActor = null;
             for(SimpleActor actor : actorList) {
-                if(actor.getType() == SimpleActor.TYPE.BALL && actor.isInAABB(cursorPosition)) {
+                if((actor.getType() == SimpleActor.TYPE.BALL || actor.getType() == SimpleActor.TYPE.TRIGGER) && actor.isInAABB(cursorPosition)) {
                     targetActor = actor;
                     break;
                 }
@@ -593,13 +593,14 @@ public class GameWorld extends Stage {
         if(winnerWindow != null)
             return true;
 
-        if(cursorPosition != null)
+        if(cursorPosition != null) {
             cursorPosition.set(getCursorPosition(screenX, screenY));
 
-        if(mouseJoint != null) {
-            cursorPosition.scl(WORLD_TO_BOX);
-            mouseJoint.setTarget(cursorPosition);
-            cursorPosition.scl(BOX_TO_WORLD);
+            if(mouseJoint != null) {
+                cursorPosition.scl(WORLD_TO_BOX);
+                mouseJoint.setTarget(cursorPosition);
+                cursorPosition.scl(BOX_TO_WORLD);
+            }
         }
 
         if(wonGame || cloud != null || emitter != null || dropList.size() > dropsMax)

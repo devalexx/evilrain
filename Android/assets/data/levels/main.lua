@@ -10,6 +10,7 @@ Hammer = luajava.bindClass("com.alex.rain.models.Hammer")
 Cloud = luajava.bindClass("com.alex.rain.models.Cloud")
 Emitter = luajava.bindClass("com.alex.rain.models.Emitter")
 Ball = luajava.bindClass("com.alex.rain.models.Ball")
+Trigger = luajava.bindClass("com.alex.rain.models.Trigger")
 -- System Classes
 Vector2 = luajava.bindClass("com.badlogic.gdx.math.Vector2")
 
