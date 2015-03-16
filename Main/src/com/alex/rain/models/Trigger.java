@@ -79,6 +79,7 @@ public class Trigger extends SimpleActor {
         DistanceJointDef distanceJointDef = new DistanceJointDef();
         distanceJointDef.initialize(body, topBody,
                 pos.cpy().scl(GameWorld.WORLD_TO_BOX), pos.cpy().add(0, getPhysicsHeight() / 2).scl(GameWorld.WORLD_TO_BOX));
+        distanceJointDef.collideConnected = true;
         distanceJoint = (DistanceJoint)physicsWorld.createJoint(distanceJointDef);
     }
 
