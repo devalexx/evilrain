@@ -14,13 +14,13 @@ function onCreate(world)
     ground:addVertex(32, 32)
     world:add(ground)
 
-    local dynamicActor = luajava.new(Home)
+    local dynamicActor = luajava.new(House)
     world:add(dynamicActor)
     dynamicActor:setPosition(luajava.new(Vector2, 650, 300))
     table.insert(dynActorArray, dynamicActor)
 
     for i = 0, 3 do
-        local dynamicActorTmp = luajava.new(Home)
+        local dynamicActorTmp = luajava.new(House)
         dynamicActorTmp:setBodyBox(20, 100 + i * 10)
         dynamicActorTmp:setSpriteBox(20, 100 + i * 10)
         world:add(dynamicActorTmp)

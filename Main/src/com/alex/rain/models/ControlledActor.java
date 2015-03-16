@@ -15,7 +15,7 @@ package com.alex.rain.models;
 
 import com.badlogic.gdx.math.Rectangle;
 
-public abstract class ControlledActor extends KinematicActor {
+public abstract class ControlledActor extends SimpleActor {
     Rectangle minMaxPosRectangle;
     boolean hasControl = true;
 

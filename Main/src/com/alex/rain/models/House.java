@@ -21,10 +21,11 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
-public class Home extends DynamicActor {
-    public Home() {
+public class House extends SimpleActor {
+    public House() {
         sprite = TextureManager.getSpriteFromDefaultAtlas("home1");
         setBodyBox(32, 100);
+        type = TYPE.HOUSE;
     }
 
     @Override

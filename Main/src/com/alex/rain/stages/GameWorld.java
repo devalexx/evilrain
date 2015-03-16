@@ -548,7 +548,7 @@ public class GameWorld extends Stage {
         } else if(pressingAction == TouchType.PICKING_BODIES) {
             SimpleActor targetActor = null;
             for(SimpleActor actor : actorList) {
-                if(actor instanceof DynamicActor && actor.isInAABB(cursorPosition)) {
+                if(actor.getType() == SimpleActor.TYPE.BALL && actor.isInAABB(cursorPosition)) {
                     targetActor = actor;
                     break;
                 }

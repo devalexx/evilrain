@@ -5,7 +5,7 @@ GROUND = "GROUND"
 -- Game Classes
 Drop = luajava.bindClass("com.alex.rain.models.Drop")
 Ground = luajava.bindClass("com.alex.rain.models.Ground")
-Home = luajava.bindClass("com.alex.rain.models.Home")
+House = luajava.bindClass("com.alex.rain.models.House")
 Hammer = luajava.bindClass("com.alex.rain.models.Hammer")
 Cloud = luajava.bindClass("com.alex.rain.models.Cloud")
 Emitter = luajava.bindClass("com.alex.rain.models.Emitter")

@@ -38,7 +38,10 @@ public abstract class SimpleActor extends Actor {
         DROP,
         GROUND,
         CLOUD,
-        EMITTER
+        EMITTER,
+        HOUSE,
+        HAMMER,
+        BALL
     }
 
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
@@ -154,5 +157,14 @@ public abstract class SimpleActor extends Actor {
     public boolean isInAABB(Vector2 v) {
         Rectangle r = new Rectangle(getX(), getY(), getWidth(), getHeight());
         return r.contains(v);
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        if(sprite != null) {
+            sprite.setPosition(pos.x + offset.x, pos.y + offset.y);
+            sprite.setRotation(rot);
+            sprite.draw(batch, parentAlpha);
+        }
     }
 }

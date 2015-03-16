@@ -22,11 +22,12 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
-public class Ball extends DynamicActor {
+public class Ball extends SimpleActor {
     public Ball() {
         sprite = TextureManager.getSpriteFromDefaultAtlas("button");
         setBodyBox(20, 20);
         setSpriteBox(40, 40);
+        type = TYPE.BALL;
     }
 
     @Override

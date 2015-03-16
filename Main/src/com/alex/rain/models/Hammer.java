@@ -22,10 +22,11 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
-public class Hammer extends DynamicActor {
+public class Hammer extends SimpleActor {
     public Hammer() {
         sprite = TextureManager.getSpriteFromDefaultAtlas("hammer");
         setBodyBox(128, 128);
+        type = TYPE.HAMMER;
     }
 
     @Override
