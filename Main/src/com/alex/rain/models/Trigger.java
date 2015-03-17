@@ -17,12 +17,14 @@ import com.alex.rain.managers.TextureManager;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
-import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
+import com.badlogic.gdx.physics.box2d.joints.PrismaticJoint;
+import com.badlogic.gdx.physics.box2d.joints.PrismaticJointDef;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Trigger extends SimpleActor {
-    private DistanceJoint distanceJoint;
+    private PrismaticJoint distanceJoint;
+    private Body topBody;
+    private boolean state;
 
     public Trigger() {
         sprite = TextureManager.getSpriteFromDefaultAtlas("game_button_off");
@@ -57,7 +59,7 @@ public class Trigger extends SimpleActor {
 
         polygonShape = new PolygonShape();
         polygonShape.setAsBox(getPhysicsWidth() / 3, getPhysicsHeight() / 20f,
-                new Vector2(0, getPhysicsHeight() / 1.33f), 0);
+                new Vector2(0, getPhysicsHeight() / 2.3f), 0);
 
         offset.set(-getWidth() / 2, -getHeight() / 2);
         sprite.setOrigin(getWidth() / 2, getHeight() / 2);
@@ -70,23 +72,39 @@ public class Trigger extends SimpleActor {
         bodyDef = new BodyDef();
         bodyDef.position.set(pos.cpy().scl(GameWorld.WORLD_TO_BOX));
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        Body topBody = physicsWorld.createBody(bodyDef);
+        topBody = physicsWorld.createBody(bodyDef);
         topBody.createFixture(fixtureDef);
         topBody.resetMassData();
 
         polygonShape.dispose();
 
-        DistanceJointDef distanceJointDef = new DistanceJointDef();
-        distanceJointDef.initialize(body, topBody,
-                pos.cpy().scl(GameWorld.WORLD_TO_BOX), pos.cpy().add(0, getPhysicsHeight() / 2).scl(GameWorld.WORLD_TO_BOX));
-        distanceJointDef.collideConnected = true;
-        distanceJoint = (DistanceJoint)physicsWorld.createJoint(distanceJointDef);
+        PrismaticJointDef jointDef = new PrismaticJointDef();
+        jointDef.initialize(body, topBody,
+                pos.cpy().scl(GameWorld.WORLD_TO_BOX), new Vector2(0.0f, 1.0f));
+        jointDef.enableLimit = true;
+        jointDef.upperTranslation = 0.01f;
+        //jointDef.referenceAngle = 1;
+        jointDef.collideConnected = true;
+        jointDef.enableMotor = true;
+        jointDef.motorSpeed = 2f;
+        jointDef.maxMotorForce = 2f;
+        distanceJoint = (PrismaticJoint)physicsWorld.createJoint(jointDef);
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
-        /*System.out.println(getBody().getJointList().get(0).joint.);
-        Joint*/
+
+        if(distanceJoint.getJointTranslation() < 0.001)
+            setState(true);
+    }
+
+    public boolean getState() {
+        return state;
+    }
+
+    public void setState(boolean state) {
+        this.state = state;
+        sprite = TextureManager.getSpriteFromDefaultAtlas(state ? "game_button_on" : "game_button_off");
     }
 }

@@ -156,7 +156,7 @@ public abstract class SimpleActor extends Actor {
     }
 
     public boolean isInAABB(Vector2 v) {
-        Rectangle r = new Rectangle(getX(), getY(), getWidth(), getHeight());
+        Rectangle r = new Rectangle(getX() - getWidth() / 2, getY() - getHeight() / 2, getWidth(), getHeight());
         return r.contains(v);
     }
 
