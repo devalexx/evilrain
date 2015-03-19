@@ -19,12 +19,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJoint;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJointDef;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Trigger extends SimpleActor {
     private PrismaticJoint distanceJoint;
     private Body topBody;
     private boolean state;
+    private EventListener listener;
 
     public Trigger() {
         sprite = TextureManager.getSpriteFromDefaultAtlas("game_button_off");
@@ -50,7 +52,7 @@ public class Trigger extends SimpleActor {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(pos.cpy().scl(GameWorld.WORLD_TO_BOX));
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.type = bodyType != null ? bodyType : BodyDef.BodyType.DynamicBody;
         body = physicsWorld.createBody(bodyDef);
         body.createFixture(fixtureDef);
         body.resetMassData();
@@ -104,7 +106,13 @@ public class Trigger extends SimpleActor {
     }
 
     public void setState(boolean state) {
+        if(this.state != state && listener != null)
+            listener.handle(null);
         this.state = state;
         sprite = TextureManager.getSpriteFromDefaultAtlas(state ? "game_button_on" : "game_button_off");
+    }
+
+    public void setListener(EventListener listener) {
+        this.listener = listener;
     }
 }

@@ -648,7 +648,7 @@ public class GameWorld extends Stage {
         if(keyCode == Input.Keys.LEFT) {
             if(cloud != null) {
                 if(pressed) {
-                    cloud.setLinearVelocity(new Vector2(-100, 0));
+                    cloud.setLinearVelocity(new Vector2(-150, 0));
                     cloud.setDirection(1);
                 } else {
                     cloud.setLinearVelocity(new Vector2(0, 0));
@@ -658,7 +658,7 @@ public class GameWorld extends Stage {
         } else if(keyCode == Input.Keys.RIGHT) {
             if(cloud != null) {
                 if(pressed) {
-                    cloud.setLinearVelocity(new Vector2(100, 0));
+                    cloud.setLinearVelocity(new Vector2(150, 0));
                     cloud.setDirection(2);
                 } else {
                     cloud.setLinearVelocity(new Vector2(0, 0));
@@ -668,14 +668,14 @@ public class GameWorld extends Stage {
         } else if(keyCode == Input.Keys.UP) {
             if(emitter != null) {
                 if(pressed)
-                    emitter.setLinearVelocity(new Vector2(0, 100));
+                    emitter.setLinearVelocity(new Vector2(0, 150));
                 else
                     emitter.setLinearVelocity(new Vector2(0, 0));
             }
         } else if(keyCode == Input.Keys.DOWN) {
             if(emitter != null) {
                 if(pressed)
-                    emitter.setLinearVelocity(new Vector2(0, -100));
+                    emitter.setLinearVelocity(new Vector2(0, -150));
                 else
                     emitter.setLinearVelocity(new Vector2(0, 0));
             }

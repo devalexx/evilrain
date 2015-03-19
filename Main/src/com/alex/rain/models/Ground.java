@@ -97,6 +97,7 @@ public class Ground extends SimpleActor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.end();
+        poly.setPosition(pos.x, pos.y);
         polyBatch.begin();
             poly.draw(polyBatch);
         polyBatch.end();
@@ -105,7 +106,7 @@ public class Ground extends SimpleActor {
                 shapeRenderer.setColor(Color.BLUE);
                 Vector2 v1 = vertices.get(i);
                 Vector2 v2 = i == vertices.size() - 1 ? vertices.get(0) : vertices.get(i + 1);
-                shapeRenderer.line(v1.x, v1.y, v2.x, v2.y);
+                shapeRenderer.line(v1.x + pos.x, v1.y + pos.y, v2.x + pos.x, v2.y + pos.y);
             }
         shapeRenderer.end();
         batch.begin();

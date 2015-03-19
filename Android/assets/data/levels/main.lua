@@ -2,6 +2,10 @@
 NONE = "NONE"
 DROP = "DROP"
 GROUND = "GROUND"
+-- BodyType
+STATIC_BODY =0
+KINEMATIC_BODY = 1
+DYNAMIC_BODY = 2
 -- Game Classes
 Drop = luajava.bindClass("com.alex.rain.models.Drop")
 Ground = luajava.bindClass("com.alex.rain.models.Ground")
@@ -16,3 +20,5 @@ Vector2 = luajava.bindClass("com.badlogic.gdx.math.Vector2")
 
 Color = luajava.bindClass("com.badlogic.gdx.graphics.Color")
 Array = luajava.bindClass("java.lang.reflect.Array")
+
+IEventListener = 'com.badlogic.gdx.scenes.scene2d.EventListener'

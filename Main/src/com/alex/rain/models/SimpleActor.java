@@ -32,6 +32,7 @@ public abstract class SimpleActor extends Actor {
     protected Sprite sprite;
     protected Texture texture;
     protected World physicsWorld;
+    protected BodyDef.BodyType bodyType;
 
     public enum TYPE {
         NONE,
@@ -167,5 +168,13 @@ public abstract class SimpleActor extends Actor {
             sprite.setRotation(rot);
             sprite.draw(batch, parentAlpha);
         }
+    }
+
+    public void setBodyType(int bodyType) {
+        setBodyType(BodyDef.BodyType.values()[bodyType]);
+    }
+
+    public void setBodyType(BodyDef.BodyType bodyType) {
+        this.bodyType = bodyType;
     }
 }
