@@ -91,10 +91,10 @@ public class GameWorld extends Stage {
     private TextureRegion m_fboRegion;
     private final Batch sb;
     private Skin skin = ResourceManager.getSkin();
-    private GameViewport gameViewport = new GameViewport();
+    protected GameViewport gameViewport = new GameViewport();
 
     private List<Drop> selectedDrops, dropsToCreate = new LinkedList<Drop>(), dropsToDelete = new LinkedList<Drop>();
-    private List<SimpleActor> actorList = new ArrayList<SimpleActor>();
+    protected List<SimpleActor> actorList = new ArrayList<SimpleActor>();
     private ArrayList<Drop> dropList = new ArrayList<Drop>();
     private final HashMap<Long, SimpleActor> actorsMap = new HashMap<>();
     private Cloud cloud;
@@ -609,7 +609,7 @@ public class GameWorld extends Stage {
         return false;
     }
 
-    private Vector2 getCursorPosition(int screenX, int screenY) {
+    protected Vector2 getCursorPosition(int screenX, int screenY) {
         Vector3 v = getCamera().unproject(new Vector3(screenX, screenY, 0));
         return new Vector2(v.x, v.y);
     }
@@ -619,7 +619,7 @@ public class GameWorld extends Stage {
         if(keyCode == Input.Keys.F4 || keyCode == Input.Keys.D)
             debugRendererEnabled = !debugRendererEnabled;
         else if(keyCode == Input.Keys.F5 || keyCode == Input.Keys.P)
-            physicsEnabled = !physicsEnabled;
+            togglePhysics();
         else if(keyCode == Input.Keys.F6 || keyCode == Input.Keys.L)
             liquidForcesEnabled = !liquidForcesEnabled;
         else if(keyCode == Input.Keys.F7 || keyCode == Input.Keys.S)
@@ -894,5 +894,39 @@ public class GameWorld extends Stage {
         }
 
         return count;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debugRendererEnabled = debug;
+    }
+
+    public boolean isDebug() {
+        return debugRendererEnabled;
+    }
+
+    public void togglePhysics() {
+        physicsEnabled = !physicsEnabled;
+    }
+
+    public void reset() {
+        dropsToDelete.addAll(dropList);
+        for(SimpleActor sa : actorList)
+            getRoot().removeActor(sa);
+        actorList.clear();
+        emitter = null;
+        cloud = null;
+    }
+
+    public HashMap<Long, SimpleActor> getGameActors() {
+        return actorsMap;
+    }
+
+    public void removeActor(SimpleActor selectedActor) {
+        getRoot().removeActor(selectedActor);
+        if(emitter == selectedActor)
+            emitter = null;
+
+        if(cloud == selectedActor)
+            cloud = null;
     }
 }

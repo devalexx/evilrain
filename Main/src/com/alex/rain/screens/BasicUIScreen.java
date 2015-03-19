@@ -36,6 +36,10 @@ public class BasicUIScreen implements Screen {
         this(true);
     }
 
+    public BasicUIScreen(Stage stage) {
+        this.stage = stage;
+    }
+
     public BasicUIScreen(boolean createStage) {
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 

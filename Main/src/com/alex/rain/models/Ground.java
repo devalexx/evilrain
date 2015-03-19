@@ -14,7 +14,7 @@
 package com.alex.rain.models;
 
 import com.alex.rain.RainGame;
-import com.alex.rain.helpers.Box2DSeparatorHelper;
+import com.alex.rain.helpers.SeparatorHelper;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.graphics.Color;
@@ -81,8 +81,7 @@ public class Ground extends SimpleActor {
         for(Vector2 v : vertices)
             v.scl(GameWorld.WORLD_TO_BOX);
 
-        Box2DSeparatorHelper separatorHelper = new Box2DSeparatorHelper();
-        separatorHelper.Separate(body, fixtureDef, vertices, 30);
+        SeparatorHelper.defaultSeparatorHelper.separate(body, fixtureDef, vertices, 30);
 
         polygonShape.dispose();
 

@@ -177,4 +177,8 @@ public abstract class SimpleActor extends Actor {
     public void setBodyType(BodyDef.BodyType bodyType) {
         this.bodyType = bodyType;
     }
+
+    public BodyDef.BodyType getBodyType() {
+        return bodyType;
+    }
 }

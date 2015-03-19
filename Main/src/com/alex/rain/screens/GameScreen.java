@@ -17,48 +17,20 @@ import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
-public class GameScreen implements Screen {
-    private OrthographicCamera camera;
+public class GameScreen extends BasicUIScreen {
     private GameWorld world;
 
     public GameScreen(GameWorld world) {
+        super(world);
         this.world = world;
     }
 
     @Override
     public void render(float delta) {
-        /*camera.viewportHeight = 480;
-        camera.viewportWidth = 800;
-        camera.position.set(0, 0, 0f);*/
     }
 
     @Override
     public void resize(int width, int height) {
         world.resize(width, height);
-    }
-
-    @Override
-    public void show() {
-        /*camera = (OrthographicCamera) world.getCamera();
-        camera.viewportHeight = 480;
-        camera.viewportWidth = 800;
-
-        camera.position.set(camera.viewportWidth * .5f, camera.viewportHeight * .5f, 0f);*/
-    }
-
-    @Override
-    public void hide() {
-    }
-
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
-    public void dispose() {
     }
 }

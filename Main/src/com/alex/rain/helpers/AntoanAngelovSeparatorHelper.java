@@ -14,9 +14,13 @@
 package com.alex.rain.helpers;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /*
 * Convex Separator for Box2D Flash
@@ -30,7 +34,7 @@ import java.util.*;
 *
 */
 
-public class Box2DSeparatorHelper {
+public class AntoanAngelovSeparatorHelper implements SeparatorHelper {
     /**
      * Separates a non-convex polygon into convex polygons and adds them as fixtures to the <code>body</code> parameter.<br/>
      * There are some rules you should follow (otherwise you might get unexpected results) :
@@ -46,8 +50,8 @@ public class Box2DSeparatorHelper {
      * @param scale <code>[optional]</code> The scale which you use to draw shapes in Box2D. The bigger the scale, the better the precision. The default value is 30.
      * */
 
-    public void Separate(Body body, FixtureDef fixtureDef, List<Vector2> verticesVec, float scale) {
-        int i, n = verticesVec.size(), j, k, m;
+    public void separate(Body body, FixtureDef fixtureDef, List<Vector2> verticesVec, float scale) {
+        int i, n = verticesVec.size(), j, m;
         List<Vector2> vec = new ArrayList<Vector2>();
         List<List<Vector2>> figsVec = new ArrayList<List<Vector2>>();
         PolygonShape polyShape;
@@ -68,20 +72,37 @@ public class Box2DSeparatorHelper {
             }
 
             polyShape = new PolygonShape();
-            float area = 0;
-            for(k = 0; k < verticesVec.size(); k++) {
-                if(k + 1 != verticesVec.size())
-                    area += verticesVec.get(k).x * verticesVec.get(k+1).y - verticesVec.get(k+1).x * verticesVec.get(k).y;
-                else
-                    area += verticesVec.get(k).x * verticesVec.get(0).y - verticesVec.get(0).x * verticesVec.get(k).y;
-            }
-            area *= 0.5f;
-            if(verticesVec.size() == 0 || Math.abs(area) < 0.04)
-                continue;
             polyShape.set(verticesVec.toArray(new Vector2[verticesVec.size()]));
             fixtureDef.shape=polyShape;
             body.createFixture(fixtureDef);
         }
+    }
+
+    public List<List<Vector2>> getSeparated(List<Vector2> verticesVec, float scale) {
+        int i, n = verticesVec.size(), j, m;
+        List<Vector2> vec = new ArrayList<Vector2>();
+        List<List<Vector2>> figsVec = new ArrayList<List<Vector2>>();
+        PolygonShape polyShape;
+
+        for (i=0; i < n; i++) {
+            vec.add(new Vector2(verticesVec.get(i).x * scale, verticesVec.get(i).y * scale));
+        }
+
+        figsVec = calcShapes(vec);
+        n = figsVec.size();
+
+        List<List<Vector2>> listOfList = new ArrayList<List<Vector2>>();
+        for (i=0; i<n; i++) {
+            List<Vector2> vertices = new ArrayList<Vector2>();
+            vec = figsVec.get(i);
+            m = vec.size();
+            for (j=0; j<m; j++) {
+                vertices.add(new Vector2(vec.get(j).x / scale, vec.get(j).y / scale));
+            }
+            listOfList.add(vertices);
+        }
+
+        return listOfList;
     }
 
     /**
@@ -98,8 +119,8 @@ public class Box2DSeparatorHelper {
      * </ul> 
      * */
 
-    public int Validate(List<Vector2> verticesVec) {
-        int i, n = verticesVec.size(), j, j2, i2, i3, ret = 0;
+    public int validate(List<Vector2> verticesVec) {
+        int i, n = verticesVec.size(), j, j2, i2, i3, ret = 0, m;
         float d;
         boolean fl, fl2 = false;
 
@@ -142,10 +163,35 @@ public class Box2DSeparatorHelper {
             }
 
         }
+
+        List<Vector2> vec = new ArrayList<Vector2>();
+        List<List<Vector2>> figsVec;
+
+        for (i=0; i < n; i++) {
+            vec.add(new Vector2(verticesVec.get(i).x * 30, verticesVec.get(i).y * 30));
+        }
+
+        if(ret == 0) {
+            figsVec = calcShapes(vec);
+            n = figsVec.size();
+
+            for (i=0; i<n; i++) {
+                verticesVec = new ArrayList<Vector2>();
+                vec = figsVec.get(i);
+                m = vec.size();
+                for (j=0; j<m; j++) {
+                    verticesVec.add(new Vector2(vec.get(j).x / 30, vec.get(j).y / 30));
+                }
+
+                if(verticesVec.size() > 8)
+                    ret = 4;
+            }
+        }
+
         return ret;
     }
 
-    private List<List<Vector2>> calcShapes(List<Vector2> verticesVec) {
+    private static List<List<Vector2>> calcShapes(List<Vector2> verticesVec) {
         List<Vector2> vec = new ArrayList<Vector2>();
         int i, n, j ;
         float d, t, dx, dy, minLen;
@@ -294,7 +340,7 @@ public class Box2DSeparatorHelper {
         return figsVec;
     }
 
-    private Vector2 hitRay(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+    private static Vector2 hitRay(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
         float t1 = x3-x1, t2 = y3-y1, t3 = x2-x1, t4 = y2-y1, t5 = x4-x3, t6 = y4-y3, t7 = t4*t5-t3*t6, a;
 
         a=(((t5*t2)-t6*t1)/t7);
@@ -309,7 +355,7 @@ public class Box2DSeparatorHelper {
         return null;
     }
 
-    private Vector2 hitSegment(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+    private static Vector2 hitSegment(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
         float t1 = x3-x1, t2 = y3-y1, t3 = x2-x1, t4 = y2-y1, t5 = x4-x3, t6 = y4-y3, t7 = t4*t5-t3*t6, a;
 
         a=(((t5*t2)-t6*t1)/t7);
@@ -324,18 +370,18 @@ public class Box2DSeparatorHelper {
         return null;
     }
 
-    private boolean isOnSegment(float px, float py, float x1, float y1, float x2, float y2) {
+    private static boolean isOnSegment(float px, float py, float x1, float y1, float x2, float y2) {
         boolean b1 = ((((x1+0.1)>=px)&&px>=x2-0.1)||(((x1-0.1)<=px)&&px<=x2+0.1));
         boolean b2 = ((((y1+0.1)>=py)&&py>=y2-0.1)||(((y1-0.1)<=py)&&py<=y2+0.1));
         return ((b1&&b2)&&isOnLine(px,py,x1,y1,x2,y2));
     }
 
-    private boolean pointsMatch(float x1, float y1, float x2, float y2) {
+    private static boolean pointsMatch(float x1, float y1, float x2, float y2) {
         float dx = (x2>=x1) ? x2-x1 : x1-x2, dy = (y2>=y1) ? y2-y1 : y1-y2;
         return ((dx<0.1)&&dy<0.1);
     }
 
-    private boolean isOnLine(float px, float py, float x1, float y1, float x2, float y2) {
+    private static boolean isOnLine(float px, float py, float x1, float y1, float x2, float y2) {
         if ((((x2-x1)>0.1)||x1-x2>0.1)) {
             float a = (y2-y1)/(x2-x1), possibleY = a*(px-x1)+y1, diff = (possibleY>py) ? possibleY-py : py-possibleY;
             return (diff<0.1);
@@ -344,11 +390,11 @@ public class Box2DSeparatorHelper {
         return (((px-x1)<0.1)||x1-px<0.1);
     }
 
-    private float det(float x1, float y1, float x2, float y2, float x3, float y3) {
+    private static float det(float x1, float y1, float x2, float y2, float x3, float y3) {
         return x1*y2+x2*y3+x3*y1-y1*x2-y2*x3-y3*x1;
     }
 
-    private void err() {
-        throw new Error("A problem has occurred. Use the Validate() method to see where the problem is.");
+    private static void err() {
+        throw new Error("A problem has occurred. Use the validate() method to see where the problem is.");
     }
 }
