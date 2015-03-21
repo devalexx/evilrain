@@ -120,7 +120,7 @@ public class GameWorld extends Stage {
     private boolean physicsEnabled = true;
     private boolean liquidForcesEnabled = true;
     private boolean useShader = true;
-    private TouchType pressingAction = TouchType.NONE;
+    protected TouchType pressingAction = TouchType.NONE;
     private Vector2 cursorPosition;
     private boolean drawingDrops;
     private boolean keepDropsForever = false;
@@ -590,6 +590,8 @@ public class GameWorld extends Stage {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        boolean result = super.touchDragged(screenX, screenY, pointer);
+
         if(winnerWindow != null)
             return true;
 
@@ -606,7 +608,7 @@ public class GameWorld extends Stage {
         if(wonGame || cloud != null || emitter != null || dropList.size() > dropsMax)
             return true;
 
-        return false;
+        return result;
     }
 
     protected Vector2 getCursorPosition(int screenX, int screenY) {

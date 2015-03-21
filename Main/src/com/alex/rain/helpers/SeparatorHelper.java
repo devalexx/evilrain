@@ -22,7 +22,7 @@ import java.util.List;
 public interface SeparatorHelper {
     public static AntoanAngelovSeparatorHelper antoanAngelovSeparatorHelper = new AntoanAngelovSeparatorHelper();
     public static EarClippingSeparatorHelper earClippingSeparatorHelper = new EarClippingSeparatorHelper();
-    public static SeparatorHelper defaultSeparatorHelper = earClippingSeparatorHelper;
+    public static SeparatorHelper defaultSeparatorHelper = antoanAngelovSeparatorHelper;
 
     public void separate(Body body, FixtureDef fixtureDef, List<Vector2> verticesVec, float scale);
 

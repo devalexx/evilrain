@@ -15,9 +15,8 @@ package com.alex.rain.ui;
 
 import com.alex.rain.managers.EditorManager;
 import com.alex.rain.managers.ResourceManager;
-import com.alex.rain.models.SimpleActor;
+import com.alex.rain.models.*;
 import com.alex.rain.stages.GameWorld;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -50,9 +49,9 @@ public class EditorUI extends Table {
         Table emptyTableLeft = new Table();
         Table emptyTableRight = new Table();
         final SplitPane leftSplitPane = new SplitPane(tableLeft, emptyTableLeft, false, skin.get("default-horizontal", SplitPane.SplitPaneStyle.class));
-        leftSplitPane.setSplitAmount(0.4f);
+        leftSplitPane.setSplitAmount(0.5f);
         final SplitPane rightSplitPane = new SplitPane(emptyTableRight, tableRight, false, skin.get("default-horizontal", SplitPane.SplitPaneStyle.class));
-        rightSplitPane.setSplitAmount(0.6f);
+        rightSplitPane.setSplitAmount(0.4f);
         topPanes.add(leftSplitPane).left().fill().expand();
         topPanes.add(rightSplitPane).right().fill().expand();
 
@@ -75,58 +74,89 @@ public class EditorUI extends Table {
     private Table createMenuTable() {
         Table table = new Table();
         Table paneTable = new Table();
-        ScrollPane scrollPane = new ScrollPane(paneTable, skin.get(ScrollPane.ScrollPaneStyle.class));
+        ScrollPane scrollPane = new ScrollPane(paneTable, skin);
         table.add(scrollPane).fill().expand();
         paneTable.align(Align.top);
 
-        TextButton addPlayerButton = new TextButton("Player", skin.get(TextButton.TextButtonStyle.class));
-        addPlayerButton.addListener(new ClickListener(0) {
+        TextButton addBallButton = new TextButton("Ball", skin);
+        addBallButton.addListener(new ClickListener(0) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //editorManager.addPlayer();
+                editorManager.add(Ball.class);
             }
         });
-        paneTable.add(addPlayerButton);
+        paneTable.add(addBallButton);
 
-        TextButton addSkateButton = new TextButton("Skate", skin.get(TextButton.TextButtonStyle.class));
-        addSkateButton.addListener(new ClickListener(0) {
+        TextButton addCloudButton = new TextButton("Cloud", skin);
+        addCloudButton.addListener(new ClickListener(0) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //editorManager.addSkate();
+                editorManager.add(Cloud.class);
             }
         });
-        paneTable.add(addSkateButton);
+        paneTable.add(addCloudButton);
 
         paneTable.row();
 
-        TextButton addCoinButton = new TextButton("Coin", skin.get(TextButton.TextButtonStyle.class));
-        addCoinButton.addListener(new ClickListener(0) {
+        TextButton addEmittorButton = new TextButton("Emitter", skin);
+        addEmittorButton.addListener(new ClickListener(0) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //editorManager.addCoin();
+                editorManager.add(Emitter.class);
             }
         });
-        paneTable.add(addCoinButton);
+        paneTable.add(addEmittorButton);
 
         paneTable.row();
 
-        TextButton addWallButton = new TextButton("Wall", skin.get(TextButton.TextButtonStyle.class));
-        addWallButton.addListener(new ClickListener(0) {
+        TextButton addHammerButton = new TextButton("Hammer", skin);
+        addHammerButton.addListener(new ClickListener(0) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //editorManager.addWall();
+                editorManager.add(Hammer.class);
             }
         });
-        paneTable.add(addWallButton);
+        paneTable.add(addHammerButton);
 
-        TextButton addMeshButton = new TextButton("Mesh", skin.get(TextButton.TextButtonStyle.class));
-        addMeshButton.addListener(new ClickListener(0) {
+        TextButton addGroundButton = new TextButton("Ground", skin);
+        addGroundButton.addListener(new ClickListener(0) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                editorManager.addMesh();
+                editorManager.addGround();
             }
         });
-        paneTable.add(addMeshButton);
+        paneTable.add(addGroundButton);
+
+        paneTable.row();
+
+        TextButton addHouseButton = new TextButton("House", skin);
+        addHouseButton.addListener(new ClickListener(0) {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                editorManager.add(House.class);
+            }
+        });
+        paneTable.add(addHouseButton);
+
+        TextButton addTriggerButton = new TextButton("Trigger", skin);
+        addTriggerButton.addListener(new ClickListener(0) {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                editorManager.add(Trigger.class);
+            }
+        });
+        paneTable.add(addTriggerButton);
+
+        paneTable.row();
+
+        TextButton addZoneButton = new TextButton("Zone", skin);
+        addZoneButton.addListener(new ClickListener(0) {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                editorManager.add(Zone.class);
+            }
+        });
+        paneTable.add(addZoneButton);
 
         paneTable.row();
 

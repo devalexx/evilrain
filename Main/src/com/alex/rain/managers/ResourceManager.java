@@ -27,7 +27,7 @@ public class ResourceManager {
         skin = new Skin(Gdx.files.internal("data/skins/uiskin.json"));
         TextureManager.addExistingAtlas("uiskin.png", skin.getAtlas());
         for(BitmapFont f : ResourceManager.getAllFonts().values())
-            f.setScale(1f);
+            f.setScale(0.5f);
     }
 
     public static ResourceManager getInstance() {

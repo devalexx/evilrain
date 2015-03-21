@@ -37,12 +37,18 @@ public class Ground extends SimpleActor {
     PolygonSpriteBatch polyBatch = RainGame.polyBatch;
     ShapeRenderer shapeRenderer = RainGame.shapeRenderer;
     TextureRegion textureRegion;
+    Rectangle aabbRectangle = new Rectangle();
 
     public Ground() {
         super();
         type = TYPE.GROUND;
 
         textureRegion = TextureManager.getRegionFromDefaultAtlas("grass");
+    }
+
+    public Ground(List<Vector2> vertices) {
+        this();
+        this.vertices.addAll(vertices);
     }
 
     @Override
@@ -89,6 +95,25 @@ public class Ground extends SimpleActor {
             v.scl(GameWorld.BOX_TO_WORLD);
     }
 
+    private void calculateAABB() {
+        float minx = 0, miny = 0, maxx = 0, maxy = 0;
+        if(!vertices.isEmpty()) {
+            minx = maxx = vertices.get(0).x + getX();
+            miny = maxy = vertices.get(0).y + getY();
+        }
+        for(Vector2 v : vertices) {
+            if(v.x + getX() < minx)
+                minx = v.x + getX();
+            if(v.x + getX() > maxx)
+                maxx = v.x + getX();
+            if(v.y + getY() < miny)
+                miny = v.y + getY();
+            if(v.y + getY() > maxy)
+                maxy = v.y + getY();
+        }
+        aabbRectangle.set(minx, miny, maxx - minx, maxy - miny);
+    }
+
     public void addVertex(float x, float y) {
         vertices.add(new Vector2(x, y));
     }
@@ -109,5 +134,15 @@ public class Ground extends SimpleActor {
             }
         shapeRenderer.end();
         batch.begin();
+    }
+
+    public List<Vector2> getVertices() {
+        return vertices;
+    }
+
+    @Override
+    public boolean isInAABB(Vector2 v) {
+        calculateAABB();
+        return aabbRectangle.contains(v);
     }
 }

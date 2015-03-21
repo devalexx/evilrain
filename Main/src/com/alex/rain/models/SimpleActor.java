@@ -54,14 +54,21 @@ public abstract class SimpleActor extends Actor {
 
     }
 
+    @Override
     public void setRotation(float a) {
         if(body != null)
             body.setTransform(getPosition().cpy().scl(GameWorld.WORLD_TO_BOX), (float)Math.toRadians(a));
         rot = a;
     }
 
+    @Override
     public float getRotation() {
         return rot;
+    }
+
+    @Override
+    public void setPosition(float x, float y) {
+        setPosition(new Vector2(x, y));
     }
 
     public void setPosition(Vector2 vec) {
@@ -74,10 +81,12 @@ public abstract class SimpleActor extends Actor {
         return pos;
     }
 
+    @Override
     public float getX() {
         return pos.x;
     }
 
+    @Override
     public float getY() {
         return pos.y;
     }

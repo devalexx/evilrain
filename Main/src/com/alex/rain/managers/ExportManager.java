@@ -13,6 +13,7 @@
  ******************************************************************************/
 package com.alex.rain.managers;
 
+import com.alex.rain.models.Ground;
 import com.alex.rain.models.SimpleActor;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -32,7 +33,7 @@ public class ExportManager {
     }
 
     public String export() {
-        String accum = "function addObjects()\n";
+        String accum = "function addObjects(world)\n";
 
         for(Actor a : stage.getRoot().getChildren()) {
             if(!(a instanceof SimpleActor))
@@ -43,8 +44,8 @@ public class ExportManager {
         }
 
         accum += "end\n" +
-                "function onCreate()\n" +
-                (onCreateStr != null && onCreateStr.length() > 0 ? onCreateStr : "    addObjects()\n") +
+                "function onCreate(world)\n" +
+                (onCreateStr != null && onCreateStr.length() > 0 ? onCreateStr : "    addObjects(world)\n") +
                 "end\n" +
                 "function onBeginContact(contact)\n" +
                 (onBeginContactStr != null ? onBeginContactStr : "") +
@@ -52,7 +53,7 @@ public class ExportManager {
                 "function onEndContact(contact)\n" +
                 (onEndContactStr != null ? onEndContactStr : "") +
                 "end\n" +
-                "function onCheck()\n" +
+                "function onCheck(world, dropsCount)\n" +
                 (onCheckStr != null ? onCheckStr : "") +
                 "end";
 
@@ -64,25 +65,12 @@ public class ExportManager {
     public String exportActor(SimpleActor sa) {
         String s = "    ------------------\n";
         String name = sa.getName() == null ? "obj" : sa.getName();
+        s += "    " + name + " = luajava.new(" + sa.getClass().getSimpleName() + ")\n";
         switch(sa.getType()) {
-            /*case WALL:
-                s += "    " + name + " = luajava.new(Wall)\n" +
-                        "    " + name + ":setSpriteAndBodyBox(" + sa.getWidth() + ", " + sa.getHeight() + ")\n";
-                break;
-            case PLAYER:
-                s += "    " + name + " = luajava.new(Player)\n";
-                break;
-            case SKATE:
-                s += "    " + name + " = luajava.new(Skate)\n";
-                break;
-            case COIN:
-                s += "    " + name + " = luajava.new(Coin)\n";
-                break;
-            case MESH:
-                s += "    " + name + " = luajava.new(Mesh)\n";
-                for(Vector2 v : ((Mesh)sa).getVertices())
+            case GROUND:
+                for(Vector2 v : ((Ground)sa).getVertices())
                 s += "    " + name + ":addVertex(" + v.x + ", " + v.y + ")\n";
-                break;*/
+                break;
         }
 
         if(s.isEmpty())
@@ -91,11 +79,12 @@ public class ExportManager {
             s += "    " + name + ":setPosition(" + (sa.getX() + sa.getWidth() / 2) + ", " +
                     (sa.getY() + sa.getHeight() / 2) + ")\n";
             s += "    " + name + ":setRotation(" + sa.getRotation() + ")\n";
-            s += "    " + name + ":setBodyType(BodyType." + sa.getBodyType() + ")\n";
+            if(sa.getBodyType() != null)
+                s += "    " + name + ":setBodyType(BodyType." + sa.getBodyType() + ")\n";
             if(sa.getName() != null)
                 s += "    " + name + ":setName('" + sa.getName() + "')\n";
             s += "    " + name + ":setVisible(" + sa.isVisible() + ")\n";
-            s += "    stage:addActor(" + name + ")\n\n";
+            s += "    world:addActor(" + name + ")\n\n";
             return s;
         }
     }

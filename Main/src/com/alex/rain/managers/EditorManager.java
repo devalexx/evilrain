@@ -15,29 +15,23 @@ package com.alex.rain.managers;
 
 import com.alex.rain.helpers.SeparatorHelper;
 import com.alex.rain.listeners.GameContactListener;
+import com.alex.rain.models.Ground;
 import com.alex.rain.models.SimpleActor;
 import com.alex.rain.stages.EditableGameWorld;
-import com.alex.rain.stages.GameWorld;
 import com.alex.rain.ui.EditorUI;
+import com.alex.rain.viewports.GameViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaClosure;
 import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.Prototype;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
-import org.luaj.vm2.lib.jse.JsePlatform;
 import org.luaj.vm2.script.LuaScriptEngine;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.SimpleBindings;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -62,23 +56,8 @@ public class EditorManager {
         this.editorUI = editorUI;
     }
 
-    /**public Wall addWall() {
-        Wall wall = new Wall();
-        moveToCenter(wall);
-        wall.setName("wall_" + counter++);
-        selectedActor = wall;
-        editorUI.setSelectedActor(selectedActor);
-        stage.setSelectedActor(selectedActor);
-        stage.addActor(wall);
-
-        return wall;
-    }*/
-
     public void moveToCenter(SimpleActor actor) {
-        Vector2 pos = stage.screenToStageCoordinates(
-                new Vector2(Gdx.graphics.getWidth() / 2 + actor.getWidth() / 2,
-                        Gdx.graphics.getHeight() / 2 - actor.getHeight() / 2));
-        actor.setPosition(pos.x, pos.y);
+        actor.setPosition(GameViewport.WIDTH / 2, GameViewport.HEIGHT / 2);
     }
 
     public void setSelectedActor(SimpleActor selectedActor) {
@@ -136,22 +115,22 @@ public class EditorManager {
         return true;
     }
 
-    public void addMesh() {
+    public void addGround() {
         creatingObject = SimpleActor.TYPE.GROUND;
     }
 
     public void touchUp(int screenX, int screenY, int button) {
-        /*if(creatingObject == SimpleActor.TYPE.MESH) {
+        if(creatingObject == SimpleActor.TYPE.GROUND) {
             if(button == 0) {
                 Vector2 pos = stage.screenToStageCoordinates(new Vector2(screenX, screenY));
                 newMeshVertices.add(pos);
             } else if(button == 2) {
-                Mesh mesh = new Mesh(newMeshVertices);
-                stage.addActor(mesh);
+                Ground ground = new Ground(newMeshVertices);
+                stage.add(ground);
                 creatingObject = SimpleActor.TYPE.NONE;
                 newMeshVertices.clear();
-                mesh.setName("mesh_" + counter++);
-                selectedActor = mesh;
+                ground.setName(ground.getClass().getSimpleName() + "_" + counter++);
+                selectedActor = ground;
                 editorUI.setSelectedActor(selectedActor);
                 stage.setSelectedActor(selectedActor);
             } else {
@@ -160,7 +139,7 @@ public class EditorManager {
                 else
                     newMeshVertices.remove(newMeshVertices.size() - 1);
             }
-        }*/
+        }
     }
 
     public boolean hasCreatingObject() {
@@ -191,42 +170,22 @@ public class EditorManager {
         }
     }
 
-    /*public Player addPlayer() {
-        Player player = new Player();
-        moveToCenter(player);
-        player.setName("player_" + counter++);
-        selectedActor = player;
-        editorUI.setSelectedActor(selectedActor);
-        stage.setSelectedActor(selectedActor);
-        stage.addActor(player);
+    public SimpleActor add(Class c) {
+        SimpleActor sa = null;
+        try {
+            sa = (SimpleActor)c.newInstance();
+            moveToCenter(sa);
+            sa.setName(c.getSimpleName().toLowerCase() + "_" + counter++);
+            selectedActor = sa;
+            editorUI.setSelectedActor(selectedActor);
+            stage.setSelectedActor(selectedActor);
+            stage.add(sa);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
-        return player;
+        return sa;
     }
-
-    public Skate addSkate() {
-        Skate skate = new Skate();
-        moveToCenter(skate);
-        skate.setName("skate_" + counter++);
-        selectedActor = skate;
-        editorUI.setSelectedActor(selectedActor);
-        stage.setSelectedActor(selectedActor);
-        stage.addActor(skate);
-
-        return skate;
-    }
-
-    public Coin addCoin() {
-        Coin coin = new Coin();
-        moveToCenter(coin);
-        coin.setName("coin_" + counter++);
-        selectedActor = coin;
-        editorUI.setSelectedActor(selectedActor);
-        stage.setSelectedActor(selectedActor);
-        stage.addActor(coin);
-
-        return coin;
-    }*/
-
     public void removeSelectedActor() {
         stage.removeActor(selectedActor);
         selectedActor = null;

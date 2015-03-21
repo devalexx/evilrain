@@ -14,66 +14,21 @@
 package com.alex.rain.stages;
 
 import com.alex.rain.RainGame;
-import com.alex.rain.listeners.GameContactListener;
 import com.alex.rain.managers.EditorManager;
-import com.alex.rain.managers.ResourceManager;
-import com.alex.rain.managers.TextureManager;
-import com.alex.rain.models.*;
-import com.alex.rain.renderer.ParticleRenderer;
-import com.alex.rain.screens.LevelsMenuScreen;
-import com.alex.rain.screens.MainMenuScreen;
+import com.alex.rain.models.SimpleActor;
 import com.alex.rain.ui.EditorUI;
-import com.alex.rain.viewports.GameViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
-import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Layout;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import finnstr.libgdx.liquidfun.ParticleDebugRenderer;
-import finnstr.libgdx.liquidfun.ParticleSystem;
-import finnstr.libgdx.liquidfun.ParticleSystemDef;
-import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
-import org.luaj.vm2.script.LuaScriptEngine;
-
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.ScriptEngine;
-import javax.script.SimpleBindings;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.*;
-import java.util.List;
 
 public class EditableGameWorld extends GameWorld {
     private final EditorUI editorUI;
     private SimpleActor selectedActor;
     private EditorManager editorManager;
-    private Vector2 moveActor, nowActorPos, rotateActor;
+    private Vector2 moveActor, nowActorPos, rotateActor, scaleActor, nowActorScale;
     private Float nowActorRot;
 
     public EditableGameWorld(String name) {
@@ -83,6 +38,12 @@ public class EditableGameWorld extends GameWorld {
         editorUI = new EditorUI(this, editorManager);
         editorManager.setEditorUI(editorUI);
         addActor(editorUI);
+    }
+
+    @Override
+    public void createWorld() {
+        super.createWorld();
+        pressingAction = TouchType.NONE;
     }
 
     public SimpleActor getSelectedActor() {
@@ -101,6 +62,13 @@ public class EditableGameWorld extends GameWorld {
     }
 
     @Override
+    public void add(SimpleActor actor) {
+        super.add(actor);
+        if(editorUI != null)
+            editorUI.toFront();
+    }
+
+    @Override
     public void resize(int width, int height) {
         super.resize(width, height);
 
@@ -114,17 +82,20 @@ public class EditableGameWorld extends GameWorld {
 
         if(selectedActor != null || editorManager.hasCreatingObject()) {
             Gdx.gl.glLineWidth(3);
-            RainGame.shapeRenderer.setProjectionMatrix(getCamera().combined);
+            //RainGame.shapeRenderer.setProjectionMatrix(getCamera().combined);
             RainGame.shapeRenderer.setColor(Color.ORANGE);
             RainGame.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
             if(selectedActor != null) {
                 RainGame.shapeRenderer.identity();
-                RainGame.shapeRenderer.translate(selectedActor.getX() + selectedActor.getWidth() / 2,
-                        selectedActor.getY() + selectedActor.getHeight() / 2, 0);
+                RainGame.shapeRenderer.translate(selectedActor.getX(),
+                        selectedActor.getY(), 0);
                 RainGame.shapeRenderer.rotate(0, 0, 1, selectedActor.getRotation());
-                RainGame.shapeRenderer.rect(-selectedActor.getWidth() / 2, -selectedActor.getHeight() / 2,
-                        selectedActor.getWidth(), selectedActor.getHeight());
+                RainGame.shapeRenderer.rect(-selectedActor.getWidth() / 2,
+                        -selectedActor.getHeight() / 2,
+                        selectedActor.getWidth(),
+                        selectedActor.getHeight());
+                RainGame.shapeRenderer.identity();
             }
 
             if(editorManager.hasCreatingObject())
@@ -138,10 +109,14 @@ public class EditableGameWorld extends GameWorld {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         boolean result = super.touchDown(screenX, screenY, pointer, button);
+        if(editorUI.isVisible() && editorUI.hit(screenX, Gdx.graphics.getHeight() - screenY, true) != null)
+            return true;
 
         Vector2 cursorPosition = getCursorPosition(screenX, screenY);
 
         if(button == 0) {
+            selectedActor = null;
+
             for(SimpleActor actor : actorList) {
                 if(actor.isInAABB(cursorPosition)) {
                     selectedActor = actor;
@@ -149,10 +124,12 @@ public class EditableGameWorld extends GameWorld {
                 }
             }
         }
+        editorUI.setSelectedActor(selectedActor);
 
         if(!editorManager.hasCreatingObject()) {
             if(button == 1) {
-
+                scaleActor = new Vector2(screenX, -screenY);
+                nowActorScale = new Vector2(selectedActor.getScaleX(), selectedActor.getScaleX());
             } else if(button == 0 && selectedActor != null) {
                 moveActor = new Vector2(screenX, -screenY);
                 nowActorPos = new Vector2(selectedActor.getX(), selectedActor.getY());
@@ -171,6 +148,12 @@ public class EditableGameWorld extends GameWorld {
             Vector2 pos = nowActorPos.cpy().add(
                     new Vector2(screenX, -screenY).sub(moveActor));
             selectedActor.setPosition(pos.x, pos.y);
+        }
+
+        if(scaleActor != null) {
+            Vector2 scale = nowActorScale.cpy().add(
+                    new Vector2(screenX, -screenY).sub(moveActor));
+            selectedActor.setScale(scale.x, scale.y);
         }
 
         if(rotateActor != null) {
@@ -202,5 +185,17 @@ public class EditableGameWorld extends GameWorld {
         editorUI.setCursorPositionValue(screenToStageCoordinates(new Vector2(screenX, screenY)));
 
         return super.mouseMoved(screenX, screenY);
+    }
+
+    @Override
+    public boolean keyDown(int keyCode) {
+        if(keyCode == Input.Keys.E)
+            editorUI.setVisible(!editorUI.isVisible());
+        else if(keyCode == Input.Keys.W)
+            for(SimpleActor sa : actorList)
+                if(sa.getBody() != null)
+                    sa.getBody().setAwake(true);
+
+        return super.keyDown(keyCode);
     }
 }
