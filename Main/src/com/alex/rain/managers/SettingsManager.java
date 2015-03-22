@@ -23,6 +23,8 @@ public class SettingsManager {
     static String LOCALE_SETTING = "locale";
     static String HIGH_GRAPHICS_SETTING = "hi_graph";
 
+    public static String availableLanguages[] = {"en", "ru"};
+
     static Preferences prefs = Gdx.app.getPreferences("BlindMrS");
 
     public static void setLanguage(Locale locale) {

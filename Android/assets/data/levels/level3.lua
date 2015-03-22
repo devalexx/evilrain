@@ -1,5 +1,4 @@
 function onCreate(world)
-    world:setWinHint('Select top left!!!')
     world:setKeepDropsForever(true)
     world:setPressingAction(1);
 
@@ -45,7 +44,6 @@ end
 
 function onCheck(world, dropsCount)
     local count = world:dropsInRect(148, 241, 155, 147)
-    print(dropsCount, count)
 
     if count > 10 and count == dropsCount then
         return true

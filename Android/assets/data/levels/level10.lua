@@ -1,7 +1,6 @@
 dynActorArray = {}
 
 function onCreate(world)
-    world:setWinHint('Push the buttons again')
     world:setPressingAction(3);
 
     local ground = luajava.new(Ground)

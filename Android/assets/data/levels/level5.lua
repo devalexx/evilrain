@@ -1,8 +1,6 @@
 dynActorArray = {}
 
 function onCreate(world)
-    world:setWinHint('Drop houses!')
-
     local ground = luajava.new(Ground)
 
     ground:addVertex(744, 32)

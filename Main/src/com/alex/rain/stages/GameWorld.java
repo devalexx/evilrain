@@ -15,6 +15,7 @@ package com.alex.rain.stages;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.listeners.GameContactListener;
+import com.alex.rain.managers.I18nManager;
 import com.alex.rain.managers.ResourceManager;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.models.*;
@@ -41,6 +42,8 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -107,6 +110,8 @@ public class GameWorld extends Stage {
     private float[] dropsXYPositions;
     private Body groundBody;
     private MouseJoint mouseJoint;
+    private List<SimpleActor.TYPE> interactTypes = new ArrayList<>();
+    private EventListener clickListener;
 
     private boolean wonGame;
     private boolean debugRendererEnabled;
@@ -200,6 +205,9 @@ public class GameWorld extends Stage {
         pixmap.fill();
 
         createUI();
+
+        if(name.startsWith("level"))
+            setWinHint(I18nManager.getString("LEVEL" + levelNumber + "_HINT"));
     }
 
     private void createUI() {
@@ -211,7 +219,7 @@ public class GameWorld extends Stage {
         hintLabel = new Label("", skin);
         tableUI.add(hintLabel).left();
 
-        Button menuButton = new TextButton("Main Menu", skin);
+        Button menuButton = new TextButton(I18nManager.getString("MAIN_MENU"), skin);
         menuButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -473,7 +481,7 @@ public class GameWorld extends Stage {
         if(winnerWindow != null)
             return;
 
-        winnerWindow = new Window(wonGame ? "Victory!" : "Menu", skin);
+        winnerWindow = new Window(wonGame ? I18nManager.getString("VICTORY") + "!" : I18nManager.getString("MENU"), skin);
         winnerWindow.setSize(GameViewport.WIDTH / 1.5f, GameViewport.HEIGHT / 1.5f);
         winnerWindow.setPosition(GameViewport.WIDTH / 2f - winnerWindow.getWidth() / 2f,
                 GameViewport.HEIGHT / 2f - winnerWindow.getHeight() / 2f);
@@ -485,17 +493,17 @@ public class GameWorld extends Stage {
 
         winnerWindow.row().width(400).padTop(10);
 
-        final TextButton nextOrContinueButton = new TextButton(!wonGame ? "Continue" : "Next", skin);
+        final TextButton nextOrContinueButton = new TextButton(I18nManager.getString(!wonGame ? "CONTINUE" : "NEXT"), skin);
         winnerWindow.add(nextOrContinueButton);
 
         winnerWindow.row().width(400).padTop(10);
 
-        final TextButton restartButton = new TextButton("Restart", skin);
+        final TextButton restartButton = new TextButton(I18nManager.getString("RESTART"), skin);
         winnerWindow.add(restartButton);
 
         winnerWindow.row().width(400).padTop(10);
 
-        final TextButton mainMenuButton = new TextButton("Back to levels", skin);
+        final TextButton mainMenuButton = new TextButton(I18nManager.getString("LEVELS"), skin);
         winnerWindow.add(mainMenuButton);
 
         nextOrContinueButton.addListener(new ClickListener() {
@@ -534,6 +542,17 @@ public class GameWorld extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         cursorPosition = getCursorPosition(screenX, screenY).cpy();
+        if(clickListener != null)
+            clickListener.handle(new InputEvent() {
+                @Override
+                public Actor getTarget() {
+                    for(SimpleActor actor : actorList)
+                        if(interactTypes.contains(actor.getType()) && actor.isInAABB(cursorPosition))
+                            return actor;
+
+                    return null;
+                }
+            });
         if(pressingAction == TouchType.PICKING_DROPS) {
             cursorPosition.scl(WORLD_TO_BOX);
             selectedDrops = new ArrayList<Drop>();
@@ -548,7 +567,7 @@ public class GameWorld extends Stage {
         } else if(pressingAction == TouchType.PICKING_BODIES) {
             SimpleActor targetActor = null;
             for(SimpleActor actor : actorList) {
-                if((actor.getType() == SimpleActor.TYPE.BALL || actor.getType() == SimpleActor.TYPE.TRIGGER) && actor.isInAABB(cursorPosition)) {
+                if(interactTypes.contains(actor.getType()) && actor.isInAABB(cursorPosition)) {
                     targetActor = actor;
                     break;
                 }
@@ -768,7 +787,7 @@ public class GameWorld extends Stage {
             particleDebugRendererCircle.render(particleSystem, PARTICLE_RADIUS / 2.5f * BOX_TO_WORLD * gameViewport.scale, getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
             particleDebugRendererDot.render(particleSystem, PARTICLE_RADIUS / 10f * BOX_TO_WORLD * gameViewport.scale, getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
 
-            hintLabel.setText((winHint != null ? "Hint: " + winHint + "\n" : "") +
+            hintLabel.setText((winHint != null ? I18nManager.getString("HINT") + ": " + winHint + "\n" : "") +
                     "FPS: " + Gdx.graphics.getFramesPerSecond() + "\n" +
                     "Drops: " + getDropsNumber());
 
@@ -794,7 +813,7 @@ public class GameWorld extends Stage {
 
     public void setWinHint(String winHint) {
         this.winHint = winHint;
-        hintLabel.setText("Hint: " + winHint);
+        hintLabel.setText(I18nManager.getString("HINT") + ": " + winHint);
     }
 
     public PolygonSpriteBatch getPolygonSpriteBatch() {
@@ -930,5 +949,13 @@ public class GameWorld extends Stage {
 
         if(cloud == selectedActor)
             cloud = null;
+    }
+
+    public void addInteractType(String type) {
+        interactTypes.add(SimpleActor.TYPE.valueOf(type));
+    }
+
+    public void setClickListener(EventListener clickListener) {
+        this.clickListener = clickListener;
     }
 }

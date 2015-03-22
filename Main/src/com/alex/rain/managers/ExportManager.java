@@ -84,7 +84,7 @@ public class ExportManager {
             if(sa.getName() != null)
                 s += "    " + name + ":setName('" + sa.getName() + "')\n";
             s += "    " + name + ":setVisible(" + sa.isVisible() + ")\n";
-            s += "    world:addActor(" + name + ")\n\n";
+            s += "    world:add(" + name + ")\n\n";
             return s;
         }
     }

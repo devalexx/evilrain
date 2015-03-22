@@ -51,7 +51,7 @@ public class AntoanAngelovSeparatorHelper implements SeparatorHelper {
      * */
 
     public void separate(Body body, FixtureDef fixtureDef, List<Vector2> verticesVec, float scale) {
-        int i, n = verticesVec.size(), j, m;
+        int i, n = verticesVec.size(), j, k, m;
         List<Vector2> vec = new ArrayList<Vector2>();
         List<List<Vector2>> figsVec = new ArrayList<List<Vector2>>();
         PolygonShape polyShape;
@@ -72,6 +72,16 @@ public class AntoanAngelovSeparatorHelper implements SeparatorHelper {
             }
 
             polyShape = new PolygonShape();
+            float area = 0;
+            for(k = 0; k < verticesVec.size(); k++) {
+                if(k + 1 != verticesVec.size())
+                    area += verticesVec.get(k).x * verticesVec.get(k+1).y - verticesVec.get(k+1).x * verticesVec.get(k).y;
+                else
+                    area += verticesVec.get(k).x * verticesVec.get(0).y - verticesVec.get(0).x * verticesVec.get(k).y;
+            }
+            area *= 0.5f;
+            if(verticesVec.size() == 0 || Math.abs(area) < 0.04)
+                continue;
             polyShape.set(verticesVec.toArray(new Vector2[verticesVec.size()]));
             fixtureDef.shape=polyShape;
             body.createFixture(fixtureDef);

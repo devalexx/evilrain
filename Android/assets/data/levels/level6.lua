@@ -1,7 +1,6 @@
 dynActorArray = {}
 
 function onCreate(world)
-    world:setWinHint('Put to the right basket')
     world:setPressingAction(2);
 
     local ground = luajava.new(Ground)
@@ -49,7 +48,7 @@ function onCheck(world, dropsCount)
         return false
     end
 
-    if world:dropsBelowX(400) > 0 then
+    if world:dropsInRect(500, 50, 250, 200) ~= counter then
         return false
     end
 

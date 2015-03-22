@@ -2,7 +2,6 @@ dynActorArray = {}
 isContacted = false
 
 function onCreate(world)
-    world:setWinHint('Use hammer!')
     world:setPressingAction(1);
 
     local ground = luajava.new(Ground)

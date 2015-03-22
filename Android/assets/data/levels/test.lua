@@ -1,5 +1,4 @@
 function onCreate(world)
-    world:setWinHint('Playground!')
     world:setPressingAction(2);
 
     local ground = luajava.new(Ground)

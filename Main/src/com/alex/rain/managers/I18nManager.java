@@ -47,7 +47,7 @@ public class I18nManager {
 
     public static String getString(String key) {
         if(!isInit)
-            load(Locale.ENGLISH);
+            load(SettingsManager.getLanguage());
 
         try {
             return rootResourceBundle.getString(key);

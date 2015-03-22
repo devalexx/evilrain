@@ -1,5 +1,4 @@
 function onCreate(world)
-    world:setWinHint('Flood house!!')
     world:setPressingAction(1);
 
     ground = luajava.new(Ground)

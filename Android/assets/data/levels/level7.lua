@@ -1,5 +1,4 @@
 function onCreate(world)
-    world:setWinHint('Direct the flow to another exit')
     world:setPressingAction(3);
 
     local ground = luajava.new(Ground)
@@ -36,6 +35,7 @@ function onCreate(world)
     emitterActor:setAutoFire(true)
     emitterActor:setRotation(180)
 
+    world:addInteractType(BALL)
     ball = luajava.new(Ball)
     ball:setPosition(luajava.new(Vector2, 300, 420))
     world:add(ball)

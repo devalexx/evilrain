@@ -1,6 +1,4 @@
 function onCreate(world)
-    world:setWinHint('Hide ball')
-
     local ground = luajava.new(Ground)
     ground:addVertex(352, 16)
     ground:addVertex(456, 32)
