@@ -20,6 +20,8 @@ function onCreate(world)
             drop:setPosition(luajava.new(Vector2, i * 10 + 20, j * 10 + 20))
             if i <= 30 then
                 drop:setColor(Color.RED)
+            elseif i <= 60 then
+                drop:setColor(Color.GREEN)
             else
                 drop:setColor(Color.BLUE)
             end
