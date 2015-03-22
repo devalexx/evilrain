@@ -6,9 +6,9 @@ filter: Linear,Linear
 repeat: none
 check-off
   rotate: false
-  xy: 11, 5
-  size: 14, 14
-  orig: 14, 14
+  xy: 78, 29
+  size: 20, 20
+  orig: 20, 20
   offset: 0, 0
   index: -1
 textfield
@@ -21,9 +21,9 @@ textfield
   index: -1
 check-on
   rotate: false
-  xy: 125, 35
-  size: 14, 14
-  orig: 14, 14
+  xy: 78, 8
+  size: 20, 20
+  orig: 20, 20
   offset: 0, 0
   index: -1
 cursor
@@ -117,8 +117,8 @@ default-scroll
   index: -1
 default-select
   rotate: false
-  xy: 29, 29
-  size: 27, 20
+  xy: 206, 1
+  size: 27, 31
   split: 4, 14, 4, 4
   orig: 27, 20
   offset: 0, 0

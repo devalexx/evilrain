@@ -46,7 +46,7 @@ public class OptionsScreen extends BasicUIScreen {
 
         table.row();
 
-        table.add(innerTable).expand();
+        table.add(innerTable).colspan(2).expand();
 
         Label languageLabel = new Label(I18nManager.getString("LANGUAGE"), skin);
         innerTable.add(languageLabel).left();
@@ -58,14 +58,17 @@ public class OptionsScreen extends BasicUIScreen {
 
         innerTable.row();
 
-        final CheckBox graphicsCheckBox = new CheckBox(I18nManager.getString("HIGH_GRAPHICS"), skin);
+        Label checkboxLabel = new Label(I18nManager.getString("HIGH_GRAPHICS"), skin);
+        innerTable.add(checkboxLabel).left();
+
+        final CheckBox graphicsCheckBox = new CheckBox("", skin);
         graphicsCheckBox.setChecked(SettingsManager.getHighGraphics());
-        innerTable.add(graphicsCheckBox).left();
+        innerTable.add(graphicsCheckBox).expand().fill();
 
         innerTable.row();
 
         final TextButton saveButton = new TextButton(I18nManager.getString("SAVE"), skin);
-        innerTable.add(saveButton).left().width(200);
+        innerTable.add(saveButton).center().width(200).padTop(40).colspan(2);
 
         saveButton.addListener(new ChangeListener() {
             @Override
