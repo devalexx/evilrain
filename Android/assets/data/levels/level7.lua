@@ -1,4 +1,4 @@
-function onCreate(world)
+function onCreate()
     world:setPressingAction(3);
 
     local ground = luajava.new(Ground)
@@ -41,7 +41,7 @@ function onCreate(world)
     world:add(ball)
 end
 
-function onCheck(world, dropsCount)
+function onCheck()
     local counter = world:dropsInRect(-100, 200, 100, 200)
 
     if counter > 10 then

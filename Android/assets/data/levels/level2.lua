@@ -1,4 +1,4 @@
-function onCreate(world)
+function onCreate()
     world:setPressingAction(1);
 
     ground = luajava.new(Ground)
@@ -34,7 +34,7 @@ function onCreate(world)
     world:addDrawingZone(500, 320, 200, 150)
 end
 
-function onCheck(world)
+function onCheck()
     count = world:dropsBelowY(200)
 
     if count > 150 then

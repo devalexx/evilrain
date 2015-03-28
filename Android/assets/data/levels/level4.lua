@@ -1,7 +1,7 @@
 dynActorArray = {}
 isContacted = false
 
-function onCreate(world)
+function onCreate()
     world:setPressingAction(1);
 
     local ground = luajava.new(Ground)
@@ -20,7 +20,7 @@ function onCreate(world)
     dynamicActor:setPosition(luajava.new(Vector2, 630, 300))
     table.insert(dynActorArray, dynamicActor)
 
-    dynamicActorTmp = luajava.new(Home)
+    dynamicActorTmp = luajava.new(House)
     dynamicActorTmp:setBodyBox(20, 100)
     dynamicActorTmp:setSpriteBox(20, 100)
     world:add(dynamicActorTmp)

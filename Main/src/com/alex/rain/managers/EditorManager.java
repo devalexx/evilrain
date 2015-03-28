@@ -26,6 +26,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.script.LuaScriptEngine;
 
 import javax.script.Compilable;
@@ -40,7 +41,6 @@ import java.util.List;
 public class EditorManager {
     private EditableGameWorld stage;
     private int counter;
-    private SimpleActor selectedActor;
     private EditorUI editorUI;
     private SimpleActor.TYPE creatingObject = SimpleActor.TYPE.NONE;
     private ShapeRenderer shapeRenderer;
@@ -58,11 +58,6 @@ public class EditorManager {
 
     public void moveToCenter(SimpleActor actor) {
         actor.setPosition(GameViewport.WIDTH / 2, GameViewport.HEIGHT / 2);
-    }
-
-    public void setSelectedActor(SimpleActor selectedActor) {
-        this.selectedActor = selectedActor;
-        editorUI.setSelectedActor(selectedActor);
     }
 
     public void save(String text) {
@@ -90,6 +85,7 @@ public class EditorManager {
             luaOnCreateFunc = (LuaFunction) sb.get("onCreate");
             LuaFunction luaOnBeginContactFunc = (LuaFunction) sb.get("onBeginContact");
             LuaFunction luaOnEndContactFunc = (LuaFunction) sb.get("onEndContact");
+            sb.put("world", CoerceJavaToLua.coerce(stage));
 
             GameContactListener contactListener = new GameContactListener(luaOnBeginContactFunc, luaOnEndContactFunc, stage.getGameActors());
             stage.getPhysicsWorld().setContactListener(contactListener);
@@ -130,9 +126,7 @@ public class EditorManager {
                 creatingObject = SimpleActor.TYPE.NONE;
                 newMeshVertices.clear();
                 ground.setName(ground.getClass().getSimpleName() + "_" + counter++);
-                selectedActor = ground;
-                editorUI.setSelectedActor(selectedActor);
-                stage.setSelectedActor(selectedActor);
+                stage.setSelectedActor(ground);
             } else {
                 if(newMeshVertices.size() == 0)
                     creatingObject = SimpleActor.TYPE.NONE;
@@ -176,9 +170,7 @@ public class EditorManager {
             sa = (SimpleActor)c.newInstance();
             moveToCenter(sa);
             sa.setName(c.getSimpleName().toLowerCase() + "_" + counter++);
-            selectedActor = sa;
-            editorUI.setSelectedActor(selectedActor);
-            stage.setSelectedActor(selectedActor);
+            stage.setSelectedActor(sa);
             stage.add(sa);
         } catch(Exception e) {
             e.printStackTrace();
@@ -187,9 +179,7 @@ public class EditorManager {
         return sa;
     }
     public void removeSelectedActor() {
-        stage.removeActor(selectedActor);
-        selectedActor = null;
-        editorUI.setSelectedActor(null);
+        stage.removeActor(stage.getSelectedActor());
         stage.setSelectedActor(null);
     }
 }

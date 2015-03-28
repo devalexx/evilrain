@@ -1,6 +1,6 @@
 dynActorArray = {}
 
-function onCreate(world)
+function onCreate()
     world:setPressingAction(3);
 
     local ground = luajava.new(Ground)

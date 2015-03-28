@@ -44,8 +44,8 @@ public class ExportManager {
         }
 
         accum += "end\n" +
-                "function onCreate(world)\n" +
-                (onCreateStr != null && onCreateStr.length() > 0 ? onCreateStr : "    addObjects(world)\n") +
+                "function onCreate()\n" +
+                (onCreateStr != null && onCreateStr.length() > 0 ? onCreateStr : "    addObjects()\n") +
                 "end\n" +
                 "function onBeginContact(contact)\n" +
                 (onBeginContactStr != null ? onBeginContactStr : "") +
@@ -53,7 +53,7 @@ public class ExportManager {
                 "function onEndContact(contact)\n" +
                 (onEndContactStr != null ? onEndContactStr : "") +
                 "end\n" +
-                "function onCheck(world, dropsCount)\n" +
+                "function onCheck()\n" +
                 (onCheckStr != null ? onCheckStr : "") +
                 "end";
 

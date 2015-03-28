@@ -1,6 +1,6 @@
 dynActorArray = {}
 
-function onCreate(world)
+function onCreate()
     world:setPressingAction(2);
 
     local ground = luajava.new(Ground)
@@ -43,8 +43,8 @@ function onCreate(world)
     end
 end
 
-function onCheck(world, dropsCount)
-    if dropsCount ~= counter then
+function onCheck()
+    if world:getDropsCount() ~= counter then
         return false
     end
 

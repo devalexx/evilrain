@@ -1,6 +1,6 @@
 dynActorArray = {}
 
-function onCreate(world)
+function onCreate()
     local ground = luajava.new(Ground)
 
     ground:addVertex(744, 32)
@@ -15,7 +15,7 @@ function onCreate(world)
     ground:addVertex(88, 24)
     world:add(ground)
 
-    local dynamicActor = luajava.new(Home)
+    local dynamicActor = luajava.new(House)
     world:add(dynamicActor)
     dynamicActor:setPosition(luajava.new(Vector2, 600, 300))
     table.insert(dynActorArray, dynamicActor)

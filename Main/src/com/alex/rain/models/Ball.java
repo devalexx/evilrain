@@ -41,12 +41,12 @@ public class Ball extends SimpleActor {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circleShape;
-        fixtureDef.density = 0.3f;
+        fixtureDef.density = density == null ? 0.3f : density;
         fixtureDef.friction = 1f;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(pos.cpy().scl(GameWorld.WORLD_TO_BOX));
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.type = bodyType != null ? bodyType : BodyDef.BodyType.DynamicBody;
         body = physicsWorld.createBody(bodyDef);
         body.createFixture(fixtureDef);
         body.resetMassData();

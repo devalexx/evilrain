@@ -16,7 +16,7 @@ package com.alex.rain.ui;
 import com.alex.rain.managers.EditorManager;
 import com.alex.rain.managers.ResourceManager;
 import com.alex.rain.models.*;
-import com.alex.rain.stages.GameWorld;
+import com.alex.rain.stages.EditableGameWorld;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -28,14 +28,13 @@ import java.text.DecimalFormat;
 
 public class EditorUI extends Table {
     private Skin skin;
-    private GameWorld stage;
+    private EditableGameWorld stage;
     private EditorManager editorManager;
-    private Actor selectedActor;
     private TextField posTextField, sizeTextField, nameTextField, angleTextField;
     private Label cursorPosValueLabel;
     private DecimalFormat floatFormat = new DecimalFormat("0.##");
 
-    public EditorUI(GameWorld stage, EditorManager editorManager) {
+    public EditorUI(EditableGameWorld stage, EditorManager editorManager) {
         setFillParent(true);
         this.stage = stage;
         skin = ResourceManager.getSkin();
@@ -269,7 +268,7 @@ public class EditorUI extends Table {
         resetPropButton.addListener(new ClickListener(0) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                readSelectedActor();
+                readActor(stage.getSelectedActor());
             }
         });
         paneTable.add(resetPropButton);
@@ -291,7 +290,7 @@ public class EditorUI extends Table {
         backButton.addListener(new ClickListener(0) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                selectedActor.toBack();
+                stage.getSelectedActor().toBack();
             }
         });
         paneTable.add(backButton);
@@ -300,7 +299,7 @@ public class EditorUI extends Table {
         frontButton.addListener(new ClickListener(0) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                selectedActor.toFront();
+                stage.getSelectedActor().toFront();
             }
         });
         paneTable.add(frontButton);
@@ -363,40 +362,34 @@ public class EditorUI extends Table {
         return table;
     }
 
-    public void setSelectedActor(SimpleActor selectedActor) {
-        this.selectedActor = selectedActor;
-
-        readSelectedActor();
-    }
-
-    private void readSelectedActor() {
+    public void readActor(SimpleActor actor) {
         String title;
 
-        if(selectedActor != null && selectedActor.getName() != null)
-            title = selectedActor.getName();
-        else if(selectedActor != null && selectedActor.getName() == null)
+        if(actor != null && actor.getName() != null)
+            title = actor.getName();
+        else if(actor != null && actor.getName() == null)
             title = "-unnamed-";
         else
             title = "-";
 
         nameTextField.setText(title);
 
-        if(selectedActor != null)
-            title = floatFormat.format(selectedActor.getX()) + "," + floatFormat.format(selectedActor.getY());
+        if(actor != null)
+            title = floatFormat.format(actor.getX()) + "," + floatFormat.format(actor.getY());
         else
             title = "-,-";
 
         posTextField.setText(title);
 
-        if(selectedActor != null)
-            title = floatFormat.format(selectedActor.getWidth()) + "," + floatFormat.format(selectedActor.getHeight());
+        if(actor != null)
+            title = floatFormat.format(actor.getWidth()) + "," + floatFormat.format(actor.getHeight());
         else
             title = "-,-";
 
         sizeTextField.setText(title);
 
-        if(selectedActor != null)
-            title = String.valueOf(floatFormat.format(selectedActor.getRotation()));
+        if(actor != null)
+            title = String.valueOf(floatFormat.format(actor.getRotation()));
         else
             title = "-";
 
@@ -404,6 +397,8 @@ public class EditorUI extends Table {
     }
 
     private void updateSelectedActor() {
+        SimpleActor selectedActor = stage.getSelectedActor();
+
         if(selectedActor == null)
             return;
 

@@ -1,4 +1,4 @@
-function onCreate(world)
+function onCreate()
     world:setKeepDropsForever(true)
     world:setPressingAction(1);
 
@@ -42,10 +42,10 @@ function onCreate(world)
     world:add(ground)
 end
 
-function onCheck(world, dropsCount)
+function onCheck()
     local count = world:dropsInRect(148, 241, 155, 147)
 
-    if count > 10 and count == dropsCount then
+    if count > 10 and count == world:getDropsCount() then
         return true
     else
         return false

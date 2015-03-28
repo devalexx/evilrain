@@ -115,4 +115,18 @@ public class Trigger extends SimpleActor {
     public void setListener(EventListener listener) {
         this.listener = listener;
     }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        if(physicsWorld == null)
+            return;
+
+        if(topBody != null)
+            physicsWorld.destroyBody(topBody);
+
+        if(distanceJoint != null)
+            physicsWorld.destroyJoint(distanceJoint);
+    }
 }

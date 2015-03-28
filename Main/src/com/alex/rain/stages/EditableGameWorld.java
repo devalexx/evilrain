@@ -15,6 +15,7 @@ package com.alex.rain.stages;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.managers.EditorManager;
+import com.alex.rain.models.Ground;
 import com.alex.rain.models.SimpleActor;
 import com.alex.rain.ui.EditorUI;
 import com.badlogic.gdx.Gdx;
@@ -52,6 +53,7 @@ public class EditableGameWorld extends GameWorld {
 
     public void setSelectedActor(SimpleActor selectedActor) {
         this.selectedActor = selectedActor;
+        editorUI.readActor(selectedActor);
     }
 
     @Override
@@ -91,10 +93,19 @@ public class EditableGameWorld extends GameWorld {
                 RainGame.shapeRenderer.translate(selectedActor.getX(),
                         selectedActor.getY(), 0);
                 RainGame.shapeRenderer.rotate(0, 0, 1, selectedActor.getRotation());
-                RainGame.shapeRenderer.rect(-selectedActor.getWidth() / 2,
-                        -selectedActor.getHeight() / 2,
-                        selectedActor.getWidth(),
-                        selectedActor.getHeight());
+                if(selectedActor.getType() == SimpleActor.TYPE.GROUND) {
+                    Ground g = (Ground)selectedActor;
+                    for(int i = 0; i < g.getVertices().size(); i++) {
+                        Vector2 v1 = g.getVertices().get(i);
+                        Vector2 v2 = i >= g.getVertices().size() - 1 ?
+                                g.getVertices().get(0) : g.getVertices().get(i + 1);
+                        RainGame.shapeRenderer.line(v1.x, v1.y, v2.x, v2.y);
+                    }
+                } else
+                    RainGame.shapeRenderer.rect(-selectedActor.getWidth() / 2,
+                            -selectedActor.getHeight() / 2,
+                            selectedActor.getWidth(),
+                            selectedActor.getHeight());
                 RainGame.shapeRenderer.identity();
             }
 
@@ -124,7 +135,7 @@ public class EditableGameWorld extends GameWorld {
                 }
             }
         }
-        editorUI.setSelectedActor(selectedActor);
+        editorUI.readActor(selectedActor);
 
         if(!editorManager.hasCreatingObject()) {
             if(button == 1) {

@@ -20,7 +20,9 @@ import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.math.EarClippingTriangulator;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -71,7 +73,7 @@ public class Ground extends SimpleActor {
         super.createPhysicsActor(particleSystem, physicsWorld);
 
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.type = bodyType != null ? bodyType : BodyDef.BodyType.StaticBody;
 
         body = physicsWorld.createBody(bodyDef);
 
@@ -79,9 +81,9 @@ public class Ground extends SimpleActor {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
-        fixtureDef.friction = 10.4f;
-        /*fixtureDef.density = 0.5f;
-        fixtureDef.friction = 0.4f;
+        fixtureDef.friction = friction != null ? friction : 0.8f;
+        fixtureDef.density = 0.5f;
+        /*fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.6f;*/
 
         for(Vector2 v : vertices)
@@ -93,6 +95,7 @@ public class Ground extends SimpleActor {
 
         for(Vector2 v : vertices)
             v.scl(GameWorld.BOX_TO_WORLD);
+        setPosition(getPosition());
     }
 
     private void calculateAABB() {
@@ -122,16 +125,22 @@ public class Ground extends SimpleActor {
     public void draw(Batch batch, float parentAlpha) {
         batch.end();
         poly.setPosition(pos.x, pos.y);
+        poly.setRotation(rot);
+        poly.setOrigin(0, 0);
         polyBatch.begin();
             poly.draw(polyBatch);
         polyBatch.end();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.identity();
+        shapeRenderer.translate(pos.x, pos.y, 0);
+        shapeRenderer.rotate(0, 0, 1, rot);
             for(int i = 0; i < vertices.size() ; i++) {
                 shapeRenderer.setColor(Color.BLUE);
                 Vector2 v1 = vertices.get(i);
                 Vector2 v2 = i == vertices.size() - 1 ? vertices.get(0) : vertices.get(i + 1);
-                shapeRenderer.line(v1.x + pos.x, v1.y + pos.y, v2.x + pos.x, v2.y + pos.y);
+                shapeRenderer.line(v1.x, v1.y, v2.x, v2.y);
             }
+        shapeRenderer.identity();
         shapeRenderer.end();
         batch.begin();
     }

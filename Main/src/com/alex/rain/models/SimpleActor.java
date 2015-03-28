@@ -33,6 +33,8 @@ public abstract class SimpleActor extends Actor {
     protected Texture texture;
     protected World physicsWorld;
     protected BodyDef.BodyType bodyType;
+    protected Float density;
+    protected Float friction;
 
     public enum TYPE {
         NONE,
@@ -189,5 +191,21 @@ public abstract class SimpleActor extends Actor {
 
     public BodyDef.BodyType getBodyType() {
         return bodyType;
+    }
+
+    public void setDensity(float density) {
+        this.density = density;
+    }
+
+    public void setFriction(Float friction) {
+        this.friction = friction;
+    }
+
+    public void dispose() {
+        if(physicsWorld == null)
+        return;
+
+        if(body != null)
+            physicsWorld.destroyBody(body);
     }
 }

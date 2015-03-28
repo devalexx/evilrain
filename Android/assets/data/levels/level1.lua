@@ -1,6 +1,6 @@
 dynActorArray = {}
 
-function onCreate(world)
+function onCreate()
     local ground = luajava.new(Ground)
     ground:addVertex(752, 48)
     ground:addVertex(752, 344)

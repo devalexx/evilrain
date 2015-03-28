@@ -53,7 +53,6 @@ import finnstr.libgdx.liquidfun.ParticleDebugRenderer;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 import finnstr.libgdx.liquidfun.ParticleSystemDef;
 import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.script.LuaScriptEngine;
 
@@ -97,6 +96,7 @@ public class GameWorld extends Stage {
     protected GameViewport gameViewport = new GameViewport();
 
     private List<Drop> selectedDrops, dropsToCreate = new LinkedList<Drop>(), dropsToDelete = new LinkedList<Drop>();
+    private List<SimpleActor> actorsToRemove = new LinkedList<>();
     protected List<SimpleActor> actorList = new ArrayList<SimpleActor>();
     private ArrayList<Drop> dropList = new ArrayList<Drop>();
     private final HashMap<Long, SimpleActor> actorsMap = new HashMap<>();
@@ -167,6 +167,7 @@ public class GameWorld extends Stage {
             luaOnCreateFunc = (LuaFunction) sb.get("onCreate");
             luaOnBeginContactFunc = (LuaFunction) sb.get("onBeginContact");
             luaOnEndContactFunc = (LuaFunction) sb.get("onEndContact");
+            sb.put("world", CoerceJavaToLua.coerce(this));
         } catch (Exception e) {
             //LogHandler.log.error(e.getMessage(), e);
             System.out.println("error: " + filename + ". " + e);
@@ -363,9 +364,8 @@ public class GameWorld extends Stage {
     }
 
     public void createWorld() {
-        LuaValue luaWorld = CoerceJavaToLua.coerce(this);
         if(luaOnCreateFunc != null)
-            luaOnCreateFunc.call(luaWorld);
+            luaOnCreateFunc.call();
 
         particleSystem.getParticlePositionBufferArray(true);
     }
@@ -390,6 +390,10 @@ public class GameWorld extends Stage {
         }
         dropsToDelete.clear();
 
+        for(SimpleActor sa : actorsToRemove)
+            removeActor(sa);
+        actorsToRemove.clear();
+
         for(int i = 0, actorListSize = actorList.size(); i < actorListSize; i++) {
             SimpleActor sa = actorList.get(i);
             sa.preAct(delta);
@@ -411,10 +415,7 @@ public class GameWorld extends Stage {
         for(int i = 0; i < src.length; i++)
             dropsXYPositions[i] = src[i] * BOX_TO_WORLD;
 
-        LuaValue luaDropsCount = CoerceJavaToLua.coerce(particleSystem.getParticleCount());
-        LuaValue luaWorld = CoerceJavaToLua.coerce(this);
-        LuaValue retVal = luaOnCheckFunc.call(luaWorld/*luaDropsPosArray*/, luaDropsCount);
-        if(retVal.toboolean(1) && !wonGame) {
+        if(luaOnCheckFunc != null && luaOnCheckFunc.call().toboolean(1) && !wonGame) {
             wonGame = true;
             showWinnerMenu();
         }
@@ -942,12 +943,21 @@ public class GameWorld extends Stage {
         return actorsMap;
     }
 
-    public void removeActor(SimpleActor selectedActor) {
-        getRoot().removeActor(selectedActor);
-        if(emitter == selectedActor)
+    public void safeRemoveActor(SimpleActor actor) {
+        actorsToRemove.add(actor);
+    }
+
+    public void removeActor(SimpleActor actor) {
+        getRoot().removeActor(actor);
+        actorList.remove(actor);
+        if(actor.getBody() != null)
+            actorsMap.remove(actor.getBody().getAddress());
+        actor.dispose();
+
+        if(emitter == actor)
             emitter = null;
 
-        if(cloud == selectedActor)
+        if(cloud == actor)
             cloud = null;
     }
 
@@ -957,5 +967,13 @@ public class GameWorld extends Stage {
 
     public void setClickListener(EventListener clickListener) {
         this.clickListener = clickListener;
+    }
+
+    public int getDropsCount() {
+        return particleSystem.getParticleCount();
+    }
+
+    public float getTime() {
+        return time;
     }
 }
