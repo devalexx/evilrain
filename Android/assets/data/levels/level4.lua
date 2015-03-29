@@ -2,7 +2,7 @@ dynActorArray = {}
 isContacted = false
 
 function onCreate()
-    world:setPressingAction(1);
+    world:setPressingAction(DRAWING);
 
     local ground = luajava.new(Ground)
     ground:addVertex(752, 48)

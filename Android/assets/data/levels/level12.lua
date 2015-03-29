@@ -1,6 +1,5 @@
 function onCreate()
-    world:setPressingAction(1);
-    ------------------
+    world:setPressingAction(DRAWING);
     ------------------
     Ground_0 = luajava.new(Ground)
     Ground_0:addVertex(145.99998, 124.999985)
@@ -45,7 +44,7 @@ function onCreate()
     Ground_0:addVertex(139.0, 184.99998)
     Ground_0:addVertex(127.0, 112.0)
     Ground_0:addVertex(144.0, 109.0)
-    Ground_0:setPosition(0.0, 0.0)
+    Ground_0:setPosition(-50.0, 0.0)
     Ground_0:setRotation(0.0)
     Ground_0:setName('Ground_0')
     Ground_0:setVisible(false)
@@ -60,7 +59,7 @@ function onCreate()
     Ground_1:addVertex(179.0, 99.999985)
     Ground_1:addVertex(195.99998, 91.99999)
     Ground_1:addVertex(219.0, 109.0)
-    Ground_1:setPosition(0.0, 0.0)
+    Ground_1:setPosition(-50.0, 0.0)
     Ground_1:setRotation(0.0)
     Ground_1:setName('Ground_1')
     Ground_1:setVisible(false)
@@ -74,14 +73,22 @@ function onCreate()
     Ground_2:addVertex(293.99997, 97.0)
     Ground_2:addVertex(316.0, 91.99999)
     Ground_2:addVertex(331.0, 106.99999)
-    Ground_2:setPosition(0.0, 0.0)
+    Ground_2:setPosition(-50.0, 0.0)
     Ground_2:setRotation(0.0)
     Ground_2:setName('Ground_2')
     Ground_2:setVisible(false)
     world:add(Ground_2)
+
+    trigger_3 = luajava.new(Trigger)
+    trigger_3:setPosition(695.57153, 94.48703)
+    trigger_3:setRotation(359.9033)
+    trigger_3:setName('trigger_3')
+    trigger_3:setVisible(true)
+    trigger_3:setBodyType(KINEMATIC_BODY)
+    world:add(trigger_3)
 end
 
 function onCheck()
-    local count = world:dropsInRect(140, 50, 230, 120)
+    local count = world:dropsInRect(90, 50, 230, 120)
     return count > 160
 end

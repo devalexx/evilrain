@@ -14,12 +14,17 @@
 package com.alex.rain.models;
 
 import com.alex.rain.managers.TextureManager;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.physics.box2d.*;
+import com.alex.rain.stages.GameWorld;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Emitter extends ControlledActor {
     boolean autoFire;
+    boolean clickable;
 
     public Emitter() {
         sprite = TextureManager.getSpriteFromDefaultAtlas("emitter");
@@ -44,6 +49,7 @@ public class Emitter extends ControlledActor {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
+        bodyDef.position.set(pos.cpy().scl(GameWorld.WORLD_TO_BOX));
         body = physicsWorld.createBody(bodyDef);
         polygonShape.set(new float[] {
                 -getPhysicsWidth() / 2.5f, getPhysicsHeight() / 3, // top
@@ -67,6 +73,7 @@ public class Emitter extends ControlledActor {
         polygonShape.dispose();
 
         setWidth(64);
+        setRotation(rot);
     }
 
     @Override
@@ -82,5 +89,13 @@ public class Emitter extends ControlledActor {
 
     public void setAutoFire(boolean autoFire) {
         this.autoFire = autoFire;
+    }
+
+    public boolean isClickable() {
+        return clickable;
+    }
+
+    public void setClickable(boolean clickable) {
+        this.clickable = clickable;
     }
 }

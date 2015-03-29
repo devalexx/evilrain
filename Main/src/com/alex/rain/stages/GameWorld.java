@@ -18,6 +18,7 @@ import com.alex.rain.listeners.GameContactListener;
 import com.alex.rain.managers.I18nManager;
 import com.alex.rain.managers.ResourceManager;
 import com.alex.rain.managers.TextureManager;
+import com.alex.rain.mics.ColorAndCount;
 import com.alex.rain.models.*;
 import com.alex.rain.renderer.ParticleRenderer;
 import com.alex.rain.screens.LevelsMenuScreen;
@@ -95,10 +96,11 @@ public class GameWorld extends Stage {
     private Skin skin = ResourceManager.getSkin();
     protected GameViewport gameViewport = new GameViewport();
 
-    private List<Drop> selectedDrops, dropsToCreate = new LinkedList<Drop>(), dropsToDelete = new LinkedList<Drop>();
+    private List<Drop> selectedDrops, dropsToCreate = new LinkedList<>(), dropsToDelete = new LinkedList<>();
+    private List<Integer> dropsToPreDelete = new LinkedList<>();
     private List<SimpleActor> actorsToRemove = new LinkedList<>();
-    protected List<SimpleActor> actorList = new ArrayList<SimpleActor>();
-    private ArrayList<Drop> dropList = new ArrayList<Drop>();
+    protected List<SimpleActor> actorList = new ArrayList<>();
+    private ArrayList<Drop> dropList = new ArrayList<>();
     private final HashMap<Long, SimpleActor> actorsMap = new HashMap<>();
     private Cloud cloud;
     private Emitter emitter;
@@ -106,8 +108,8 @@ public class GameWorld extends Stage {
     private Window winnerWindow;
     private ImageButton actionButton, arrowUpButton, arrowDownButton, arrowLeftButton ,arrowRightButton;
     private Label hintLabel;
-    private List<Zone> drawingZones = new LinkedList<Zone>();
-    private float[] dropsXYPositions;
+    private List<Zone> drawingZones = new LinkedList<>();
+    private float[] dropsXYPositions, dropsXYRGBA;
     private Body groundBody;
     private MouseJoint mouseJoint;
     private List<SimpleActor.TYPE> interactTypes = new ArrayList<>();
@@ -129,6 +131,7 @@ public class GameWorld extends Stage {
     private Vector2 cursorPosition;
     private boolean drawingDrops;
     private boolean keepDropsForever = false;
+    private boolean dropsColorMixing;
 
     public GameWorld(String name) {
         setViewport(gameViewport);
@@ -409,6 +412,7 @@ public class GameWorld extends Stage {
         dropsToCreate.clear();
 
         float[] src = particleSystem.getParticlePositionBufferArray(true);
+        dropsXYRGBA = null;
 
         super.act(delta);
 
@@ -424,9 +428,10 @@ public class GameWorld extends Stage {
             if((itRain || emitter != null && emitter.isAutoFire()) &&
                     !wonGame && (emitter != null || cloud != null) &&
                     time - timeLastDrop > 0.01) {
-                Drop drop = new Drop();
+                Drop drop = new Drop(dropsColorMixing);
                 Random r = new Random();
-                SimpleActor actor = cloud != null ? cloud : emitter;
+                ControlledActor actor = cloud != null ? cloud : emitter;
+                drop.setColor(actor.getColor());
                 float offset = r.nextFloat() * actor.getWidth() * 0.1f;
                 drop.setPosition(new Vector2(actor.getPosition().x + offset, actor.getPosition().y));
                 dropsToCreate.add(drop);
@@ -443,7 +448,7 @@ public class GameWorld extends Stage {
                 }
 
                 if(inZone) {
-                    Drop drop = new Drop();
+                    Drop drop = new Drop(dropsColorMixing);
                     Random r = new Random();
                     int offset = r.nextInt(20);
                     drop.setPosition(cursorPosition.cpy().add(offset, offset));
@@ -474,8 +479,11 @@ public class GameWorld extends Stage {
 
         float[] pos = particleSystem.getParticlePositionBufferArray(false);
         for(int i = particleSystem.getParticleCount() - 1; i >= 0; i--)
-            if(pos[i*2] < MIN_DROP_X_POS || pos[i*2] > MAX_DROP_X_POS || pos[i*2+1] < MIN_DROP_Y_POS)
+            if(pos[i*2] < MIN_DROP_X_POS || pos[i*2] > MAX_DROP_X_POS || pos[i*2+1] < MIN_DROP_Y_POS ||
+                    dropsToPreDelete.contains(i))
                 dropsToDelete.add(dropList.get(i));
+
+        dropsToPreDelete.clear();
     }
 
     private void showWinnerMenu() {
@@ -543,18 +551,29 @@ public class GameWorld extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         cursorPosition = getCursorPosition(screenX, screenY).cpy();
-        if(clickListener != null)
-            clickListener.handle(new InputEvent() {
-                @Override
-                public Actor getTarget() {
-                    for(SimpleActor actor : actorList)
-                        if(interactTypes.contains(actor.getType()) && actor.isInAABB(cursorPosition))
-                            return actor;
+        if(pressingAction == TouchType.NONE) {
+            if(clickListener != null)
+                clickListener.handle(new InputEvent() {
+                    @Override
+                    public Actor getTarget() {
+                        for(SimpleActor actor : actorList)
+                            if(interactTypes.contains(actor.getType()) && actor.isInAABB(cursorPosition))
+                                return actor;
 
-                    return null;
+                        return null;
+                    }
+                });
+
+            if(interactTypes.contains(SimpleActor.TYPE.EMITTER)) {
+                for(SimpleActor actor : actorList) {
+                    if(actor.getType() == SimpleActor.TYPE.EMITTER && actor.isInAABB(cursorPosition)) {
+                        emitter = (Emitter)actor;
+                        emitter.setAutoFire(true);
+                        break;
+                    }
                 }
-            });
-        if(pressingAction == TouchType.PICKING_DROPS) {
+            }
+        } else if(pressingAction == TouchType.PICKING_DROPS) {
             cursorPosition.scl(WORLD_TO_BOX);
             selectedDrops = new ArrayList<Drop>();
             float[] pos = particleSystem.getParticlePositionBufferArray(false);
@@ -605,6 +624,12 @@ public class GameWorld extends Stage {
             mouseJoint = null;
             groundBody = null;
         }
+
+        if(emitter != null && emitter.isClickable()) {
+            emitter.setAutoFire(false);
+            emitter = null;
+        }
+
         return super.touchUp(screenX, screenY, pointer, button);
     }
 
@@ -918,6 +943,37 @@ public class GameWorld extends Stage {
         return count;
     }
 
+    public ColorAndCount summaryDropsColor(float x, float y, float width, float height) {
+        if(dropsXYRGBA == null) {
+            dropsXYRGBA = particleSystem.getParticlePositionAndColorBufferArray(true);
+            for(int i = 0; i < dropsXYRGBA.length / 6; i++) {
+                dropsXYRGBA[i * 6] *= BOX_TO_WORLD;
+                dropsXYRGBA[i * 6 + 1] *= BOX_TO_WORLD;
+            }
+        }
+
+        float xyrgba[] = dropsXYRGBA;
+
+        float r = 0, g = 0, b = 0, a = 0;
+        int count = 0;
+        for(int i = 0, max = particleSystem.getParticleCount(); i < max; i++) {
+            float dx = xyrgba[i * 6];
+            float dy = xyrgba[i * 6 + 1];
+            if(dx > x && dx < x + width && dy > y && dy < y + height) {
+                r += xyrgba[i * 6 + 2];
+                g += xyrgba[i * 6 + 3];
+                b += xyrgba[i * 6 + 4];
+                a += xyrgba[i * 6 + 5];
+                count++;
+            }
+        }
+
+        if(r == 0 && g == 0 && b == 0 && a == 0)
+            return null;
+
+        return new ColorAndCount(new Color(r / count, g / count, b / count, a / count), count);
+    }
+
     public void setDebug(boolean debug) {
         this.debugRendererEnabled = debug;
     }
@@ -932,11 +988,9 @@ public class GameWorld extends Stage {
 
     public void reset() {
         dropsToDelete.addAll(dropList);
-        for(SimpleActor sa : actorList)
-            getRoot().removeActor(sa);
+        for(SimpleActor sa : new ArrayList<>(actorList))
+            removeActor(sa);
         actorList.clear();
-        emitter = null;
-        cloud = null;
     }
 
     public HashMap<Long, SimpleActor> getGameActors() {
@@ -975,5 +1029,19 @@ public class GameWorld extends Stage {
 
     public float getTime() {
         return time;
+    }
+
+    public void setDropsColorMixing(boolean state) {
+        dropsColorMixing = state;
+    }
+
+    public void deleteDropsInRect(float x, float y, float width, float height) {
+        float xy[] = dropsXYPositions;
+        for(int i = 0, max = particleSystem.getParticleCount(); i < max; i++) {
+            float dx = xy[i * 2];
+            float dy = xy[i * 2 + 1];
+            if(dx > x && dx < x + width && dy > y && dy < y + height)
+                dropsToPreDelete.add(i);
+        }
     }
 }

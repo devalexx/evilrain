@@ -1,5 +1,5 @@
 function onCreate()
-    world:setPressingAction(3);
+    world:setPressingAction(PICKING_BODIES);
 
     local ground = luajava.new(Ground)
     ground:addVertex(792, 0)

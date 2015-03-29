@@ -13,11 +13,13 @@
  ******************************************************************************/
 package com.alex.rain.models;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 
 public abstract class ControlledActor extends SimpleActor {
     Rectangle minMaxPosRectangle;
     boolean hasControl = true;
+    Color color = Color.BLUE;
 
     public void setMinMaxPosRectangle(float x, float y, float width, float height) {
         minMaxPosRectangle = new Rectangle(x, y, width, height);
@@ -48,5 +50,13 @@ public abstract class ControlledActor extends SimpleActor {
 
     public void setHasControl(boolean hasControl) {
         this.hasControl = hasControl;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

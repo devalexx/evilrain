@@ -1,6 +1,6 @@
 function onCreate()
     world:setKeepDropsForever(true)
-    world:setPressingAction(1);
+    world:setPressingAction(DRAWING);
 
     local ground = luajava.new(Ground)
     ground:addVertex(528, 336)

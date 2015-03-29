@@ -1,5 +1,5 @@
 function onCreate()
-    world:setPressingAction(1);
+    world:setPressingAction(DRAWING);
 
     ground = luajava.new(Ground)
     ground:addVertex(736, 48)

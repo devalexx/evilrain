@@ -13,12 +13,9 @@
  ******************************************************************************/
 package com.alex.rain.models;
 
-import com.alex.rain.RainGame;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import finnstr.libgdx.liquidfun.ParticleDef;
@@ -27,18 +24,20 @@ import finnstr.libgdx.liquidfun.ParticleGroupDef;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class Drop extends SimpleActor {
-    private static float RADIUS;
-    private static CircleShape circleShape;
-    private static BodyDef bodyDef;
     private Color color = Color.BLUE;
     private int particleIndex;
     public ParticleGroup particleGroup;
     private ParticleSystem particleSystem;
+    private boolean dropsColorMixing;
 
     public Drop() {
+        this(false);
+    }
+
+    public Drop(boolean dropsColorMixing) {
         super();
         type = TYPE.DROP;
-        RADIUS = RainGame.isLightVersion() ? 0.4f : 0.3f;
+        this.dropsColorMixing = dropsColorMixing;
     }
 
     @Override
@@ -49,12 +48,15 @@ public class Drop extends SimpleActor {
 
         ParticleDef particleDef = new ParticleDef();
         particleDef.flags.add(ParticleDef.ParticleType.b2_waterParticle);
+        if(dropsColorMixing)
+            particleDef.flags.add(ParticleDef.ParticleType.b2_colorMixingParticle);
         particleDef.position.set(pos).scl(GameWorld.WORLD_TO_BOX);
         particleDef.color.set(color);
         particleDef.velocity.set(linVel);
 
         ParticleGroupDef particleGroupDef = new ParticleGroupDef();
         particleGroupDef.flags.add(ParticleDef.ParticleType.b2_waterParticle);
+        particleGroupDef.flags.add(ParticleDef.ParticleType.b2_colorMixingParticle);
         //particleGroupDef.flags.add(ParticleDef.ParticleType.b2_fixtureContactListenerParticle);
         particleGroupDef.position.set(pos).scl(GameWorld.WORLD_TO_BOX);
         particleGroupDef.color.set(color);
@@ -64,24 +66,6 @@ public class Drop extends SimpleActor {
         //particleIndex = particleSystem.createParticle(particleDef);
         particleGroup = particleSystem.createParticleGroup(particleGroupDef);
         particleIndex = particleGroup.getBufferIndex();
-    }
-
-    private static CircleShape getCircleShape() {
-        if(circleShape == null) {
-            circleShape = new CircleShape();
-            circleShape.setRadius(RADIUS);
-        }
-
-        return circleShape;
-    }
-
-    private static BodyDef getBodyDef() {
-        if(bodyDef == null) {
-            bodyDef = new BodyDef();
-            bodyDef.type = BodyDef.BodyType.DynamicBody;
-        }
-
-        return bodyDef;
     }
 
     public Color getColor() {

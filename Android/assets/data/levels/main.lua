@@ -1,5 +1,4 @@
 -- SimpleActor's types
-NONE = "NONE"
 DROP = "DROP"
 GROUND = "GROUND"
 CLOUD = "CLOUD"
@@ -9,9 +8,14 @@ HAMMER = "HAMMER"
 BALL = "BALL"
 TRIGGER = "TRIGGER"
 -- BodyType
-STATIC_BODY =0
+STATIC_BODY = 0
 KINEMATIC_BODY = 1
 DYNAMIC_BODY = 2
+-- TouchType
+NONE = 0
+DRAWING = 1
+PICKING_DROPS = 2
+PICKING_BODIES = 3
 -- Game Classes
 Drop = luajava.bindClass("com.alex.rain.models.Drop")
 Ground = luajava.bindClass("com.alex.rain.models.Ground")

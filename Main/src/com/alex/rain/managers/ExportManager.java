@@ -33,7 +33,7 @@ public class ExportManager {
     }
 
     public String export() {
-        String accum = "function addObjects(world)\n";
+        String accum = "function addObjects()\n";
 
         for(Actor a : stage.getRoot().getChildren()) {
             if(!(a instanceof SimpleActor))

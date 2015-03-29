@@ -1,7 +1,7 @@
 dynActorArray = {}
 
 function onCreate()
-    world:setPressingAction(2);
+    world:setPressingAction(PICKING_DROPS);
 
     local ground = luajava.new(Ground)
     ground:addVertex(776, 24)
