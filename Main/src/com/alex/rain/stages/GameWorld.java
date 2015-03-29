@@ -86,6 +86,7 @@ public class GameWorld extends Stage {
     private ParticleSystem particleSystem;
     private LuaFunction luaOnCreateFunc, luaOnCheckFunc, luaOnBeginContactFunc, luaOnEndContactFunc;
     private Texture backgroundTexture;
+    private Sprite zoneSprite;
     private final Box2DDebugRenderer debugRenderer;
     private final ParticleDebugRenderer particleDebugRendererCircle, particleDebugRendererDot;
     private final ParticleRenderer particleRenderer;
@@ -188,6 +189,7 @@ public class GameWorld extends Stage {
 
         backgroundTexture = TextureManager.getTexture("background.png");
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        zoneSprite = TextureManager.getSpriteFromDefaultAtlas("zone");
 
         spriteBatchShadered = new SpriteBatch();
         spriteBatchShadered.setShader(shader);
@@ -465,9 +467,9 @@ public class GameWorld extends Stage {
                 if(inZone) {
                     Drop drop = new Drop(dropsColorMixing);
                     Random r = new Random();
-                    int offset = r.nextInt(20);
-                    drop.setPosition(cursorPosition.cpy().add(offset, offset));
-                    drop.setLinearVelocity(new Vector2(100000, 0));
+                    int offsetX = r.nextInt(30);
+                    int offsetY = r.nextInt(30);
+                    drop.setPosition(cursorPosition.cpy().add(offsetX - 15, offsetY - 15));
                     dropsToCreate.add(drop);
                     timeLastDrop = time;
                 }
@@ -631,7 +633,7 @@ public class GameWorld extends Stage {
             selectedDrops = new ArrayList<Drop>();
             float[] pos = particleSystem.getParticlePositionBufferArray(false);
             for(int i = 0; i < pos.length; i += 2) {
-                if(Math.abs(cursorPosition.x - pos[i]) < 1 && Math.abs(cursorPosition.y - pos[i + 1]) < 1)
+                if(Math.abs(cursorPosition.x - pos[i]) < 0.5 && Math.abs(cursorPosition.y - pos[i + 1]) < 0.5)
                     selectedDrops.add(dropList.get(i / 2));
             }
             cursorPosition.scl(BOX_TO_WORLD);
@@ -830,6 +832,11 @@ public class GameWorld extends Stage {
         RainGame.shapeRenderer.setProjectionMatrix(sb.getProjectionMatrix());
         sb.begin();
             sb.draw(backgroundTexture, -(int)getViewport().getWorldWidth(), -(int)getViewport().getWorldHeight(), 0, 0, (int)getViewport().getWorldWidth() * 2, (int)getViewport().getWorldHeight() * 2);
+            for(Zone zone : drawingZones) {
+                zoneSprite.setPosition(zone.rectangle.x, zone.rectangle.y);
+                zoneSprite.setSize(zone.rectangle.width, zone.rectangle.height);
+                zoneSprite.draw(sb);
+            }
         sb.end();
 
         if(m_fbo != null && useShader) {
@@ -844,17 +851,7 @@ public class GameWorld extends Stage {
                         gameViewport.getWorldWidth(), gameViewport.getWorldHeight());
             spriteBatchShadered.end();
         } else {
-                drawDrops(false);
-        }
-
-        for(Zone zone : drawingZones) {
-            RainGame.shapeRenderer.setColor(zone.color);
-            RainGame.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-                RainGame.shapeRenderer.line(zone.rectangle.x, zone.rectangle.y, zone.rectangle.x, zone.rectangle.y + zone.rectangle.height);
-                RainGame.shapeRenderer.line(zone.rectangle.x, zone.rectangle.y + zone.rectangle.height, zone.rectangle.x + zone.rectangle.width, zone.rectangle.y + zone.rectangle.height);
-                RainGame.shapeRenderer.line(zone.rectangle.x + zone.rectangle.width, zone.rectangle.y, zone.rectangle.x + zone.rectangle.width, zone.rectangle.y + zone.rectangle.height);
-                RainGame.shapeRenderer.line(zone.rectangle.x, zone.rectangle.y, zone.rectangle.x + zone.rectangle.width, zone.rectangle.y);
-            RainGame.shapeRenderer.end();
+            drawDrops(false);
         }
 
         sb.begin();

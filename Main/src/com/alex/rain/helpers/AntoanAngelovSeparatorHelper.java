@@ -80,7 +80,15 @@ public class AntoanAngelovSeparatorHelper implements SeparatorHelper {
                     area += verticesVec.get(k).x * verticesVec.get(0).y - verticesVec.get(0).x * verticesVec.get(k).y;
             }
             area *= 0.5f;
-            if(verticesVec.size() == 0 || Math.abs(area) < 0.006)
+
+            boolean hasSmallAngle = false;
+            for(k = 0; k < verticesVec.size() - 2; k++) {
+                Vector2 edge1 = new Vector2(verticesVec.get(k+1).cpy().sub(verticesVec.get(k)));
+                Vector2 edge2 = new Vector2(verticesVec.get(k+1).cpy().sub(verticesVec.get(k+2)));
+                if(Math.abs(edge1.angle(edge2)) < 2)
+                    hasSmallAngle = true;
+            }
+            if(verticesVec.size() == 0 || hasSmallAngle || Math.abs(area) < 0.001)
                 continue;
             polyShape.set(verticesVec.toArray(new Vector2[verticesVec.size()]));
             fixtureDef.shape=polyShape;

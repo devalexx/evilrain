@@ -44,7 +44,7 @@ public class House extends SimpleActor {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(pos.cpy().scl(GameWorld.WORLD_TO_BOX));
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.type = bodyType != null ? bodyType : BodyDef.BodyType.DynamicBody;
         body = physicsWorld.createBody(bodyDef);
         body.createFixture(fixtureDef);
         body.resetMassData();

@@ -28,6 +28,7 @@ function onCreate()
     dynamicActor = luajava.new(House)
     dynamicActor:setBodyBox(200, 100)
     dynamicActor:setSpriteBox(200, 100)
+    dynamicActor:setBodyType(KINEMATIC_BODY)
     world:add(dynamicActor)
     dynamicActor:setPosition(luajava.new(Vector2, 200, 150))
 

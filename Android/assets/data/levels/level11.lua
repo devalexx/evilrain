@@ -157,7 +157,7 @@ function onCreate()
     Ground_4:addVertex(708.99994, 151.0)
     Ground_4:addVertex(667.0, 144.0)
     Ground_4:addVertex(647.0, 102.0)
-    Ground_4:setPosition(-7.0, 10.0)
+    Ground_4:setPosition(-7.0, 2.0)
     Ground_4:setRotation(0.0)
     Ground_4:setName('Ground_4')
     Ground_4:setVisible(true)
@@ -207,8 +207,6 @@ end
 time = 0
 moved = false
 function onCheck()
-    print(Ground_2:getRotation(), time, world:getTime() - time)
-
     if Ground_2:getRotation() > -10 and Ground_2:getRotation() < 15 then
         if time == 0 then
             time = world:getTime()
