@@ -213,6 +213,8 @@ public class GameWorld extends Stage {
 
         if(name.startsWith("level"))
             setWinHint(I18nManager.getString("LEVEL" + levelNumber + "_HINT"));
+        else
+            setWinHint(I18nManager.getString("TEST_HINT"));
     }
 
     private void createUI() {
@@ -437,7 +439,7 @@ public class GameWorld extends Stage {
             showWinnerWindow();
         }
 
-        if(dropList.size() < dropsMax && winnerWindow == null) {
+        if(dropList.size() < dropsMax && winnerWindow == null && !hintWindow.isVisible()) {
             if((itRain || emitter != null && emitter.isAutoFire()) &&
                     !wonGame && (emitter != null || cloud != null) &&
                     time - timeLastDrop > 0.01) {

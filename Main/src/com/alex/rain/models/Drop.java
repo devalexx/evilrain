@@ -56,7 +56,8 @@ public class Drop extends SimpleActor {
 
         ParticleGroupDef particleGroupDef = new ParticleGroupDef();
         particleGroupDef.flags.add(ParticleDef.ParticleType.b2_waterParticle);
-        particleGroupDef.flags.add(ParticleDef.ParticleType.b2_colorMixingParticle);
+        if(dropsColorMixing)
+            particleGroupDef.flags.add(ParticleDef.ParticleType.b2_colorMixingParticle);
         //particleGroupDef.flags.add(ParticleDef.ParticleType.b2_fixtureContactListenerParticle);
         particleGroupDef.position.set(pos).scl(GameWorld.WORLD_TO_BOX);
         particleGroupDef.color.set(color);

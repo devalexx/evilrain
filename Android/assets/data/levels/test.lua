@@ -1,4 +1,4 @@
-function onCreate(world)
+function onCreate()
     world:setPressingAction(PICKING_DROPS);
 
     local ground = luajava.new(Ground)
