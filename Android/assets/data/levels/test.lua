@@ -1,5 +1,5 @@
 function onCreate(world)
-    world:setPressingAction(2);
+    world:setPressingAction(PICKING_DROPS);
 
     local ground = luajava.new(Ground)
     ground:addVertex(800, 480)

@@ -177,7 +177,7 @@ function onCheck()
         end
     elseif step == 2 then
         cnc = world:summaryDropsColor(530, 50, 110, 110)
-        if cnc ~= nil and cnc.color.b > 0.99 and cnc.count > 40 then
+        if cnc ~= nil and cnc.color.r > 0.4 and cnc.color.g > 0.4 and cnc.color.b < 0.01 and cnc.count > 40 then
             step = 3
         end
     end
