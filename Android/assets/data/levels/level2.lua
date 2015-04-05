@@ -30,7 +30,7 @@ function onCreate()
     dynamicActor:setSpriteBox(200, 100)
     dynamicActor:setBodyType(KINEMATIC_BODY)
     world:add(dynamicActor)
-    dynamicActor:setPosition(luajava.new(Vector2, 200, 150))
+    dynamicActor:setPosition(luajava.new(Vector2, 200, 120))
 
     world:addDrawingZone(500, 320, 200, 150)
 end
