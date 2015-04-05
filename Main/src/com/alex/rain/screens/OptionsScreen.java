@@ -62,7 +62,7 @@ public class OptionsScreen extends BasicUIScreen {
         innerTable.add(checkboxLabel).left();
 
         final CheckBox graphicsCheckBox = new CheckBox("", skin);
-        graphicsCheckBox.setChecked(SettingsManager.getHighGraphics());
+        graphicsCheckBox.setChecked(SettingsManager.isHighGraphics());
         innerTable.add(graphicsCheckBox).expand().fill();
 
         innerTable.row();
@@ -77,6 +77,7 @@ public class OptionsScreen extends BasicUIScreen {
                 //SettingsManager.setSound(soundCheckBox.isChecked());
                 SettingsManager.setHighGraphics(graphicsCheckBox.isChecked());
                 RainGame.getInstance().setScreen(new MainMenuScreen());
+                SettingsManager.save();
             }
         });
     }

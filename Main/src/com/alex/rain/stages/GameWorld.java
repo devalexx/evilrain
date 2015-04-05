@@ -17,6 +17,7 @@ import com.alex.rain.RainGame;
 import com.alex.rain.listeners.GameContactListener;
 import com.alex.rain.managers.I18nManager;
 import com.alex.rain.managers.ResourceManager;
+import com.alex.rain.managers.SettingsManager;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.mics.ColorAndCount;
 import com.alex.rain.models.*;
@@ -78,9 +79,9 @@ public class GameWorld extends Stage {
     public static final float WORLD_TO_BOX = 0.01f;
     public static final float BOX_TO_WORLD = 1 / WORLD_TO_BOX;
     public static float PARTICLE_RADIUS = 6f;
-    public static int MIN_DROP_X_POS = (int)(-GameViewport.WIDTH * 2 * WORLD_TO_BOX);
-    public static int MAX_DROP_X_POS = (int)(GameViewport.WIDTH * 2 * WORLD_TO_BOX);
-    public static int MIN_DROP_Y_POS = (int)(-GameViewport.HEIGHT * WORLD_TO_BOX);
+    public static final int MIN_DROP_X_POS = (int)(-GameViewport.WIDTH * 2 * WORLD_TO_BOX);
+    public static final int MAX_DROP_X_POS = (int)(GameViewport.WIDTH * 2 * WORLD_TO_BOX);
+    public static final int MIN_DROP_Y_POS = (int)(-GameViewport.HEIGHT * WORLD_TO_BOX);
 
     private World physicsWorld = new World(new Vector2(0, -9.8f), true);
     private ParticleSystem particleSystem;
@@ -99,7 +100,7 @@ public class GameWorld extends Stage {
     protected GameViewport gameViewport = new GameViewport();
 
     private List<Drop> selectedDrops, dropsToCreate = new LinkedList<>(), dropsToDelete = new LinkedList<>();
-    private List<Integer> dropsToPreDelete = new LinkedList<>();
+    private int[] dropsToPreDelete = new int[100];
     private List<SimpleActor> actorsToRemove = new LinkedList<>();
     protected List<SimpleActor> actorList = new ArrayList<>();
     private ArrayList<Drop> dropList = new ArrayList<>();
@@ -128,7 +129,7 @@ public class GameWorld extends Stage {
     private int dropsMax;
     private boolean physicsEnabled = true;
     private boolean liquidForcesEnabled = true;
-    private boolean useShader = true;
+    private boolean useShader = SettingsManager.isHighGraphics();
     protected TouchType pressingAction = TouchType.NONE;
     private Vector2 cursorPosition;
     private boolean drawingDrops;
@@ -136,13 +137,15 @@ public class GameWorld extends Stage {
     private boolean dropsColorMixing;
 
     public GameWorld(String name) {
+        Arrays.fill(dropsToPreDelete, -1);
+
         setViewport(gameViewport);
         getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         ParticleSystemDef particleSystemDef = new ParticleSystemDef();
         particleSystemDef.radius = PARTICLE_RADIUS * GameWorld.WORLD_TO_BOX;
         //particleSystemDef.pressureStrength = 0.4f;
-        particleSystemDef.dampingStrength = 0.2f;
+        particleSystemDef.dampingStrength = 0.8f;
 
         particleSystem = new ParticleSystem(physicsWorld, particleSystemDef);
 
@@ -222,7 +225,7 @@ public class GameWorld extends Stage {
     private void createUI() {
         tableUI = new Table();
         tableUI.setFillParent(true);
-        tableUI.debug();
+        //tableUI.debug();
         addActor(tableUI);
 
         Button hintButton = new TextButton(I18nManager.getString("HINT"), skin);
@@ -253,13 +256,13 @@ public class GameWorld extends Stage {
         tableUI.row();
 
         Table controlButtonsTable = new Table();
-        controlButtonsTable.debug();
+        //controlButtonsTable.debug();
         tableUI.add(controlButtonsTable).left();
-        Sprite arrowLeftSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
-        Sprite arrowDownSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
-        Sprite arrowRightSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
-        actionButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("button")));
-        arrowUpButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("arrow")));
+        Sprite arrowLeftSprite = TextureManager.getSpriteFromAtlas("uiskin.png", "arrow");
+        Sprite arrowDownSprite = TextureManager.getSpriteFromAtlas("uiskin.png", "arrow");
+        Sprite arrowRightSprite = TextureManager.getSpriteFromAtlas("uiskin.png", "arrow");
+        actionButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromAtlas("uiskin.png", "button")));
+        arrowUpButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromAtlas("uiskin.png", "arrow")));
         arrowDownButton = new ImageButton(new SpriteDrawable(arrowDownSprite));
         arrowLeftButton = new ImageButton(new SpriteDrawable(arrowLeftSprite));
         arrowRightButton = new ImageButton(new SpriteDrawable(arrowRightSprite));
@@ -438,6 +441,8 @@ public class GameWorld extends Stage {
 
         if(luaOnCheckFunc != null && luaOnCheckFunc.call().toboolean(1) && !wonGame) {
             wonGame = true;
+            if(SettingsManager.getMaxCompletedLevel() < levelNumber)
+                SettingsManager.setMaxCompletedLevel(levelNumber);
             showWinnerWindow();
         }
 
@@ -476,7 +481,7 @@ public class GameWorld extends Stage {
             }
         }
 
-        if(pressingAction == TouchType.PICKING_DROPS && cursorPosition != null) {
+        if(pressingAction == TouchType.PICKING_DROPS && cursorPosition != null && selectedDrops != null) {
             for(int i = 0, selectedDropsSize = selectedDrops.size(); i < selectedDropsSize; i++) {
                 Drop d = selectedDrops.get(i);
                 Vector2 pos = d.getPosition();
@@ -495,12 +500,21 @@ public class GameWorld extends Stage {
             return;
 
         float[] pos = particleSystem.getParticlePositionBufferArray(false);
-        for(int i = particleSystem.getParticleCount() - 1; i >= 0; i--)
-            if(pos[i*2] < MIN_DROP_X_POS || pos[i*2] > MAX_DROP_X_POS || pos[i*2+1] < MIN_DROP_Y_POS ||
-                    dropsToPreDelete.contains(i))
+        for(int i = particleSystem.getParticleCount() - 1; i >= 0; i--) {
+            boolean delete = false;
+            for(int j = 0; j < dropsToPreDelete.length; j++) {
+                if(dropsToPreDelete[j] == -1)
+                    break;
+                if(dropsToPreDelete[j] == i) {
+                    delete = true;
+                    break;
+                }
+            }
+            if(pos[i*2] < MIN_DROP_X_POS || pos[i*2] > MAX_DROP_X_POS || pos[i*2+1] < MIN_DROP_Y_POS || delete)
                 dropsToDelete.add(dropList.get(i));
+        }
 
-        dropsToPreDelete.clear();
+        Arrays.fill(dropsToPreDelete, -1);
     }
 
     private void showHintWindow() {
@@ -516,7 +530,7 @@ public class GameWorld extends Stage {
         hintWindow.setModal(true);
         hintWindow.setMovable(false);
         hintWindow.setKeepWithinStage(false);
-        hintWindow.debug();
+        //hintWindow.debug();
         addActor(hintWindow);
 
         hintWindow.row().width(400).padTop(10);
@@ -552,7 +566,7 @@ public class GameWorld extends Stage {
         winnerWindow.setModal(true);
         winnerWindow.setMovable(false);
         winnerWindow.setKeepWithinStage(false);
-        winnerWindow.debug();
+        //winnerWindow.debug();
         addActor(winnerWindow);
 
         winnerWindow.row().width(400).padTop(10);
@@ -606,6 +620,10 @@ public class GameWorld extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         cursorPosition = getCursorPosition(screenX, screenY).cpy();
+
+        if(hit(cursorPosition.x, cursorPosition.y, true) != null)
+            return super.touchDown(screenX, screenY, pointer, button);
+
         if(pressingAction == TouchType.NONE) {
             if(clickListener != null)
                 clickListener.handle(new InputEvent() {
@@ -804,7 +822,6 @@ public class GameWorld extends Stage {
         particleRenderer.render(particleSystem,
                 PARTICLE_RADIUS / 2 * BOX_TO_WORLD * (useFBO ? 1 : gameViewport.scale),
                 getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1), useFBO);
-
     }
 
     public void resize(int width, int height) {
@@ -830,13 +847,9 @@ public class GameWorld extends Stage {
         sb.setProjectionMatrix(getCamera().combined);
         RainGame.polyBatch.setProjectionMatrix(sb.getProjectionMatrix());
         RainGame.shapeRenderer.setProjectionMatrix(sb.getProjectionMatrix());
+
         sb.begin();
             sb.draw(backgroundTexture, -(int)getViewport().getWorldWidth(), -(int)getViewport().getWorldHeight(), 0, 0, (int)getViewport().getWorldWidth() * 2, (int)getViewport().getWorldHeight() * 2);
-            for(Zone zone : drawingZones) {
-                zoneSprite.setPosition(zone.rectangle.x, zone.rectangle.y);
-                zoneSprite.setSize(zone.rectangle.width, zone.rectangle.height);
-                zoneSprite.draw(sb);
-            }
         sb.end();
 
         if(m_fbo != null && useShader) {
@@ -855,6 +868,11 @@ public class GameWorld extends Stage {
         }
 
         sb.begin();
+            for(Zone zone : drawingZones) {
+                zoneSprite.setPosition(zone.rectangle.x, zone.rectangle.y);
+                zoneSprite.setSize(zone.rectangle.width, zone.rectangle.height);
+                zoneSprite.draw(sb);
+            }
             getRoot().draw(sb, 1);
         sb.end();
 
@@ -875,9 +893,7 @@ public class GameWorld extends Stage {
                     RainGame.shapeRenderer.end();
                 }
             }
-        }
 
-        if(debugRendererEnabled) {
             RainGame.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             if(winnerWindow != null)
                 winnerWindow.drawDebug(RainGame.shapeRenderer);
@@ -1089,11 +1105,12 @@ public class GameWorld extends Stage {
 
     public void deleteDropsInRect(float x, float y, float width, float height) {
         float xy[] = dropsXYPositions;
+        int c = 0;
         for(int i = 0, max = particleSystem.getParticleCount(); i < max; i++) {
             float dx = xy[i * 2];
             float dy = xy[i * 2 + 1];
             if(dx > x && dx < x + width && dy > y && dy < y + height)
-                dropsToPreDelete.add(i);
+                dropsToPreDelete[c++] = i;
         }
     }
 }

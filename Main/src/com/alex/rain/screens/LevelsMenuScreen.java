@@ -15,6 +15,7 @@ package com.alex.rain.screens;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.managers.I18nManager;
+import com.alex.rain.managers.SettingsManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -48,7 +49,7 @@ public class LevelsMenuScreen extends BasicUIScreen {
 
         table.row();
 
-        table.add(scrollPane).colspan(2).expandX().fill();
+        table.add(scrollPane).colspan(2).expand().fill();
 
         FileHandle[] levels = Gdx.files.internal("data/levels").list(new FilenameFilter() {
             @Override
@@ -70,6 +71,8 @@ public class LevelsMenuScreen extends BasicUIScreen {
                     RainGame.getInstance().setLevel(level);
                 }
             });
+            button1.setDisabled(i > SettingsManager.getMaxCompletedLevel() + 1);
+            skin.setEnabled(button1, i <= SettingsManager.getMaxCompletedLevel() + 1);
         }
 
         final TextButton button0 = new TextButton(I18nManager.getString("TEST") + " " + I18nManager.getString("LEVEL"), skin);

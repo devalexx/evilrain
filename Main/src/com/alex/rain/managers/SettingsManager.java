@@ -22,6 +22,7 @@ import java.util.Locale;
 public class SettingsManager {
     static String LOCALE_SETTING = "locale";
     static String HIGH_GRAPHICS_SETTING = "hi_graph";
+    static String MAX_COMPLETED_LEVEL = "max_completed_lvl";
 
     public static String availableLanguages[] = {"en", "ru"};
 
@@ -49,7 +50,16 @@ public class SettingsManager {
         TextureManager.setLinearFilter(state);
     }
 
-    public static boolean getHighGraphics() {
-        return prefs.getBoolean(HIGH_GRAPHICS_SETTING, false);
+    public static boolean isHighGraphics() {
+        return prefs.getBoolean(HIGH_GRAPHICS_SETTING, true);
+    }
+
+    public static void setMaxCompletedLevel(int level) {
+        prefs.putInteger(MAX_COMPLETED_LEVEL, level);
+        save();
+    }
+
+    public static int getMaxCompletedLevel() {
+        return prefs.getInteger(MAX_COMPLETED_LEVEL, 0);
     }
 }

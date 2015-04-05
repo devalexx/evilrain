@@ -123,9 +123,13 @@ public class TextureManager {
     }
 
     public static void setLinearFilter(boolean state) {
-        for(Texture t : textureMap.values()) {
-            t.unsafeSetFilter(state ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest,
+        for(Texture t : textureMap.values())
+            t.setFilter(state ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest,
                     state ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest);
-        }
+
+        for(TextureAtlas ta : textureAtlasMap.values())
+            for(Texture t : ta.getTextures())
+                t.setFilter(state ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest,
+                        state ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest);
     }
 }

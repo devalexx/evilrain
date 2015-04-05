@@ -2,7 +2,7 @@
 uiskin.png
 size: 256,128
 format: RGBA8888
-filter: Linear,Linear
+filter: Nearest,Nearest
 repeat: none
 check-off
   rotate: false
@@ -198,3 +198,17 @@ white
   orig: 3, 3
   offset: 0, 0
   index: -1
+button
+  rotate: false
+  xy: 0, 448
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+arrow
+    rotate: false
+    xy: 64, 448
+    size: 64, 64
+    orig: 64, 64
+    offset: 0, 0
+    index: -1

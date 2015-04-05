@@ -68,6 +68,7 @@ public class ParticleRenderer {
         mesh.render(shader, GL20.GL_POINTS, 0, pSystem.getParticleCount());
         shader.end();
         Gdx.gl20.glDisable(0x8861);
+        Gdx.gl20.glDisable(GL20.GL_BLEND);
     }
 
     public void dispose() {
