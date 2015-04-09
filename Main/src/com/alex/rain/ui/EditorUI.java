@@ -25,6 +25,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import java.text.DecimalFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EditorUI extends Table {
     private Skin skin;
@@ -418,7 +420,7 @@ public class EditorUI extends Table {
             text = angleTextField.getText();
             selectedActor.setRotation(Float.valueOf(text));
         } catch (NumberFormatException e) {
-
+            Logger.getGlobal().log(Level.WARNING, e.getMessage(), e);
         }
     }
 

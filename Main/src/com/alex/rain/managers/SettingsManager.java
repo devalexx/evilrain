@@ -50,6 +50,6 @@ public class SettingsManager {
     }
 
     public static boolean getHighGraphics() {
-        return prefs.getBoolean(HIGH_GRAPHICS_SETTING, false);
+        return prefs.getBoolean(HIGH_GRAPHICS_SETTING, true);
     }
 }

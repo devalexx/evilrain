@@ -22,6 +22,8 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author: Alexander Shubenkov
@@ -41,7 +43,7 @@ public class I18nManager {
             locale = l;
             isInit = true;
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -52,7 +54,7 @@ public class I18nManager {
         try {
             return rootResourceBundle.getString(key);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.WARNING, e.getMessage(), e);
             return '!' + key + '!';
         }
     }
@@ -61,6 +63,7 @@ public class I18nManager {
         try {
             return MessageFormat.format(rootResourceBundle.getString(key), params);
         } catch (MissingResourceException e) {
+            Logger.getGlobal().log(Level.WARNING, e.getMessage(), e);
             return '!' + key + '!';
         }
     }

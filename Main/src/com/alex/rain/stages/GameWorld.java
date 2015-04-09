@@ -21,8 +21,10 @@ import com.alex.rain.managers.TextureManager;
 import com.alex.rain.mics.ColorAndCount;
 import com.alex.rain.models.*;
 import com.alex.rain.renderer.ParticleRenderer;
-import com.alex.rain.screens.LevelsMenuScreen;
 import com.alex.rain.screens.MainMenuScreen;
+import com.alex.rain.ui.GameUI;
+import com.alex.rain.ui.MenuWindow;
+import com.alex.rain.ui.HintWindow;
 import com.alex.rain.viewports.GameViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -48,15 +50,13 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import finnstr.libgdx.liquidfun.ParticleDebugRenderer;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 import finnstr.libgdx.liquidfun.ParticleSystemDef;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.script.LuaScriptEngine;
+import sun.rmi.runtime.Log;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -66,6 +66,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.*;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GameWorld extends Stage {
     enum TouchType {
@@ -106,8 +108,9 @@ public class GameWorld extends Stage {
     private final HashMap<Long, SimpleActor> actorsMap = new HashMap<>();
     private Cloud cloud;
     private Emitter emitter;
-    private Table tableUI;
-    private Window winnerWindow, hintWindow;
+    private GameUI tableUI;
+    private HintWindow hintWindow;
+    private MenuWindow menuWindow;
     private ImageButton actionButton, arrowUpButton, arrowDownButton, arrowLeftButton ,arrowRightButton;
     private Label hintLabel;
     private List<Zone> drawingZones = new LinkedList<>();
@@ -124,8 +127,7 @@ public class GameWorld extends Stage {
     private boolean itRain;
     private int levelNumber = 0;
     private String winHint;
-    private final boolean lightVersion;
-    private int dropsMax;
+    private int MAX_DROPS = 1500;
     private boolean physicsEnabled = true;
     private boolean liquidForcesEnabled = true;
     private boolean useShader = true;
@@ -141,15 +143,11 @@ public class GameWorld extends Stage {
 
         ParticleSystemDef particleSystemDef = new ParticleSystemDef();
         particleSystemDef.radius = PARTICLE_RADIUS * GameWorld.WORLD_TO_BOX;
-        //particleSystemDef.pressureStrength = 0.4f;
         particleSystemDef.dampingStrength = 0.2f;
 
         particleSystem = new ParticleSystem(physicsWorld, particleSystemDef);
 
-        //super(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, new SpriteBatch(3000, 10));
-        lightVersion = RainGame.isLightVersion();
-        dropsMax = lightVersion ? 2000 : 2000;
-        dropsXYPositions = new float[dropsMax * 2];
+        dropsXYPositions = new float[MAX_DROPS * 2];
 
         String filename = "data/levels/" + name + ".lua";
 
@@ -173,9 +171,8 @@ public class GameWorld extends Stage {
             luaOnBeginContactFunc = (LuaFunction) sb.get("onBeginContact");
             luaOnEndContactFunc = (LuaFunction) sb.get("onEndContact");
             sb.put("world", CoerceJavaToLua.coerce(this));
-        } catch (Exception e) {
-            //LogHandler.log.error(e.getMessage(), e);
-            System.out.println("error: " + filename + ". " + e);
+        } catch(Exception e) {
+            Logger.getGlobal().log(Level.SEVERE, e.getMessage(), e);
         }
 
         final String VERTEX = Gdx.files.internal("data/shaders/drop_shader.vert").readString();
@@ -211,140 +208,20 @@ public class GameWorld extends Stage {
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
 
-        createUI();
+        tableUI = new GameUI(this, skin);
+
+        actionButton = tableUI.actionButton;
+        arrowUpButton = tableUI.arrowUpButton;
+        arrowDownButton = tableUI.arrowDownButton;
+        arrowLeftButton = tableUI.arrowLeftButton;
+        arrowRightButton = tableUI.arrowRightButton;
+        addActor(tableUI);
+        showHintWindow();
 
         if(name.startsWith("level"))
             setWinHint(I18nManager.getString("LEVEL" + levelNumber + "_HINT"));
         else
             setWinHint(I18nManager.getString("TEST_HINT"));
-    }
-
-    private void createUI() {
-        tableUI = new Table();
-        tableUI.setFillParent(true);
-        tableUI.debug();
-        addActor(tableUI);
-
-        Button hintButton = new TextButton(I18nManager.getString("HINT"), skin);
-        hintButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                showHintWindow();
-            }
-        });
-        tableUI.add(hintButton).left();
-
-        Button menuButton = new TextButton(I18nManager.getString("MAIN_MENU"), skin);
-        menuButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                showWinnerWindow();
-            }
-        });
-        tableUI.add(menuButton).right().top();
-
-        /*if(cloud == null && emitter == null)
-            return;*/
-
-        tableUI.row();
-
-        tableUI.add().expand();
-
-        tableUI.row();
-
-        Table controlButtonsTable = new Table();
-        controlButtonsTable.debug();
-        tableUI.add(controlButtonsTable).left();
-        Sprite arrowLeftSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
-        Sprite arrowDownSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
-        Sprite arrowRightSprite = TextureManager.getSpriteFromDefaultAtlas("arrow");
-        actionButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("button")));
-        arrowUpButton = new ImageButton(new SpriteDrawable(TextureManager.getSpriteFromDefaultAtlas("arrow")));
-        arrowDownButton = new ImageButton(new SpriteDrawable(arrowDownSprite));
-        arrowLeftButton = new ImageButton(new SpriteDrawable(arrowLeftSprite));
-        arrowRightButton = new ImageButton(new SpriteDrawable(arrowRightSprite));
-        actionButton.setVisible(false);
-        arrowUpButton.setVisible(false);
-        arrowDownButton.setVisible(false);
-        arrowLeftButton.setVisible(false);
-        arrowRightButton.setVisible(false);
-        arrowLeftButton.getImage().setOrigin(arrowLeftSprite.getWidth() / 2, arrowLeftSprite.getHeight() / 2);
-        arrowDownButton.getImage().setOrigin(arrowLeftSprite.getWidth() / 2, arrowLeftSprite.getHeight() / 2);
-        arrowRightButton.getImage().setOrigin(arrowLeftSprite.getWidth() / 2, arrowLeftSprite.getHeight() / 2);
-        arrowLeftButton.getImage().setRotation(90);
-        arrowDownButton.getImage().setRotation(180);
-        arrowRightButton.getImage().setRotation(-90);
-        controlButtonsTable.setFillParent(true);
-        controlButtonsTable.bottom();
-        controlButtonsTable.defaults().width(100).height(100);
-        controlButtonsTable.add(arrowUpButton).colspan(3);
-        controlButtonsTable.row();
-        controlButtonsTable.add(arrowLeftButton);
-        controlButtonsTable.add(arrowDownButton);
-        controlButtonsTable.add(arrowRightButton);
-        controlButtonsTable.add(actionButton).expandX().right();
-        arrowLeftButton.addListener(new ClickListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                handleAction(Input.Keys.LEFT, false);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                handleAction(Input.Keys.LEFT, true);
-                return true;
-            }
-        });
-        arrowRightButton.addListener(new ClickListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                handleAction(Input.Keys.RIGHT, false);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                handleAction(Input.Keys.RIGHT, true);
-                return true;
-            }
-        });
-        arrowUpButton.addListener(new ClickListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                handleAction(Input.Keys.UP, false);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                handleAction(Input.Keys.UP, true);
-                return true;
-            }
-        });
-        arrowDownButton.addListener(new ClickListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                handleAction(Input.Keys.DOWN, false);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                handleAction(Input.Keys.DOWN, true);
-                return true;
-            }
-        });
-        actionButton.addListener(new ClickListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                handleAction(Input.Keys.SPACE, false);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                handleAction(Input.Keys.SPACE, true);
-                return true;
-            }
-        });
-
-        showHintWindow();
     }
 
     public void add(SimpleActor actor) {
@@ -379,8 +256,8 @@ public class GameWorld extends Stage {
             tableUI.toFront();
         if(hintWindow != null)
             hintWindow.toFront();
-        if(winnerWindow != null)
-            winnerWindow.toFront();
+        if(menuWindow != null)
+            menuWindow.toFront();
     }
 
     public void createWorld() {
@@ -438,11 +315,11 @@ public class GameWorld extends Stage {
 
         if(luaOnCheckFunc != null && luaOnCheckFunc.call().toboolean(1) && !wonGame) {
             wonGame = true;
-            showWinnerWindow();
+            showMenuWindow();
         }
 
-        if(dropList.size() < dropsMax && winnerWindow == null && !hintWindow.isVisible()) {
-            if((itRain || emitter != null && emitter.isAutoFire()) &&
+        if(dropList.size() < MAX_DROPS) {
+            if((itRain && isControllable() || emitter != null && emitter.isAutoFire()) &&
                     !wonGame && (emitter != null || cloud != null) &&
                     time - timeLastDrop > 0.01) {
                 Drop drop = new Drop(dropsColorMixing);
@@ -455,7 +332,7 @@ public class GameWorld extends Stage {
                 timeLastDrop = time;
             }
 
-            if(drawingDrops && time - timeLastDrop > 0.04) {
+            if(isControllable() && drawingDrops && time - timeLastDrop > 0.04) {
                 boolean inZone = drawingZones.isEmpty();
                 for(Zone zone : drawingZones) {
                     if(zone.rectangle.contains(cursorPosition)) {
@@ -503,100 +380,32 @@ public class GameWorld extends Stage {
         dropsToPreDelete.clear();
     }
 
-    private void showHintWindow() {
+    public void showHintWindow() {
         if(hintWindow != null) {
             hintWindow.setVisible(true);
+            hintWindow.toFront();
             return;
         }
 
-        hintWindow = new Window(I18nManager.getString("HINT"), skin);
-        hintWindow.setSize(GameViewport.WIDTH / 1.5f, GameViewport.HEIGHT / 1.5f);
-        hintWindow.setPosition(GameViewport.WIDTH / 2f - hintWindow.getWidth() / 2f,
-                GameViewport.HEIGHT / 2f - hintWindow.getHeight() / 2f);
-        hintWindow.setModal(true);
-        hintWindow.setMovable(false);
-        hintWindow.setKeepWithinStage(false);
-        hintWindow.debug();
+        hintWindow = new HintWindow(skin);
         addActor(hintWindow);
-
-        hintWindow.row().width(400).padTop(10);
-
-        hintLabel = new Label("", skin);
-        hintLabel.setAlignment(Align.center);
-        hintLabel.setWrap(true);
-        hintWindow.add(hintLabel);
-
-        hintWindow.row().width(400).padTop(10);
-
-        final TextButton closeButton = new TextButton(I18nManager.getString("CLOSE"), skin);
-        hintWindow.add(closeButton);
-
-        closeButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                hintWindow.setVisible(false);
-            }
-        });
+        hintLabel = hintWindow.hintLabel;
 
         hintWindow.toFront();
     }
 
-    private void showWinnerWindow() {
-        if(winnerWindow != null)
+    public void showMenuWindow() {
+        if(menuWindow != null) {
+            menuWindow.update(wonGame);
+            menuWindow.setVisible(true);
+            menuWindow.toFront();
             return;
+        }
 
-        winnerWindow = new Window(wonGame ? I18nManager.getString("VICTORY") + "!" : I18nManager.getString("MENU"), skin);
-        winnerWindow.setSize(GameViewport.WIDTH / 1.5f, GameViewport.HEIGHT / 1.5f);
-        winnerWindow.setPosition(GameViewport.WIDTH / 2f - winnerWindow.getWidth() / 2f,
-                GameViewport.HEIGHT / 2f - winnerWindow.getHeight() / 2f);
-        winnerWindow.setModal(true);
-        winnerWindow.setMovable(false);
-        winnerWindow.setKeepWithinStage(false);
-        winnerWindow.debug();
-        addActor(winnerWindow);
+        menuWindow = new MenuWindow(wonGame, skin, levelNumber);
+        addActor(menuWindow);
 
-        winnerWindow.row().width(400).padTop(10);
-
-        final TextButton nextOrContinueButton = new TextButton(I18nManager.getString(!wonGame ? "CONTINUE" : "NEXT"), skin);
-        winnerWindow.add(nextOrContinueButton);
-
-        winnerWindow.row().width(400).padTop(10);
-
-        final TextButton restartButton = new TextButton(I18nManager.getString("RESTART"), skin);
-        winnerWindow.add(restartButton);
-
-        winnerWindow.row().width(400).padTop(10);
-
-        final TextButton mainMenuButton = new TextButton(I18nManager.getString("LEVELS"), skin);
-        winnerWindow.add(mainMenuButton);
-
-        nextOrContinueButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if(wonGame)
-                    RainGame.getInstance().setLevel("level" + (levelNumber + 1));
-                else {
-                    winnerWindow.remove();
-                    winnerWindow = null;
-                }
-            }
-        });
-
-        restartButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                RainGame.getInstance().setLevel("level" + levelNumber);
-            }
-        });
-
-        mainMenuButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                RainGame.getInstance().setMenu(new LevelsMenuScreen());
-            }
-        });
-
-        winnerWindow.toFront();
+        menuWindow.toFront();
     }
 
     public World getPhysicsWorld() {
@@ -605,6 +414,9 @@ public class GameWorld extends Stage {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if(!isControllable())
+            return super.touchDown(screenX, screenY, pointer, button);
+
         cursorPosition = getCursorPosition(screenX, screenY).cpy();
         if(pressingAction == TouchType.NONE) {
             if(clickListener != null)
@@ -692,7 +504,7 @@ public class GameWorld extends Stage {
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         boolean result = super.touchDragged(screenX, screenY, pointer);
 
-        if(winnerWindow != null)
+        if(menuWindow != null)
             return true;
 
         if(cursorPosition != null) {
@@ -705,7 +517,7 @@ public class GameWorld extends Stage {
             }
         }
 
-        if(wonGame || cloud != null || emitter != null || dropList.size() > dropsMax)
+        if(wonGame || cloud != null || emitter != null || dropList.size() > MAX_DROPS)
             return true;
 
         return result;
@@ -727,9 +539,9 @@ public class GameWorld extends Stage {
         else if(keyCode == Input.Keys.F7 || keyCode == Input.Keys.S)
             useShader = !useShader;
         else if(keyCode == Input.Keys.ESCAPE || keyCode == Input.Keys.Q || keyCode == Input.Keys.BACK) {
-            if(winnerWindow != null)
+            if(menuWindow != null)
                 RainGame.getInstance().setMenu(new MainMenuScreen());
-            showWinnerWindow();
+            showMenuWindow();
         } else if(keyCode == Input.Keys.LEFT || keyCode == Input.Keys.RIGHT || keyCode == Input.Keys.UP ||
                 keyCode == Input.Keys.DOWN || keyCode == Input.Keys.SPACE)
             handleAction(keyCode, true);
@@ -746,14 +558,18 @@ public class GameWorld extends Stage {
         return true;
     }
 
-    private void handleAction(int keyCode, boolean pressed) {
+    public void handleAction(int keyCode, boolean pressed) {
+        if(!isControllable())
+            return;
+
         if(keyCode == Input.Keys.LEFT) {
             if(cloud != null) {
                 if(pressed) {
                     cloud.setLinearVelocity(new Vector2(-150, 0));
                     cloud.setDirection(1);
                 } else {
-                    cloud.setLinearVelocity(new Vector2(0, 0));
+                    if(cloud.getLinearVelocity().x < 0)
+                        cloud.setLinearVelocity(new Vector2(0, 0));
                     cloud.setDirection(0);
                 }
             }
@@ -763,23 +579,28 @@ public class GameWorld extends Stage {
                     cloud.setLinearVelocity(new Vector2(150, 0));
                     cloud.setDirection(2);
                 } else {
-                    cloud.setLinearVelocity(new Vector2(0, 0));
+                    if(cloud.getLinearVelocity().x > 0)
+                        cloud.setLinearVelocity(new Vector2(0, 0));
                     cloud.setDirection(0);
                 }
             }
         } else if(keyCode == Input.Keys.UP) {
             if(emitter != null) {
-                if(pressed)
+                if(pressed) {
                     emitter.setLinearVelocity(new Vector2(0, 150));
-                else
-                    emitter.setLinearVelocity(new Vector2(0, 0));
+                } else {
+                    if(emitter.getLinearVelocity().y > 0)
+                        emitter.setLinearVelocity(new Vector2(0, 0));
+                }
             }
         } else if(keyCode == Input.Keys.DOWN) {
             if(emitter != null) {
-                if(pressed)
+                if(pressed) {
                     emitter.setLinearVelocity(new Vector2(0, -150));
-                else
-                    emitter.setLinearVelocity(new Vector2(0, 0));
+                } else {
+                    if(emitter.getLinearVelocity().y < 0)
+                        emitter.setLinearVelocity(new Vector2(0, 0));
+                }
             }
         } else if(keyCode == Input.Keys.SPACE) {
             if(pressed) {
@@ -879,8 +700,8 @@ public class GameWorld extends Stage {
 
         if(debugRendererEnabled) {
             RainGame.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            if(winnerWindow != null)
-                winnerWindow.drawDebug(RainGame.shapeRenderer);
+            if(menuWindow != null)
+                menuWindow.drawDebug(RainGame.shapeRenderer);
             if(hintWindow != null)
                 hintWindow.drawDebug(RainGame.shapeRenderer);
             if(tableUI != null)
@@ -1095,5 +916,9 @@ public class GameWorld extends Stage {
             if(dx > x && dx < x + width && dy > y && dy < y + height)
                 dropsToPreDelete.add(i);
         }
+    }
+
+    private boolean isControllable() {
+        return (menuWindow == null || !menuWindow.isVisible()) && !hintWindow.isVisible();
     }
 }

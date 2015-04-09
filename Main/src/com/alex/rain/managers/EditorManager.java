@@ -37,6 +37,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EditorManager {
     private EditableGameWorld stage;
@@ -89,8 +91,8 @@ public class EditorManager {
 
             GameContactListener contactListener = new GameContactListener(luaOnBeginContactFunc, luaOnEndContactFunc, stage.getGameActors());
             stage.getPhysicsWorld().setContactListener(contactListener);
-        } catch (Exception e) {
-            System.out.println("error: " + text + ". " + e);
+        } catch(Exception e) {
+            Logger.getGlobal().log(Level.WARNING, e.getMessage(), e);
         }
 
         String accumStr = file.readString();
@@ -173,7 +175,7 @@ public class EditorManager {
             stage.setSelectedActor(sa);
             stage.add(sa);
         } catch(Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().log(Level.WARNING, e.getMessage(), e);
         }
 
         return sa;
