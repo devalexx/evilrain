@@ -14,6 +14,7 @@
 package com.alex.rain.screens;
 
 import com.alex.rain.RainGame;
+import com.alex.rain.managers.SoundManager;
 import com.alex.rain.managers.TextureManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -29,6 +30,7 @@ public class SplashScreen extends BasicUIScreen {
 
     public SplashScreen() {
         super();
+        SoundManager.playMusic(SoundManager.MENU_MUSIC);
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         autoStartTimer.scheduleTask(new Timer.Task() {
             @Override

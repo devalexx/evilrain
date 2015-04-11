@@ -13,15 +13,15 @@
  ******************************************************************************/
 package com.alex.rain.screens;
 
+import com.alex.rain.managers.SoundManager;
 import com.alex.rain.stages.GameWorld;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 
 public class GameScreen extends BasicUIScreen {
     private GameWorld world;
 
     public GameScreen(GameWorld world) {
         super(world);
+        SoundManager.playMusic(SoundManager.GAME_MUSIC);
         this.world = world;
     }
 

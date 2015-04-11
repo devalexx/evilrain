@@ -6,84 +6,91 @@ filter: Nearest,Nearest
 repeat: none
 arrow
   rotate: false
-  xy: 804, 686
+  xy: 132, 190
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 background
   rotate: false
-  xy: 804, 664
+  xy: 2, 2
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
 button
   rotate: false
-  xy: 934, 816
-  size: 64, 64
-  orig: 64, 64
+  xy: 804, 746
+  size: 90, 90
+  orig: 90, 90
   offset: 0, 0
   index: -1
 cloud
   rotate: false
-  xy: 2, 198
+  xy: 2, 256
   size: 600, 200
   orig: 600, 200
   offset: 0, 0
   index: -1
 drop
   rotate: false
-  xy: 604, 264
+  xy: 896, 804
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 emitter
   rotate: false
-  xy: 2, 2
+  xy: 604, 262
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 game_button_off
   rotate: false
-  xy: 132, 132
+  xy: 734, 392
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 game_button_on
   rotate: false
-  xy: 638, 334
+  xy: 804, 680
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 grass
   rotate: false
-  xy: 2, 400
+  xy: 2, 458
   size: 800, 480
   orig: 800, 480
   offset: 0, 0
   index: -1
 hammer
   rotate: false
-  xy: 804, 752
+  xy: 2, 126
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 home1
   rotate: false
-  xy: 604, 298
+  xy: 2, 24
   size: 32, 100
   orig: 32, 100
   offset: 0, 0
   index: -1
+home2
+  rotate: false
+  xy: 804, 838
+  size: 200, 100
+  orig: 200, 100
+  offset: 0, 0
+  index: -1
 zone
   rotate: false
-  xy: 2, 68
+  xy: 604, 328
   size: 128, 128
   orig: 128, 128
   offset: 0, 0

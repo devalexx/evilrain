@@ -15,17 +15,14 @@ package com.alex.rain.stages;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.listeners.GameContactListener;
-import com.alex.rain.managers.I18nManager;
-import com.alex.rain.managers.ResourceManager;
-import com.alex.rain.managers.SettingsManager;
-import com.alex.rain.managers.TextureManager;
+import com.alex.rain.managers.*;
 import com.alex.rain.mics.ColorAndCount;
 import com.alex.rain.models.*;
 import com.alex.rain.renderer.ParticleRenderer;
 import com.alex.rain.screens.MainMenuScreen;
 import com.alex.rain.ui.GameUI;
-import com.alex.rain.ui.MenuWindow;
 import com.alex.rain.ui.HintWindow;
+import com.alex.rain.ui.MenuWindow;
 import com.alex.rain.viewports.GameViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -50,14 +47,15 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import finnstr.libgdx.liquidfun.ParticleDebugRenderer;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 import finnstr.libgdx.liquidfun.ParticleSystemDef;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.script.LuaScriptEngine;
-import sun.rmi.runtime.Log;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -66,7 +64,6 @@ import javax.script.SimpleBindings;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.*;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -318,12 +315,14 @@ public class GameWorld extends Stage {
 
         if(luaOnCheckFunc != null && luaOnCheckFunc.call().toboolean(1) && !wonGame) {
             wonGame = true;
+            itRain = false;
+            drawingDrops = false;
             showMenuWindow();
         }
 
         if(dropList.size() < MAX_DROPS) {
             if((itRain && isControllable() || emitter != null && emitter.isAutoFire()) &&
-                    !wonGame && (emitter != null || cloud != null) &&
+                    (emitter != null || cloud != null) &&
                     time - timeLastDrop > 0.01) {
                 Drop drop = new Drop(dropsColorMixing);
                 Random r = new Random();
@@ -355,6 +354,12 @@ public class GameWorld extends Stage {
                 }
             }
         }
+
+        if(!dropsToCreate.isEmpty())
+            SoundManager.playWaterSound();
+
+        if(!itRain && !drawingDrops && (emitter == null || !emitter.isAutoFire()))
+            SoundManager.stopWaterSound();
 
         if(pressingAction == TouchType.PICKING_DROPS && cursorPosition != null && selectedDrops != null) {
             for(int i = 0, selectedDropsSize = selectedDrops.size(); i < selectedDropsSize; i++) {
@@ -399,14 +404,7 @@ public class GameWorld extends Stage {
             return;
         }
 
-        hintWindow = new Window(I18nManager.getString("HINT"), skin);
-        hintWindow.setSize(GameViewport.WIDTH / 1.5f, GameViewport.HEIGHT / 1.5f);
-        hintWindow.setPosition(GameViewport.WIDTH / 2f - hintWindow.getWidth() / 2f,
-                GameViewport.HEIGHT / 2f - hintWindow.getHeight() / 2f);
-        hintWindow.setModal(true);
-        hintWindow.setMovable(false);
-        hintWindow.setKeepWithinStage(false);
-        hintWindow.debug();
+        hintWindow = new HintWindow(skin);
         addActor(hintWindow);
         hintLabel = hintWindow.hintLabel;
 
@@ -421,15 +419,8 @@ public class GameWorld extends Stage {
             return;
         }
 
-        winnerWindow = new Window(wonGame ? I18nManager.getString("VICTORY") + "!" : I18nManager.getString("MENU"), skin);
-        winnerWindow.setSize(GameViewport.WIDTH / 1.5f, GameViewport.HEIGHT / 1.5f);
-        winnerWindow.setPosition(GameViewport.WIDTH / 2f - winnerWindow.getWidth() / 2f,
-                GameViewport.HEIGHT / 2f - winnerWindow.getHeight() / 2f);
-        winnerWindow.setModal(true);
-        winnerWindow.setMovable(false);
-        winnerWindow.setKeepWithinStage(false);
-        winnerWindow.debug();
-        addActor(winnerWindow);
+        menuWindow = new MenuWindow(wonGame, skin, levelNumber);
+        addActor(menuWindow);
 
         menuWindow.toFront();
     }
@@ -596,22 +587,26 @@ public class GameWorld extends Stage {
             if(cloud != null) {
                 if(pressed) {
                     cloud.setLinearVelocity(new Vector2(-150, 0));
-                    cloud.setDirection(1);
+                    if(cloud.getDirection() != -1)
+                        cloud.setDirection(1);
                 } else {
                     if(cloud.getLinearVelocity().x < 0)
                         cloud.setLinearVelocity(new Vector2(0, 0));
-                    cloud.setDirection(0);
+                    if(cloud.getDirection() != -1)
+                        cloud.setDirection(0);
                 }
             }
         } else if(keyCode == Input.Keys.RIGHT) {
             if(cloud != null) {
                 if(pressed) {
                     cloud.setLinearVelocity(new Vector2(150, 0));
-                    cloud.setDirection(2);
+                    if(cloud.getDirection() != -1)
+                        cloud.setDirection(2);
                 } else {
                     if(cloud.getLinearVelocity().x > 0)
                         cloud.setLinearVelocity(new Vector2(0, 0));
-                    cloud.setDirection(0);
+                    if(cloud.getDirection() != -1)
+                        cloud.setDirection(0);
                 }
             }
         } else if(keyCode == Input.Keys.UP) {

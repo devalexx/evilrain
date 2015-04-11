@@ -45,7 +45,7 @@ end
 function onCheck()
     local count = world:dropsInRect(148, 241, 155, 147)
 
-    if count > 10 and count == world:getDropsCount() then
+    if count > 20 and count == world:getDropsCount() then
         return true
     else
         return false

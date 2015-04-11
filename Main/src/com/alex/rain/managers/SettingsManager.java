@@ -22,6 +22,8 @@ import java.util.Locale;
 public class SettingsManager {
     static String LOCALE_SETTING = "locale";
     static String HIGH_GRAPHICS_SETTING = "hi_graph";
+    static String SMOOTH_TEXTURES_SETTING = "smooth_textures";
+    static String SOUND_SETTING = "sound";
     static String MAX_COMPLETED_LEVEL = "max_completed_lvl";
 
     public static String availableLanguages[] = {"en", "ru"};
@@ -50,10 +52,28 @@ public class SettingsManager {
         TextureManager.setLinearFilter(state);
     }
 
-    public static boolean getHighGraphics() {
-        return prefs.getBoolean(HIGH_GRAPHICS_SETTING, true);
     public static boolean isHighGraphics() {
         return prefs.getBoolean(HIGH_GRAPHICS_SETTING, true);
+    }
+
+    public static void setSmoothTextures(boolean state) {
+        prefs.putBoolean(SMOOTH_TEXTURES_SETTING, state);
+
+        TextureManager.setLinearFilter(state);
+    }
+
+    public static boolean isSmoothTextures() {
+        return prefs.getBoolean(SMOOTH_TEXTURES_SETTING, true);
+    }
+
+    public static void setSound(boolean state) {
+        prefs.putBoolean(SOUND_SETTING, state);
+
+        SoundManager.setSound(state);
+    }
+
+    public static boolean hasSound() {
+        return prefs.getBoolean(SOUND_SETTING, true);
     }
 
     public static void setMaxCompletedLevel(int level) {

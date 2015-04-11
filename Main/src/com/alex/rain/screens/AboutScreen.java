@@ -15,28 +15,22 @@ package com.alex.rain.screens;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.managers.I18nManager;
-import com.alex.rain.managers.SettingsManager;
 import com.alex.rain.managers.SoundManager;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
-import java.io.File;
-import java.io.FilenameFilter;
-
-public class LevelsMenuScreen extends BasicUIScreen {
-    public LevelsMenuScreen() {
+public class AboutScreen extends BasicUIScreen {
+    public AboutScreen() {
         super();
         SoundManager.playMusic(SoundManager.MENU_MUSIC);
 
         final Table table = new Table();
         final Table scrollPaneTable = new Table();
-        scrollPaneTable.defaults().width(400).padTop(10);
         ScrollPane scrollPane = new ScrollPane(scrollPaneTable, skin);
         mainUI = table;
         table.setFillParent(true);
@@ -46,46 +40,17 @@ public class LevelsMenuScreen extends BasicUIScreen {
         final TextButton buttonBackTop = new TextButton(I18nManager.getString("BACK"), skin);
         table.add(buttonBackTop).left().width(200);
 
-        Label gameLabel = new Label(I18nManager.getString("LEVELS"), skin);
+        Label gameLabel = new Label(I18nManager.getString("ABOUT"), skin);
         table.add(gameLabel).left();
 
         table.row();
 
         table.add(scrollPane).colspan(2).expand().fill();
 
-        FileHandle[] levels = Gdx.files.internal("data/levels").list(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.startsWith("level");
-            }
-        });
-
-        for(int i = 1; i < levels.length + 1; i++) {
-            final TextButton button1 = new TextButton(I18nManager.getString("LEVEL") + " " + String.valueOf(i), skin);
-            scrollPaneTable.add(button1);
-
-            scrollPaneTable.row();
-
-            final String level = "level" + String.valueOf(i);
-            button1.addListener(new ChangeListener() {
-                @Override
-                public void changed (ChangeEvent event, Actor actor) {
-                    RainGame.getInstance().setLevel(level);
-                }
-            });
-            button1.setDisabled(i > SettingsManager.getMaxCompletedLevel() + 1);
-            skin.setEnabled(button1, i <= SettingsManager.getMaxCompletedLevel() + 1);
-        }
-
-        final TextButton button0 = new TextButton(I18nManager.getString("TEST") + " " + I18nManager.getString("LEVEL"), skin);
-        scrollPaneTable.add(button0).padBottom(10);
-
-        button0.addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                RainGame.getInstance().setLevel("test");
-            }
-        });
+        Label aboutLabel = new Label(I18nManager.getString("ABOUT_TEXT"), skin);
+        aboutLabel.setWrap(true);
+        aboutLabel.setAlignment(Align.center);
+        scrollPaneTable.add(aboutLabel).expand();
 
         buttonBackTop.addListener(new ChangeListener() {
             @Override

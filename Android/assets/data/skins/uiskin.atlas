@@ -200,15 +200,15 @@ white
   index: -1
 button
   rotate: false
-  xy: 0, 448
-  size: 64, 64
-  orig: 64, 64
+  xy: 0, 416
+  size: 96, 96
+  orig: 96, 96
   offset: 0, 0
   index: -1
 arrow
     rotate: false
-    xy: 64, 448
-    size: 64, 64
-    orig: 64, 64
+    xy: 96, 416
+    size: 96, 96
+    orig: 96, 96
     offset: 0, 0
     index: -1

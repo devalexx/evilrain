@@ -25,7 +25,7 @@ function onCreate()
     ground:addVertex(8, 48)
     world:add(ground)
 
-    dynamicActor = luajava.new(House)
+    dynamicActor = luajava.new(House, 2)
     dynamicActor:setBodyBox(200, 100)
     dynamicActor:setSpriteBox(200, 100)
     dynamicActor:setBodyType(KINEMATIC_BODY)

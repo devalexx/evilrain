@@ -23,7 +23,11 @@ import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class House extends SimpleActor {
     public House() {
-        sprite = TextureManager.getSpriteFromDefaultAtlas("home1");
+        this(1);
+    }
+
+    public House(int n) {
+        sprite = TextureManager.getSpriteFromDefaultAtlas("home" + n);
         setBodyBox(32, 100);
         type = TYPE.HOUSE;
     }

@@ -13,10 +13,10 @@
  ******************************************************************************/
 package com.alex.rain;
 
+import com.alex.rain.managers.SettingsManager;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.screens.GameScreen;
 import com.alex.rain.screens.SplashScreen;
-import com.alex.rain.stages.EditableGameWorld;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
@@ -34,6 +34,7 @@ public class RainGame extends Game {
     static boolean lightVersion = true;
     public static PolygonSpriteBatch polyBatch;
     public static ShapeRenderer shapeRenderer;
+    public final static String VERSION = "0.1";
 
     private RainGame() {
     }
@@ -59,6 +60,7 @@ public class RainGame extends Game {
         setScreen(new GameScreen(gameWorld));*/
         setScreen(new SplashScreen());
         Gdx.gl.glClearColor(0, 0, 0, 0);
+        TextureManager.setLinearFilter(SettingsManager.isSmoothTextures());
     }
 
     @Override

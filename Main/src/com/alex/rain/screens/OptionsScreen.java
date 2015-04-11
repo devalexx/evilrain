@@ -16,6 +16,7 @@ package com.alex.rain.screens;
 import com.alex.rain.RainGame;
 import com.alex.rain.managers.I18nManager;
 import com.alex.rain.managers.SettingsManager;
+import com.alex.rain.managers.SoundManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -25,6 +26,7 @@ import java.util.Locale;
 public class OptionsScreen extends BasicUIScreen {
     public OptionsScreen() {
         super();
+        SoundManager.playMusic(SoundManager.MENU_MUSIC);
 
         final Table table = new Table();
         final Table innerTable = new Table();
@@ -58,12 +60,21 @@ public class OptionsScreen extends BasicUIScreen {
 
         innerTable.row();
 
-        Label checkboxLabel = new Label(I18nManager.getString("HIGH_GRAPHICS"), skin);
-        innerTable.add(checkboxLabel).left();
+        Label checkboxGraphicsLabel = new Label(I18nManager.getString("HIGH_GRAPHICS"), skin);
+        innerTable.add(checkboxGraphicsLabel).left();
 
         final CheckBox graphicsCheckBox = new CheckBox("", skin);
         graphicsCheckBox.setChecked(SettingsManager.isHighGraphics());
         innerTable.add(graphicsCheckBox).expand().fill();
+
+        innerTable.row();
+
+        Label checkboxSmoothLabel = new Label(I18nManager.getString("SMOOTH_TEXTURES"), skin);
+        innerTable.add(checkboxSmoothLabel).left();
+
+        final CheckBox smoothCheckBox = new CheckBox("", skin);
+        smoothCheckBox.setChecked(SettingsManager.isSmoothTextures());
+        innerTable.add(smoothCheckBox).expand().fill();
 
         innerTable.row();
 
@@ -76,6 +87,7 @@ public class OptionsScreen extends BasicUIScreen {
                 SettingsManager.setLanguage(new Locale(I18nManager.availableLanguages[languageSelect.getSelectedIndex()]));
                 //SettingsManager.setSound(soundCheckBox.isChecked());
                 SettingsManager.setHighGraphics(graphicsCheckBox.isChecked());
+                SettingsManager.setSmoothTextures(smoothCheckBox.isChecked());
                 RainGame.getInstance().setScreen(new MainMenuScreen());
                 SettingsManager.save();
             }

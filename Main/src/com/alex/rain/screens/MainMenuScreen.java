@@ -15,17 +15,24 @@ package com.alex.rain.screens;
 
 import com.alex.rain.RainGame;
 import com.alex.rain.managers.I18nManager;
+import com.alex.rain.managers.SettingsManager;
+import com.alex.rain.managers.SoundManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class MainMenuScreen extends BasicUIScreen {
+    int c = 0;
+
     public MainMenuScreen() {
         super();
+        SoundManager.playMusic(SoundManager.MENU_MUSIC);
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
         final Table table = new Table();
@@ -34,7 +41,7 @@ public class MainMenuScreen extends BasicUIScreen {
         stage.addActor(table);
 
         Label gameLabel = new Label(I18nManager.getString("GAME_NAME"), skin);
-        table.add(gameLabel);
+        table.add(gameLabel).expand();
 
         table.row().width(400).padTop(10);
 
@@ -50,9 +57,19 @@ public class MainMenuScreen extends BasicUIScreen {
 
         table.row().width(400).padTop(10);
 
+        final TextButton aboutButton = new TextButton(I18nManager.getString("ABOUT"), skin);
+        table.add(aboutButton);
+
+        table.row().width(400).padTop(10);
+
         final TextButton button3 = new TextButton(I18nManager.getString("QUIT"), skin);
         table.add(button3);
         button3.setPosition(0, 100);
+
+        table.row().padTop(10);
+
+        Label versionLabel = new Label(RainGame.VERSION, skin);
+        table.add(versionLabel).expand().right().bottom();
 
         button.addListener(new ChangeListener() {
             @Override
@@ -72,6 +89,22 @@ public class MainMenuScreen extends BasicUIScreen {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 Gdx.app.exit();
+            }
+        });
+
+        aboutButton.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                RainGame.getInstance().setScreen(new AboutScreen());
+            }
+        });
+
+        gameLabel.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                if(c++ > 10)
+                    SettingsManager.setMaxCompletedLevel(1000);
             }
         });
     }
