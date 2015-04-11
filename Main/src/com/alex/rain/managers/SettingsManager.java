@@ -26,7 +26,7 @@ public class SettingsManager {
 
     public static String availableLanguages[] = {"en", "ru"};
 
-    static Preferences prefs = Gdx.app.getPreferences("BlindMrS");
+    static Preferences prefs = Gdx.app.getPreferences("EvilRain");
 
     public static void setLanguage(Locale locale) {
         prefs.putString(LOCALE_SETTING, locale.getLanguage());
@@ -50,6 +50,8 @@ public class SettingsManager {
         TextureManager.setLinearFilter(state);
     }
 
+    public static boolean getHighGraphics() {
+        return prefs.getBoolean(HIGH_GRAPHICS_SETTING, true);
     public static boolean isHighGraphics() {
         return prefs.getBoolean(HIGH_GRAPHICS_SETTING, true);
     }

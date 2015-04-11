@@ -30,8 +30,8 @@ function onCreate()
     world:add(ground)
 
     counter = 0
-    for i = 15, 25 do
-        for j = 9, 18 do
+    for i = 13, 27 do
+        for j = 9, 19 do
             local drop = luajava.new(Drop)
             drop:setPosition(luajava.new(Vector2, i * 10 + 20, j * 10 + 20))
             if i < 20 then
