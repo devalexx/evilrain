@@ -78,6 +78,15 @@ public class OptionsScreen extends BasicUIScreen {
 
         innerTable.row();
 
+        Label checkboxSoundLabel = new Label(I18nManager.getString("SOUND"), skin);
+        innerTable.add(checkboxSoundLabel).left();
+
+        final CheckBox soundCheckBox = new CheckBox("", skin);
+        soundCheckBox.setChecked(SettingsManager.hasSound());
+        innerTable.add(soundCheckBox).expand().fill();
+
+        innerTable.row();
+
         final TextButton saveButton = new TextButton(I18nManager.getString("SAVE"), skin);
         innerTable.add(saveButton).center().width(200).padTop(40).colspan(2);
 
@@ -85,7 +94,7 @@ public class OptionsScreen extends BasicUIScreen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 SettingsManager.setLanguage(new Locale(I18nManager.availableLanguages[languageSelect.getSelectedIndex()]));
-                //SettingsManager.setSound(soundCheckBox.isChecked());
+                SettingsManager.setSound(soundCheckBox.isChecked());
                 SettingsManager.setHighGraphics(graphicsCheckBox.isChecked());
                 SettingsManager.setSmoothTextures(smoothCheckBox.isChecked());
                 RainGame.getInstance().setScreen(new MainMenuScreen());

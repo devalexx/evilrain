@@ -125,7 +125,7 @@ public class GameWorld extends Stage {
     private boolean itRain;
     private int levelNumber = 0;
     private String winHint;
-    private int MAX_DROPS = 1500;
+    private int MAX_DROPS = 2000;
     private boolean physicsEnabled = true;
     private boolean liquidForcesEnabled = true;
     private boolean useShader = SettingsManager.isHighGraphics();
@@ -159,8 +159,10 @@ public class GameWorld extends Stage {
 
         try {
             //Reader reader = new FileReader(filename);
-            if(!Gdx.files.internal(filename).exists())
+            if(!Gdx.files.internal(filename).exists()) {
                 filename = "data/levels/test.lua";
+                levelNumber = 0;
+            }
             Reader reader = new StringReader(
                     Gdx.files.internal(filenameMain).readString() + Gdx.files.internal(filename).readString());
             cs = ((Compilable)engine).compile(reader);
@@ -218,7 +220,7 @@ public class GameWorld extends Stage {
         addActor(tableUI);
         showHintWindow();
 
-        if(name.startsWith("level"))
+        if(levelNumber != 0)
             setWinHint(I18nManager.getString("LEVEL" + levelNumber + "_HINT"));
         else
             setWinHint(I18nManager.getString("TEST_HINT"));
@@ -525,7 +527,7 @@ public class GameWorld extends Stage {
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         boolean result = super.touchDragged(screenX, screenY, pointer);
 
-        if(menuWindow != null)
+        if(!isControllable())
             return true;
 
         if(cursorPosition != null) {
