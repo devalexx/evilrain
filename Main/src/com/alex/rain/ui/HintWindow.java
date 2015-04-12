@@ -26,8 +26,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public class HintWindow extends Window {
     public Label hintLabel;
 
-    public HintWindow(Skin skin) {
-        super(I18nManager.getString("HINT"), skin);
+    public HintWindow(Skin skin, int levelNumber) {
+        super(I18nManager.getString("LEVEL") + " " + levelNumber, skin);
         setSize(GameViewport.WIDTH / 1.5f, GameViewport.HEIGHT / 1.5f);
         setPosition(GameViewport.WIDTH / 2f - getWidth() / 2f,
                 GameViewport.HEIGHT / 2f - getHeight() / 2f);

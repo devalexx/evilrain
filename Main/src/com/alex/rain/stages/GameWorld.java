@@ -404,7 +404,7 @@ public class GameWorld extends Stage {
             return;
         }
 
-        hintWindow = new HintWindow(skin);
+        hintWindow = new HintWindow(skin, levelNumber);
         addActor(hintWindow);
         hintLabel = hintWindow.hintLabel;
 
