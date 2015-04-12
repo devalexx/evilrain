@@ -16,6 +16,7 @@ package com.alex.rain.screens;
 import com.alex.rain.RainGame;
 import com.alex.rain.managers.ResourceManager;
 import com.alex.rain.managers.TextureManager;
+import com.alex.rain.stages.BasicStage;
 import com.alex.rain.viewports.GameViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -44,7 +45,7 @@ public class BasicUIScreen implements Screen {
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
         if(createStage) {
-            stage = new Stage(new GameViewport());
+            stage = new BasicStage(new GameViewport());
             Gdx.input.setInputProcessor(stage);
         }
     }

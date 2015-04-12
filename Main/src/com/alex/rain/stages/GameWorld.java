@@ -562,14 +562,14 @@ public class GameWorld extends Stage {
         else if(keyCode == Input.Keys.F7 || keyCode == Input.Keys.S)
             useShader = !useShader;
         else if(keyCode == Input.Keys.ESCAPE || keyCode == Input.Keys.Q || keyCode == Input.Keys.BACK) {
-            if(menuWindow != null)
+            if(menuWindow != null && menuWindow.isVisible())
                 RainGame.getInstance().setMenu(new MainMenuScreen());
             showMenuWindow();
         } else if(keyCode == Input.Keys.LEFT || keyCode == Input.Keys.RIGHT || keyCode == Input.Keys.UP ||
                 keyCode == Input.Keys.DOWN || keyCode == Input.Keys.SPACE)
             handleAction(keyCode, true);
 
-        return false;
+        return super.keyDown(keyCode);
     }
 
     @Override
