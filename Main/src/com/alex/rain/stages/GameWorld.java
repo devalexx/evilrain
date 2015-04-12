@@ -319,6 +319,8 @@ public class GameWorld extends Stage {
             wonGame = true;
             itRain = false;
             drawingDrops = false;
+            if(SettingsManager.getMaxCompletedLevel() < levelNumber)
+                SettingsManager.setMaxCompletedLevel(levelNumber);
             showMenuWindow();
         }
 
