@@ -68,7 +68,7 @@ public class MainMenuScreen extends BasicUIScreen {
 
         table.row().padTop(10);
 
-        Label versionLabel = new Label(RainGame.VERSION, skin);
+        Label versionLabel = new Label("v." + RainGame.VERSION, skin);
         table.add(versionLabel).expand().right().bottom();
 
         button.addListener(new ChangeListener() {

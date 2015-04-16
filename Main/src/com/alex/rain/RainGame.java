@@ -34,7 +34,7 @@ public class RainGame extends Game {
     static boolean lightVersion = true;
     public static PolygonSpriteBatch polyBatch;
     public static ShapeRenderer shapeRenderer;
-    public final static String VERSION = "0.1";
+    public final static String VERSION = "0.1.1";
 
     private RainGame() {
     }
