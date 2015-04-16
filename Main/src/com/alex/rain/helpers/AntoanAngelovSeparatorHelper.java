@@ -82,10 +82,13 @@ public class AntoanAngelovSeparatorHelper implements SeparatorHelper {
             area *= 0.5f;
 
             boolean hasSmallAngle = false;
-            for(k = 0; k < verticesVec.size() - 2; k++) {
-                Vector2 edge1 = new Vector2(verticesVec.get(k+1).cpy().sub(verticesVec.get(k)));
-                Vector2 edge2 = new Vector2(verticesVec.get(k+1).cpy().sub(verticesVec.get(k+2)));
-                if(Math.abs(edge1.angle(edge2)) < 2)
+            for(k = 0; k < verticesVec.size(); k++) {
+                int v1 = k;
+                int v2 = k+1 < verticesVec.size() ? k+1 : (k + 1) - verticesVec.size();
+                int v3 = k+2 < verticesVec.size() ? k+2 : (k + 2) - verticesVec.size();
+                Vector2 edge1 = new Vector2(verticesVec.get(v2).cpy().sub(verticesVec.get(v1)));
+                Vector2 edge2 = new Vector2(verticesVec.get(v2).cpy().sub(verticesVec.get(v3)));
+                if(Math.abs(edge1.angle(edge2)) < 3.6f)
                     hasSmallAngle = true;
             }
             if(verticesVec.size() == 0 || hasSmallAngle || Math.abs(area) < 0.001)
