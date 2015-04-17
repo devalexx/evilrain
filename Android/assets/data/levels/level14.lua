@@ -2,10 +2,10 @@ function addObjects()
     world:setPressingAction(PICKING_BODIES);
     ------------------
     Ground_0 = luajava.new(Ground)
-    Ground_0:addVertex(-8.780487, 19.512192)
+    Ground_0:addVertex(500.780487, 19.512192)
     Ground_0:addVertex(812.683, 21.46341)
     Ground_0:addVertex(812.683, 54.634155)
-    Ground_0:addVertex(-6.8292847, 54.634155)
+    Ground_0:addVertex(500.8292847, 54.634155)
     Ground_0:setPosition(0.0, 0.0)
     Ground_0:setRotation(0.0)
     Ground_0:setName('Ground_0')
@@ -14,14 +14,14 @@ function addObjects()
 
     ------------------
     Ground_1 = luajava.new(Ground)
-    Ground_1:addVertex(47.804867, 165.85364)
+    Ground_1:addVertex(47.804867, 200.85364)
     Ground_1:addVertex(45.85367, 66.34144)
     Ground_1:addVertex(166.82925, 66.34144)
-    Ground_1:addVertex(168.78049, 165.85364)
-    Ground_1:addVertex(145.36583, 165.85364)
+    Ground_1:addVertex(168.78049, 200.85364)
+    Ground_1:addVertex(145.36583, 200.85364)
     Ground_1:addVertex(143.41464, 87.80486)
     Ground_1:addVertex(69.26828, 83.90243)
-    Ground_1:addVertex(71.21951, 165.85364)
+    Ground_1:addVertex(71.21951, 200.85364)
     Ground_1:setPosition(-2.0, -8.0)
     Ground_1:setRotation(0.0)
     Ground_1:setName('Ground_1')
@@ -30,15 +30,15 @@ function addObjects()
 
     ------------------
     Ground_2 = luajava.new(Ground)
-    Ground_2:addVertex(371.7073, 165.85364)
-    Ground_2:addVertex(334.63412, 163.90242)
+    Ground_2:addVertex(371.7073, 200.85364)
+    Ground_2:addVertex(334.63412, 200.90242)
     Ground_2:addVertex(332.68292, 95.60973)
     Ground_2:addVertex(244.87804, 93.658516)
-    Ground_2:addVertex(244.87804, 163.90242)
-    Ground_2:addVertex(219.51218, 161.9512)
+    Ground_2:addVertex(244.87804, 200.90242)
+    Ground_2:addVertex(219.51218, 200.9512)
     Ground_2:addVertex(217.56096, 72.195114)
     Ground_2:addVertex(369.7561, 74.14633)
-    Ground_2:setPosition(-25.0, -15.999998)
+    Ground_2:setPosition(105.0, -15.999998)
     Ground_2:setRotation(0.0)
     Ground_2:setName('Ground_2')
     Ground_2:setVisible(true)
@@ -77,37 +77,37 @@ function addObjects()
     Ground_3:addVertex(570.7317, 349.26828)
     Ground_3:addVertex(555.12195, 323.9024)
     Ground_3:addVertex(529.75604, 298.53656)
-    Ground_3:setPosition(0.0, 0.0)
+    Ground_3:setPosition(0.0, -15.0)
     Ground_3:setRotation(0.0)
     Ground_3:setName('Ground_3')
     Ground_3:setVisible(true)
     Ground_3:setBodyType(DYNAMIC_BODY)
     world:add(Ground_3)
 
-    ------------------
-    Ground_4 = luajava.new(Ground)
-    Ground_4:addVertex(365.85367, 70.24387)
-    Ground_4:addVertex(498.5366, 72.195114)
-    Ground_4:addVertex(500.4878, 218.53656)
-    Ground_4:addVertex(473.17072, 218.53656)
-    Ground_4:addVertex(473.17072, 89.75608)
-    Ground_4:addVertex(389.26828, 91.7073)
-    Ground_4:addVertex(395.12192, 216.58533)
-    Ground_4:addVertex(369.7561, 216.58533)
-    Ground_4:setPosition(2.0, -14.0)
-    Ground_4:setRotation(0.0)
-    Ground_4:setName('Ground_4')
-    Ground_4:setVisible(true)
-    world:add(Ground_4)
-
     world:addInteractType(GROUND)
+
+    counter = 0
+    for i = 0, 12 do
+        for j = 1, 20 do
+            local drop = luajava.new(Drop)
+            drop:setPosition(luajava.new(Vector2, i * 9 + 560, j * 9 + 80))
+            drop:setColor(Color.RED)
+            counter = counter + 1
+            world:add(drop)
+        end
+    end
 end
 function onCreate()
     addObjects()
 end
-function onBeginContact(contact)
-end
-function onEndContact(contact)
-end
 function onCheck()
+    if world:dropsInRect(345, 75, 100, 110) < 80 then
+        return false
+    end
+
+    if world:dropsInRect(65, 73, 90, 120) < 80 then
+        return false
+    end
+
+    return true
 end

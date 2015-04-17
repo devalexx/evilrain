@@ -21,7 +21,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.EarClippingTriangulator;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -39,7 +39,7 @@ public class Ground extends SimpleActor {
     PolygonSpriteBatch polyBatch = RainGame.polyBatch;
     ShapeRenderer shapeRenderer = RainGame.shapeRenderer;
     TextureRegion textureRegion;
-    Rectangle aabbRectangle = new Rectangle();
+    Polygon p = new Polygon();
 
     public Ground() {
         super();
@@ -82,7 +82,7 @@ public class Ground extends SimpleActor {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
         fixtureDef.friction = friction != null ? friction : 0.8f;
-        fixtureDef.density = 0.5f;
+        fixtureDef.density = 0.8f;
         /*fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.6f;*/
 
@@ -101,20 +101,29 @@ public class Ground extends SimpleActor {
     private void calculateAABB() {
         float minx = 0, miny = 0, maxx = 0, maxy = 0;
         if(!vertices.isEmpty()) {
-            minx = maxx = vertices.get(0).x + getX();
-            miny = maxy = vertices.get(0).y + getY();
+            minx = maxx = vertices.get(0).x;
+            miny = maxy = vertices.get(0).y;
         }
         for(Vector2 v : vertices) {
-            if(v.x + getX() < minx)
-                minx = v.x + getX();
-            if(v.x + getX() > maxx)
-                maxx = v.x + getX();
-            if(v.y + getY() < miny)
-                miny = v.y + getY();
-            if(v.y + getY() > maxy)
-                maxy = v.y + getY();
+            if(v.x < minx)
+                minx = v.x;
+            if(v.x > maxx)
+                maxx = v.x;
+            if(v.y < miny)
+                miny = v.y;
+            if(v.y > maxy)
+                maxy = v.y;
         }
-        aabbRectangle.set(minx, miny, maxx - minx, maxy - miny);
+
+        float[] f = {
+                minx, miny,
+                maxx, miny,
+                maxx, maxy,
+                minx, maxy};
+        p.setRotation(0);
+        p.setVertices(f);
+        p.rotate(getRotation());
+        p.setPosition(getX(), getY());
     }
 
     public void addVertex(float x, float y) {
@@ -152,6 +161,6 @@ public class Ground extends SimpleActor {
     @Override
     public boolean isInAABB(Vector2 v) {
         calculateAABB();
-        return aabbRectangle.contains(v);
+        return p.contains(v.x, v.y);
     }
 }

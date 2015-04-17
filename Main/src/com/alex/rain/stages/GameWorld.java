@@ -143,7 +143,6 @@ public class GameWorld extends Stage {
 
         ParticleSystemDef particleSystemDef = new ParticleSystemDef();
         particleSystemDef.radius = PARTICLE_RADIUS * GameWorld.WORLD_TO_BOX;
-        particleSystemDef.dampingStrength = 0.2f;
 
         particleSystem = new ParticleSystem(physicsWorld, particleSystemDef);
 
