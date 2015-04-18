@@ -1,3 +1,5 @@
+dynActorArray = {}
+
 function addObjects()
     world:setPressingAction(PICKING_BODIES);
     ------------------
@@ -245,9 +247,41 @@ function addObjects()
     world:add(Ground_z)
 
     world:addInteractType(GROUND)
+
+    table.insert(dynActorArray, Ground_w)
+    table.insert(dynActorArray, Ground_a)
+    table.insert(dynActorArray, Ground_t)
+    table.insert(dynActorArray, Ground_e)
+    table.insert(dynActorArray, Ground_r)
 end
 function onCreate()
     addObjects()
 end
+
+won = false
 function onCheck()
+    for i = 1, #dynActorArray do
+        local pos = dynActorArray[i]:getPosition()
+        if pos.x < 600 then
+            return false
+        end
+    end
+
+    if won == false then
+        for i = 0, 8 do
+            for j = 0, 35 do
+                local drop = luajava.new(Drop)
+                drop:setPosition(luajava.new(Vector2, i * 9 + 670, j * 9 + 20))
+                world:addDropToCreate(drop)
+            end
+        end
+
+        for i = 1, #dynActorArray do
+            dynActorArray[i]:setPosition(-1000, -1000)
+        end
+
+        won = true
+    end
+
+    return true
 end
