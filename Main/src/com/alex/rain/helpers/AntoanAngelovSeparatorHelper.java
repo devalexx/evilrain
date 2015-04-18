@@ -82,16 +82,20 @@ public class AntoanAngelovSeparatorHelper implements SeparatorHelper {
             area *= 0.5f;
 
             boolean hasSmallAngle = false;
+            boolean hasMegaSmallAngle = false;
             for(k = 0; k < verticesVec.size(); k++) {
                 int v1 = k;
                 int v2 = k+1 < verticesVec.size() ? k+1 : (k + 1) - verticesVec.size();
                 int v3 = k+2 < verticesVec.size() ? k+2 : (k + 2) - verticesVec.size();
                 Vector2 edge1 = new Vector2(verticesVec.get(v2).cpy().sub(verticesVec.get(v1)));
                 Vector2 edge2 = new Vector2(verticesVec.get(v2).cpy().sub(verticesVec.get(v3)));
-                if(Math.abs(edge1.angle(edge2)) < 3.6f)
+                if(Math.abs(edge1.angle(edge2)) < 5.8f)
                     hasSmallAngle = true;
+                if(Math.abs(edge1.angle(edge2)) < 2f)
+                    hasMegaSmallAngle = true;
             }
-            if(verticesVec.size() == 0 || hasSmallAngle || Math.abs(area) < 0.001)
+            if(verticesVec.size() == 0 || hasMegaSmallAngle || Math.abs(area) < 0.001 ||
+                    (hasSmallAngle && Math.abs(area) < 0.007))
                 continue;
             polyShape.set(verticesVec.toArray(new Vector2[verticesVec.size()]));
             fixtureDef.shape=polyShape;
