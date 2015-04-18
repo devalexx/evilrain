@@ -86,8 +86,20 @@ public class Ground extends SimpleActor {
         /*fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.6f;*/
 
+        float minx = 0, miny = 0;
+        if(!vertices.isEmpty()) {
+            minx = vertices.get(0).x;
+            miny = vertices.get(0).y;
+        }
+        for(Vector2 v : vertices) {
+            if(v.x < minx)
+                minx = v.x;
+            if(v.y < miny)
+                miny = v.y;
+        }
+
         for(Vector2 v : vertices)
-            v.scl(GameWorld.WORLD_TO_BOX);
+            v.sub(minx*1.0001f, miny*1.0001f).scl(GameWorld.WORLD_TO_BOX);
 
         SeparatorHelper.defaultSeparatorHelper.separate(body, fixtureDef, vertices, 30);
 
@@ -95,7 +107,11 @@ public class Ground extends SimpleActor {
 
         for(Vector2 v : vertices)
             v.scl(GameWorld.BOX_TO_WORLD);
-        setPosition(getPosition());
+        setPosition(getPosition().add(minx, miny));
+    }
+
+    public void addToPosition(float x, float y) {
+        setPosition(getPosition().add(x, y));
     }
 
     private void calculateAABB() {

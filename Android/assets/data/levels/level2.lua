@@ -3,7 +3,7 @@ function onCreate()
 
     ground = luajava.new(Ground)
     ground:addVertex(736, 48)
-    ground:addVertex(736, 352)
+    ground:addVertex(736, 452)
     ground:addVertex(720, 352)
     ground:addVertex(712, 320)
     ground:addVertex(688, 296)

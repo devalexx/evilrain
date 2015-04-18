@@ -314,14 +314,8 @@ public class GameWorld extends Stage {
         for(int i = 0; i < src.length; i++)
             dropsXYPositions[i] = src[i] * BOX_TO_WORLD;
 
-        if(luaOnCheckFunc != null && luaOnCheckFunc.call().toboolean(1) && !wonGame) {
-            wonGame = true;
-            itRain = false;
-            drawingDrops = false;
-            if(SettingsManager.getMaxCompletedLevel() < levelNumber)
-                SettingsManager.setMaxCompletedLevel(levelNumber);
-            showMenuWindow();
-        }
+        if(luaOnCheckFunc != null && luaOnCheckFunc.call().toboolean(1) && !wonGame)
+            win();
 
         if(dropList.size() < MAX_DROPS) {
             if((itRain && isControllable() || emitter != null && emitter.isAutoFire()) &&
@@ -372,6 +366,21 @@ public class GameWorld extends Stage {
                         (cursorPosition.y - pos.y)).scl(0.01f));
             }
         }
+    }
+
+    private void win() {
+        wonGame = true;
+        itRain = false;
+        drawingDrops = false;
+        if(mouseJoint != null) {
+            physicsWorld.destroyJoint(mouseJoint);
+            physicsWorld.destroyBody(groundBody);
+            mouseJoint = null;
+            groundBody = null;
+        }
+        if(SettingsManager.getMaxCompletedLevel() < levelNumber)
+            SettingsManager.setMaxCompletedLevel(levelNumber);
+        showMenuWindow();
     }
 
     public void setKeepDropsForever(boolean state) {
@@ -478,7 +487,8 @@ public class GameWorld extends Stage {
         } else if(pressingAction == TouchType.PICKING_BODIES) {
             SimpleActor targetActor = null;
             for(SimpleActor actor : actorList) {
-                if(interactTypes.contains(actor.getType()) && actor.isInAABB(cursorPosition)) {
+                if(interactTypes.contains(actor.getType()) && actor.isInAABB(cursorPosition) &&
+                        actor.getBodyType() == BodyDef.BodyType.DynamicBody) {
                     targetActor = actor;
                     break;
                 }
@@ -492,9 +502,9 @@ public class GameWorld extends Stage {
                 MouseJointDef mouseJointDef = new MouseJointDef();
                 mouseJointDef.bodyA = groundBody;
                 mouseJointDef.bodyB = targetActor.getBody();
-                mouseJointDef.dampingRatio = 0.2f;
-                mouseJointDef.frequencyHz = 30;
-                mouseJointDef.maxForce = 200.0f * targetActor.getBody().getMass();
+                //mouseJointDef.dampingRatio = 0.2f;
+                //mouseJointDef.frequencyHz = 30;
+                mouseJointDef.maxForce = 180.0f * targetActor.getBody().getMass();
                 mouseJointDef.collideConnected= true;
                 mouseJointDef.target.set(cursorPosition);
                 mouseJoint = (MouseJoint)physicsWorld.createJoint(mouseJointDef);
@@ -569,6 +579,8 @@ public class GameWorld extends Stage {
         } else if(keyCode == Input.Keys.LEFT || keyCode == Input.Keys.RIGHT || keyCode == Input.Keys.UP ||
                 keyCode == Input.Keys.DOWN || keyCode == Input.Keys.SPACE)
             handleAction(keyCode, true);
+        else if(keyCode == Input.Keys.F12)
+            win();
 
         return super.keyDown(keyCode);
     }
@@ -947,5 +959,9 @@ public class GameWorld extends Stage {
 
     private boolean isControllable() {
         return (menuWindow == null || !menuWindow.isVisible()) && !hintWindow.isVisible();
+    }
+
+    public void addDropToCreate(Drop drop) {
+        dropsToCreate.add(drop);
     }
 }

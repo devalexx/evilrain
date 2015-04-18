@@ -190,6 +190,9 @@ public abstract class SimpleActor extends Actor {
     }
 
     public BodyDef.BodyType getBodyType() {
+        if(body != null && bodyType == null)
+            return body.getType();
+
         return bodyType;
     }
 
