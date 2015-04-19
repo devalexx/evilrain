@@ -40,7 +40,7 @@ function onCreate()
 
     trigger:setListener(luajava.createProxy(IEventListener, {
         handle = function (e)
-            ground:setPosition(luajava.new(Vector2, 0, 100))
+            ground:addToPosition(0, 100)
         end,
     }))
 end
