@@ -378,6 +378,13 @@ public class GameWorld extends Stage {
             mouseJoint = null;
             groundBody = null;
         }
+        if(emitter != null) {
+            emitter.setLinearVelocity(0, 0);
+        }
+        if(cloud != null) {
+            cloud.setLinearVelocity(0, 0);
+            cloud.setDirection(0);
+        }
         if(SettingsManager.getMaxCompletedLevel() < levelNumber)
             SettingsManager.setMaxCompletedLevel(levelNumber);
         showMenuWindow();
