@@ -766,6 +766,7 @@ public class GameWorld extends Stage {
 
     public void setPressingAction(int action) {
         pressingAction = TouchType.values()[action];
+        touchUp(0, 0, 0, 0);
     }
 
     @Override
