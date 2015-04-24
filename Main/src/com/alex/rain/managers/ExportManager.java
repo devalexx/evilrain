@@ -76,11 +76,25 @@ public class ExportManager {
         if(s.isEmpty())
             return "    --Error import " + sa + "\n\n";
         else {
-            s += "    " + name + ":setPosition(" + (sa.getX() + sa.getWidth() / 2) + ", " +
-                    (sa.getY() + sa.getHeight() / 2) + ")\n";
+            s += "    " + name + ":" + (sa.getType() == SimpleActor.TYPE.GROUND ? "addTo" : "set") + "Position(" +
+                    (sa.getX() + sa.getWidth() / 2) + ", " + (sa.getY() + sa.getHeight() / 2) + ")\n";
             s += "    " + name + ":setRotation(" + sa.getRotation() + ")\n";
-            if(sa.getBodyType() != null)
-                s += "    " + name + ":setBodyType(BodyType." + sa.getBodyType() + ")\n";
+            if(sa.getBodyType() != null) {
+                s += "    " + name + ":setBodyType(";
+                switch(sa.getBodyType()) {
+                    case DynamicBody:
+                        s += "DYNAMIC_BODY";
+                        break;
+                    case StaticBody:
+                        s += "STATIC_BODY";
+                        break;
+                    case KinematicBody:
+                        s += "KINEMATIC_BODY";
+                        break;
+                }
+                s += sa.getBodyType();
+                s += ")\n";
+            }
             if(sa.getName() != null)
                 s += "    " + name + ":setName('" + sa.getName() + "')\n";
             s += "    " + name + ":setVisible(" + sa.isVisible() + ")\n";
