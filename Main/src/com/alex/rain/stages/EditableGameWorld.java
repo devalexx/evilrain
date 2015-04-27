@@ -130,8 +130,9 @@ public class EditableGameWorld extends GameWorld {
 
             for(SimpleActor actor : actorList) {
                 if(actor.isInAABB(cursorPosition)) {
-                    selectedActor = actor;
-                    break;
+                    if(selectedActor == null || selectedActor != null &&
+                                selectedActor.getWidth() > actor.getWidth() && selectedActor.getHeight() > actor.getHeight())
+                        selectedActor = actor;
                 }
             }
         }
@@ -200,7 +201,7 @@ public class EditableGameWorld extends GameWorld {
 
     @Override
     public boolean keyDown(int keyCode) {
-        if(keyCode == Input.Keys.E)
+        if(keyCode == Input.Keys.ALT_LEFT || keyCode == Input.Keys.ALT_RIGHT)
             editorUI.setVisible(!editorUI.isVisible());
         else if(keyCode == Input.Keys.W)
             for(SimpleActor sa : actorList)
