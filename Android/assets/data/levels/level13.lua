@@ -50,7 +50,7 @@ function onCreate()
 
     ------------------
     emitter_l = luajava.new(Emitter)
-    emitter_l:setPosition(228.99998, 440.99997)
+    emitter_l:setPosition(260.99998, 472.99997)
     emitter_l:setRotation(-92.0)
     emitter_l:setName('emitter_l')
     emitter_l:setVisible(true)
@@ -61,7 +61,7 @@ function onCreate()
 
     ------------------
     emitter_m = luajava.new(Emitter)
-    emitter_m:setPosition(402.99997, 445.99994)
+    emitter_m:setPosition(434.99997, 477.99994)
     emitter_m:setRotation(-91.0)
     emitter_m:setName('emitter_m')
     emitter_m:setVisible(true)
@@ -72,7 +72,7 @@ function onCreate()
 
     ------------------
     emitter_r = luajava.new(Emitter)
-    emitter_r:setPosition(600.0, 447.0)
+    emitter_r:setPosition(632.0, 479.0)
     emitter_r:setRotation(-90.0)
     emitter_r:setName('emitter_r')
     emitter_r:setVisible(true)

@@ -24,7 +24,7 @@ function onCreate()
     cloud:setMinMaxPosRectangle(0, 300, 800, 200)
 
     ball = luajava.new(Ball)
-    ball:setPosition(luajava.new(Vector2, 400, 420))
+    ball:setPosition(luajava.new(Vector2, 400, 452))
     world:add(ball)
 end
 

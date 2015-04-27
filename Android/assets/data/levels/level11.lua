@@ -29,7 +29,7 @@ function onCreate()
     --world:add(Ground_0)
 
     ball_7 = luajava.new(Ball)
-    ball_7:setPosition(340, 220)
+    ball_7:setPosition(350, 240)
     ball_7:setRotation(0.0)
     ball_7:setName('ball_7')
     ball_7:setVisible(true)
@@ -130,7 +130,7 @@ function onCreate()
 
     ------------------
     trigger_3 = luajava.new(Trigger)
-    trigger_3:setPosition(695.57153, 94.48703)
+    trigger_3:setPosition(727.57153, 126.48703)
     trigger_3:setRotation(359.9033)
     trigger_3:setName('trigger_3')
     trigger_3:setVisible(true)
@@ -164,7 +164,7 @@ function onCreate()
 
     ------------------
     ball_5 = luajava.new(Ball)
-    ball_5:setPosition(213.0, 212.99997)
+    ball_5:setPosition(245.0, 244.99997)
     ball_5:setRotation(0.0)
     ball_5:setName('ball_5')
     ball_5:setVisible(true)
@@ -172,7 +172,7 @@ function onCreate()
 
     ------------------
     ball_6 = luajava.new(Ball)
-    ball_6:setPosition(192.0, 235.0)
+    ball_6:setPosition(224.0, 237.0)
     ball_6:setRotation(0.0)
     ball_6:setName('ball_6')
     ball_6:setVisible(true)
@@ -183,7 +183,7 @@ function onCreate()
 
     ------------------
     ball_7 = luajava.new(Ball)
-    ball_7:setPosition(138.0, 229.0)
+    ball_7:setPosition(170.0, 261.0)
     ball_7:setRotation(0.0)
     ball_7:setName('ball_7')
     ball_7:setVisible(true)
@@ -191,7 +191,7 @@ function onCreate()
 
     ------------------
     ball_8 = luajava.new(Ball)
-    ball_8:setPosition(171.99997, 210.0)
+    ball_8:setPosition(203.99997, 242.0)
     ball_8:setRotation(0.0)
     ball_8:setName('ball_8')
     ball_8:setVisible(true)

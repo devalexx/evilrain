@@ -36,6 +36,7 @@ public class Emitter extends ControlledActor {
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
         super.createPhysicsActor(particleSystem, physicsWorld);
+        pos.sub(getWidth() / 2, getHeight() / 2);
 
         PolygonShape polygonShape = new PolygonShape();
         //polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 2);

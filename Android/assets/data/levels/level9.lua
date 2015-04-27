@@ -50,22 +50,22 @@ function onCreate()
     cloud:setMinMaxPosRectangle(0, 300, 800, 200)
 
     trigger = luajava.new(Trigger)
-    trigger:setPosition(luajava.new(Vector2, 190, 128))
+    trigger:setPosition(luajava.new(Vector2, 222, 160))
     world:add(trigger)
     table.insert(dynActorArray, trigger)
 
     trigger = luajava.new(Trigger)
-    trigger:setPosition(luajava.new(Vector2, 300, 128))
+    trigger:setPosition(luajava.new(Vector2, 332, 160))
     world:add(trigger)
     table.insert(dynActorArray, trigger)
 
     trigger = luajava.new(Trigger)
-    trigger:setPosition(luajava.new(Vector2, 536, 128))
+    trigger:setPosition(luajava.new(Vector2, 568, 160))
     world:add(trigger)
     table.insert(dynActorArray, trigger)
 
     trigger = luajava.new(Trigger)
-    trigger:setPosition(luajava.new(Vector2, 420, 128))
+    trigger:setPosition(luajava.new(Vector2, 452, 160))
     world:add(trigger)
     table.insert(dynActorArray, trigger)
 

@@ -27,6 +27,7 @@ public class Trigger extends SimpleActor {
     private Body topBody;
     private boolean state;
     private EventListener listener;
+    private boolean isReady = false;
 
     public Trigger() {
         sprite = TextureManager.getSpriteFromDefaultAtlas("game_button_off");
@@ -37,6 +38,7 @@ public class Trigger extends SimpleActor {
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
         super.createPhysicsActor(particleSystem, physicsWorld);
+        pos.sub(getWidth() / 2, getHeight() / 2);
 
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 2.4f,
@@ -60,8 +62,7 @@ public class Trigger extends SimpleActor {
         polygonShape.dispose();
 
         polygonShape = new PolygonShape();
-        polygonShape.setAsBox(getPhysicsWidth() / 3, getPhysicsHeight() / 20f,
-                new Vector2(0, getPhysicsHeight() / 2.3f), 0);
+        polygonShape.setAsBox(getPhysicsWidth() / 3, getPhysicsHeight() / 20f);
 
         offset.set(-getWidth() / 2, -getHeight() / 2);
         sprite.setOrigin(getWidth() / 2, getHeight() / 2);
@@ -72,7 +73,7 @@ public class Trigger extends SimpleActor {
         fixtureDef.friction = 10.4f;
 
         bodyDef = new BodyDef();
-        bodyDef.position.set(pos.cpy().scl(GameWorld.WORLD_TO_BOX));
+        bodyDef.position.set(pos.cpy().add(0, getHeight() / 2.5f).scl(GameWorld.WORLD_TO_BOX));
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         topBody = physicsWorld.createBody(bodyDef);
         topBody.createFixture(fixtureDef);
@@ -84,20 +85,25 @@ public class Trigger extends SimpleActor {
         jointDef.initialize(body, topBody,
                 pos.cpy().scl(GameWorld.WORLD_TO_BOX), new Vector2(0.0f, 1.0f));
         jointDef.enableLimit = true;
-        jointDef.upperTranslation = 0.01f;
+        jointDef.upperTranslation = 0.02f;
         //jointDef.referenceAngle = 1;
         jointDef.collideConnected = true;
         jointDef.enableMotor = true;
         jointDef.motorSpeed = 2f;
         jointDef.maxMotorForce = 2f;
         distanceJoint = (PrismaticJoint)physicsWorld.createJoint(jointDef);
+
+        setRotation(rot);
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
 
-        if(distanceJoint.getJointTranslation() < 0.001)
+        if(!isReady && distanceJoint.getJointTranslation() > 0.023)
+            isReady = true;
+
+        if(isReady && distanceJoint.getJointTranslation() < 0.023)
             setState(true);
     }
 

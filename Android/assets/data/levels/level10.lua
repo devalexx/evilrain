@@ -28,13 +28,13 @@ function onCreate()
 
     trigger = luajava.new(Trigger)
     trigger:setBodyType(KINEMATIC_BODY)
-    trigger:setPosition(luajava.new(Vector2, 190, 128))
+    trigger:setPosition(luajava.new(Vector2, 222, 160))
     world:add(trigger)
     table.insert(dynActorArray, trigger)
 
     trigger = luajava.new(Trigger)
     trigger:setBodyType(KINEMATIC_BODY)
-    trigger:setPosition(luajava.new(Vector2, 536, 128))
+    trigger:setPosition(luajava.new(Vector2, 568, 160))
     world:add(trigger)
     table.insert(dynActorArray, trigger)
 

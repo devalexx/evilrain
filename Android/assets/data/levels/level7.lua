@@ -37,7 +37,7 @@ function onCreate()
 
     world:addInteractType(BALL)
     ball = luajava.new(Ball)
-    ball:setPosition(luajava.new(Vector2, 300, 420))
+    ball:setPosition(luajava.new(Vector2, 332, 452))
     world:add(ball)
 end
 

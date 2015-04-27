@@ -33,6 +33,7 @@ public class Ball extends SimpleActor {
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
         super.createPhysicsActor(particleSystem, physicsWorld);
+        pos.sub(getWidth() / 2, getHeight() / 2);
 
         offset.set(-getWidth(), -getHeight());
         sprite.setOrigin(getWidth(), getHeight());

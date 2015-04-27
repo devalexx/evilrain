@@ -80,7 +80,7 @@ function onCreate()
     world:add(Ground_2)
 
     trigger_3 = luajava.new(Trigger)
-    trigger_3:setPosition(695.57153, 94.48703)
+    trigger_3:setPosition(727.57153, 126.48703)
     trigger_3:setRotation(359.9033)
     trigger_3:setName('trigger_3')
     trigger_3:setVisible(true)

@@ -2,7 +2,7 @@ function addObjects()
     world:setPressingAction(PICKING_DROPS);
 
     emitter_2 = luajava.new(Emitter)
-    emitter_2:setPosition(80.0, 261.99997)
+    emitter_2:setPosition(112.0, 293.99997)
     emitter_2:setRotation(-12.0)
     emitter_2:setBodyType(KINEMATIC_BODY)
     emitter_2:setName('emitter_2')
