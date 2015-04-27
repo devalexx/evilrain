@@ -92,7 +92,6 @@ public class ExportManager {
                         s += "KINEMATIC_BODY";
                         break;
                 }
-                s += sa.getBodyType();
                 s += ")\n";
             }
             if(sa.getName() != null)
