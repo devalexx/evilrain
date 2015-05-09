@@ -17,7 +17,7 @@ function onCreate()
 
     local dynamicActor = luajava.new(House)
     world:add(dynamicActor)
-    dynamicActor:setPosition(luajava.new(Vector2, 600, 310))
+    dynamicActor:setPosition(luajava.new(Vector2, 610, 310))
     table.insert(dynActorArray, dynamicActor)
 
     local emitterActor = luajava.new(Emitter)
