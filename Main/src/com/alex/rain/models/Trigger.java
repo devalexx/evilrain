@@ -100,10 +100,10 @@ public class Trigger extends SimpleActor {
     public void act(float delta) {
         super.act(delta);
 
-        if(!isReady && distanceJoint.getJointTranslation() > 0.023)
+        if(!isReady && distanceJoint.getJointTranslation() > 0.024)
             isReady = true;
 
-        if(isReady && distanceJoint.getJointTranslation() < 0.023)
+        if(isReady && distanceJoint.getJointTranslation() < 0.024)
             setState(true);
     }
 
