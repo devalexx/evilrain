@@ -17,14 +17,14 @@ function onCreate()
 
     dynamicActor = luajava.new(Hammer)
     world:add(dynamicActor)
-    dynamicActor:setPosition(luajava.new(Vector2, 620, 300))
+    dynamicActor:setPosition(luajava.new(Vector2, 620, 280))
     table.insert(dynActorArray, dynamicActor)
 
     dynamicActorTmp = luajava.new(House)
     dynamicActorTmp:setBodyBox(20, 100)
     dynamicActorTmp:setSpriteBox(20, 100)
     world:add(dynamicActorTmp)
-    dynamicActorTmp:setPosition(luajava.new(Vector2, 470, 200))
+    dynamicActorTmp:setPosition(luajava.new(Vector2, 460, 190))
 
     table.insert(dynActorArray, dynamicActorTmp)
 

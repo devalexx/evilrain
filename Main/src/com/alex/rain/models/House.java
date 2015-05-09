@@ -15,6 +15,8 @@ package com.alex.rain.models;
 
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.stages.GameWorld;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -22,6 +24,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import finnstr.libgdx.liquidfun.ParticleSystem;
 
 public class House extends SimpleActor {
+    private Polygon p = new Polygon();
+
     public House() {
         this(1);
     }
@@ -35,6 +39,7 @@ public class House extends SimpleActor {
     @Override
     public void createPhysicsActor(ParticleSystem particleSystem, World physicsWorld) {
         super.createPhysicsActor(particleSystem, physicsWorld);
+        pos.sub(getWidth() / 2, getHeight() / 2);
 
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.setAsBox(getPhysicsWidth() / 2, getPhysicsHeight() / 2);
@@ -54,5 +59,23 @@ public class House extends SimpleActor {
         body.resetMassData();
 
         polygonShape.dispose();
+    }
+
+    @Override
+    public boolean isInAABB(Vector2 v) {
+        calculateAABB();
+        return p.contains(v.x, v.y);
+    }
+
+    private void calculateAABB() {
+        float[] f = {
+                -getWidth() / 2, -getHeight() / 2,
+                getWidth() / 2, -getHeight() / 2,
+                getWidth() / 2, getHeight() / 2,
+                -getWidth() / 2, getHeight() / 2};
+        p.setRotation(0);
+        p.setVertices(f);
+        p.rotate(getRotation());
+        p.setPosition(getX(), getY());
     }
 }

@@ -14,7 +14,7 @@ function onCreate()
 
     local dynamicActor = luajava.new(House)
     world:add(dynamicActor)
-    dynamicActor:setPosition(luajava.new(Vector2, 650, 300))
+    dynamicActor:setPosition(luajava.new(Vector2, 634, 260))
     table.insert(dynActorArray, dynamicActor)
 
     for i = 0, 3 do
@@ -22,7 +22,7 @@ function onCreate()
         dynamicActorTmp:setBodyBox(20, 100 + i * 10)
         dynamicActorTmp:setSpriteBox(20, 100 + i * 10)
         world:add(dynamicActorTmp)
-        dynamicActorTmp:setPosition(luajava.new(Vector2, 150 + i * 90, 200))
+        dynamicActorTmp:setPosition(luajava.new(Vector2, 134 + i * 90, 185 + i * 5))
 
         table.insert(dynActorArray, dynamicActorTmp)
     end

@@ -12,7 +12,7 @@ function addObjects()
 
     ------------------
     house_3 = luajava.new(House)
-    house_3:setPosition(730.0, 189.99998)
+    house_3:setPosition(746.0, 195.99998)
     house_3:setRotation(0.0)
     house_3:setName('house_3')
     house_3:setVisible(true)

@@ -33,13 +33,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Ground extends SimpleActor {
-    List<Vector2> vertices = new ArrayList<Vector2>();
-
-    PolygonSprite poly;
-    PolygonSpriteBatch polyBatch = RainGame.polyBatch;
-    ShapeRenderer shapeRenderer = RainGame.shapeRenderer;
-    TextureRegion textureRegion;
-    Polygon p = new Polygon();
+    private List<Vector2> vertices = new ArrayList<Vector2>();
+    private PolygonSprite poly;
+    private PolygonSpriteBatch polyBatch = RainGame.polyBatch;
+    private ShapeRenderer shapeRenderer = RainGame.shapeRenderer;
+    private TextureRegion textureRegion;
+    private Polygon p = new Polygon();
 
     public Ground() {
         super();
