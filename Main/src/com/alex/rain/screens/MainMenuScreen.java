@@ -81,7 +81,7 @@ public class MainMenuScreen extends BasicUIScreen {
         button2.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                RainGame.getInstance().setScreen(new OptionsScreen());
+                RainGame.getInstance().setScreen(new SettingsScreen());
             }
         });
 

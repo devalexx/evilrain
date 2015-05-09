@@ -122,14 +122,25 @@ public class TextureManager {
         }
     }
 
-    public static void setLinearFilter(boolean state) {
+    public static void setLinearFilter(SettingsManager.SmoothTextureType state) {
         for(Texture t : textureMap.values())
-            t.setFilter(state ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest,
-                    state ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest);
+            t.setFilter(state == SettingsManager.SmoothTextureType.ALL_TEXTURES ?
+                            Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest,
+                    state == SettingsManager.SmoothTextureType.ALL_TEXTURES ?
+                            Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest);
 
-        for(TextureAtlas ta : textureAtlasMap.values())
-            for(Texture t : ta.getTextures())
-                t.setFilter(state ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest,
-                        state ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest);
+        for(TextureAtlas ta : textureAtlasMap.values()) {
+            for(Texture t : ta.getTextures()) {
+                boolean isLinear = false;
+                if(state == SettingsManager.SmoothTextureType.ALL_TEXTURES ||
+                        state == SettingsManager.SmoothTextureType.UI_TEXTURES &&
+                        t.getTextureData() instanceof FileTextureData &&
+                        ((FileTextureData)t.getTextureData()).getFileHandle().name().contains("uiskin"))
+                    isLinear = true;
+
+                t.setFilter(isLinear ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest,
+                        isLinear ? Texture.TextureFilter.Linear : Texture.TextureFilter.Nearest);
+            }
+        }
     }
 }

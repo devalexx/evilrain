@@ -22,9 +22,20 @@ import java.util.Locale;
 public class SettingsManager {
     static String LOCALE_SETTING = "locale";
     static String HIGH_GRAPHICS_SETTING = "hi_graph";
-    static String SMOOTH_TEXTURES_SETTING = "smooth_textures";
+    static String SMOOTH_TEXTURES_SETTING = "smooth_texture_type";
     static String SOUND_SETTING = "sound";
     static String MAX_COMPLETED_LEVEL = "max_completed_lvl";
+
+    public enum SmoothTextureType {
+        NONE_TEXTURES,
+        UI_TEXTURES,
+        ALL_TEXTURES;
+
+        @Override
+        public String toString() {
+            return I18nManager.getString(super.toString());
+        }
+    }
 
     public static String availableLanguages[] = {"en", "ru"};
 
@@ -48,22 +59,20 @@ public class SettingsManager {
 
     public static void setHighGraphics(boolean state) {
         prefs.putBoolean(HIGH_GRAPHICS_SETTING, state);
-
-        TextureManager.setLinearFilter(state);
     }
 
     public static boolean isHighGraphics() {
         return prefs.getBoolean(HIGH_GRAPHICS_SETTING, true);
     }
 
-    public static void setSmoothTextures(boolean state) {
-        prefs.putBoolean(SMOOTH_TEXTURES_SETTING, state);
+    public static void setSmoothTextureType(SmoothTextureType state) {
+        prefs.putString(SMOOTH_TEXTURES_SETTING, state.name());
 
         TextureManager.setLinearFilter(state);
     }
 
-    public static boolean isSmoothTextures() {
-        return prefs.getBoolean(SMOOTH_TEXTURES_SETTING, true);
+    public static SmoothTextureType getSmoothTextureType() {
+        return SmoothTextureType.valueOf(prefs.getString(SMOOTH_TEXTURES_SETTING, SmoothTextureType.UI_TEXTURES.name()));
     }
 
     public static void setSound(boolean state) {

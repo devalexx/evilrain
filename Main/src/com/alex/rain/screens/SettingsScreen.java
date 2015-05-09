@@ -23,8 +23,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import java.util.Locale;
 
-public class OptionsScreen extends BasicUIScreen {
-    public OptionsScreen() {
+public class SettingsScreen extends BasicUIScreen {
+    public SettingsScreen() {
         super();
         SoundManager.playMusic(SoundManager.MENU_MUSIC);
 
@@ -72,9 +72,10 @@ public class OptionsScreen extends BasicUIScreen {
         Label checkboxSmoothLabel = new Label(I18nManager.getString("SMOOTH_TEXTURES"), skin);
         innerTable.add(checkboxSmoothLabel).left();
 
-        final CheckBox smoothCheckBox = new CheckBox("", skin);
-        smoothCheckBox.setChecked(SettingsManager.isSmoothTextures());
-        innerTable.add(smoothCheckBox).expand().fill();
+        final SelectBox<SettingsManager.SmoothTextureType> smoothTextureSelect = new SelectBox<>(skin);
+        smoothTextureSelect.setItems(SettingsManager.SmoothTextureType.values());
+        smoothTextureSelect.setSelected(SettingsManager.getSmoothTextureType());
+        innerTable.add(smoothTextureSelect).expand().fill();
 
         innerTable.row();
 
@@ -96,7 +97,7 @@ public class OptionsScreen extends BasicUIScreen {
                 SettingsManager.setLanguage(new Locale(I18nManager.availableLanguages[languageSelect.getSelectedIndex()]));
                 SettingsManager.setSound(soundCheckBox.isChecked());
                 SettingsManager.setHighGraphics(graphicsCheckBox.isChecked());
-                SettingsManager.setSmoothTextures(smoothCheckBox.isChecked());
+                SettingsManager.setSmoothTextureType(smoothTextureSelect.getSelected());
                 RainGame.getInstance().setScreen(new MainMenuScreen());
                 SettingsManager.save();
             }
