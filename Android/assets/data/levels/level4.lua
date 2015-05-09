@@ -24,7 +24,7 @@ function onCreate()
     dynamicActorTmp:setBodyBox(20, 100)
     dynamicActorTmp:setSpriteBox(20, 100)
     world:add(dynamicActorTmp)
-    dynamicActorTmp:setPosition(luajava.new(Vector2, 460, 190))
+    dynamicActorTmp:setPosition(luajava.new(Vector2, 470, 190))
 
     table.insert(dynActorArray, dynamicActorTmp)
 
