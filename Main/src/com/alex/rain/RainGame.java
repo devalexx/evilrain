@@ -17,6 +17,7 @@ import com.alex.rain.managers.SettingsManager;
 import com.alex.rain.managers.TextureManager;
 import com.alex.rain.screens.GameScreen;
 import com.alex.rain.screens.SplashScreen;
+import com.alex.rain.stages.EditableGameWorld;
 import com.alex.rain.stages.GameWorld;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
@@ -31,7 +32,6 @@ public class RainGame extends Game {
     Stage stage;
     static RainGame instance = new RainGame();
     static float time;
-    static boolean lightVersion = true;
     public static PolygonSpriteBatch polyBatch;
     public static ShapeRenderer shapeRenderer;
     public final static String VERSION = "0.1.1";
@@ -45,22 +45,16 @@ public class RainGame extends Game {
 
     @Override
     public void create() {
+        TextureManager.reload();
         polyBatch = new PolygonSpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
-        lightVersion = Gdx.app.getType() != Application.ApplicationType.Desktop;
         TextureManager.getAtlas("pack.atlas");
 
-        //EditableGameWorld gameWorld = new EditableGameWorld("level13");
-        /*GameWorld gameWorld = new GameWorld("level13");
-        gameWorld.createWorld();
-        stage = gameWorld;
-        Gdx.input.setInputProcessor(stage);
-
-        setScreen(new GameScreen(gameWorld));*/
+        //setLevel("level1", false);
         setScreen(new SplashScreen());
         Gdx.gl.glClearColor(0, 0, 0, 0);
-        TextureManager.setLinearFilter(SettingsManager.isSmoothTextures());
+        TextureManager.setLinearFilter(SettingsManager.getSmoothTextureType());
     }
 
     @Override
@@ -76,9 +70,17 @@ public class RainGame extends Game {
     }
 
     public void setLevel(String name) {
+        setLevel(name, false);
+    }
+
+    public void setLevel(String name, boolean editable) {
         if(stage != null)
             stage.dispose();
-        GameWorld gameWorld = new GameWorld(name);
+        GameWorld gameWorld;
+        if(!editable)
+            gameWorld = new GameWorld(name);
+        else
+            gameWorld = new EditableGameWorld(name);
         gameWorld.createWorld();
         stage = gameWorld;
         Gdx.input.setInputProcessor(stage);
@@ -96,10 +98,6 @@ public class RainGame extends Game {
 
     public static float getTime() {
         return time;
-    }
-
-    public static boolean isLightVersion() {
-        return lightVersion;
     }
 
     @Override

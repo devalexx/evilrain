@@ -47,6 +47,7 @@ public class BasicUIScreen implements Screen {
         if(createStage) {
             stage = new BasicStage(new GameViewport());
             Gdx.input.setInputProcessor(stage);
+            Gdx.input.setCatchBackKey(true);
         }
     }
 
