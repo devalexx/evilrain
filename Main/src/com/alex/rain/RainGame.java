@@ -53,7 +53,7 @@ public class RainGame extends Game {
 
         //setLevel("level1", false);
         setScreen(new SplashScreen());
-        Gdx.gl.glClearColor(0, 0, 0, 0);
+        Gdx.gl.glClearColor(1, 1, 1, 1);
         TextureManager.setLinearFilter(SettingsManager.getSmoothTextureType());
     }
 

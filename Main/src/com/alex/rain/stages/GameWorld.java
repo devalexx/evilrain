@@ -702,6 +702,7 @@ public class GameWorld extends Stage {
             sb.draw(backgroundTexture, -(int)getViewport().getWorldWidth(), -(int)getViewport().getWorldHeight(), 0, 0, (int)getViewport().getWorldWidth() * 2, (int)getViewport().getWorldHeight() * 2);
         sb.end();
 
+        Gdx.gl.glClearColor(0, 0, 0, 0);
         if(m_fbo != null && useShader) {
             m_fbo.begin();
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -716,6 +717,7 @@ public class GameWorld extends Stage {
         } else {
             drawDrops(false);
         }
+        Gdx.gl.glClearColor(1, 1, 1, 1);
 
         sb.begin();
             for(Zone zone : drawingZones) {
