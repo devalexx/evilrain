@@ -34,7 +34,7 @@ public class RainGame extends Game {
     static float time;
     public static PolygonSpriteBatch polyBatch;
     public static ShapeRenderer shapeRenderer;
-    public final static String VERSION = "0.1.1";
+    public final static String VERSION = "0.2.0";
 
     private RainGame() {
     }

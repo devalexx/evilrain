@@ -110,7 +110,6 @@ public class GameWorld extends Stage {
     private HintWindow hintWindow;
     private MenuWindow menuWindow;
     private ImageButton actionButton, arrowUpButton, arrowDownButton, arrowLeftButton ,arrowRightButton;
-    private Label hintLabel;
     private List<Zone> drawingZones = new LinkedList<>();
     private float[] dropsXYPositions, dropsXYRGBA;
     private Body groundBody;
@@ -124,7 +123,6 @@ public class GameWorld extends Stage {
     private float timeLastDrop;
     private boolean itRain;
     private int levelNumber = 0;
-    private String winHint;
     private int MAX_DROPS = 2000;
     private boolean physicsEnabled = true;
     private boolean liquidForcesEnabled = true;
@@ -217,12 +215,10 @@ public class GameWorld extends Stage {
         arrowLeftButton = tableUI.arrowLeftButton;
         arrowRightButton = tableUI.arrowRightButton;
         addActor(tableUI);
-        showHintWindow();
 
-        if(levelNumber != 0)
-            setWinHint(I18nManager.getString("LEVEL" + levelNumber + "_HINT"));
-        else
-            setWinHint(I18nManager.getString("TEST_HINT"));
+        hintWindow = new HintWindow(skin, levelNumber);
+        addActor(hintWindow);
+        showHintWindow();
     }
 
     public void add(SimpleActor actor) {
@@ -417,16 +413,7 @@ public class GameWorld extends Stage {
     }
 
     public void showHintWindow() {
-        if(hintWindow != null) {
-            hintWindow.setVisible(true);
-            hintWindow.toFront();
-            return;
-        }
-
-        hintWindow = new HintWindow(skin, levelNumber);
-        addActor(hintWindow);
-        hintLabel = hintWindow.hintLabel;
-
+        hintWindow.setVisible(true);
         hintWindow.toFront();
     }
 
@@ -733,8 +720,7 @@ public class GameWorld extends Stage {
             particleDebugRendererCircle.render(particleSystem, PARTICLE_RADIUS / 2.5f * BOX_TO_WORLD * gameViewport.scale, getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
             particleDebugRendererDot.render(particleSystem, PARTICLE_RADIUS / 10f * BOX_TO_WORLD * gameViewport.scale, getCamera().combined.cpy().scale(BOX_TO_WORLD, BOX_TO_WORLD, 1));
 
-            hintLabel.setText((winHint != null ? I18nManager.getString("HINT") + ": " + winHint + "\n" : "") +
-                    "FPS: " + Gdx.graphics.getFramesPerSecond() + "\n" +
+            hintWindow.setText("FPS: " + Gdx.graphics.getFramesPerSecond() + "\n" +
                     "Drops: " + getDropsNumber());
 
             if(selectedDrops != null) {
@@ -755,11 +741,6 @@ public class GameWorld extends Stage {
                 tableUI.drawDebug(RainGame.shapeRenderer);
             RainGame.shapeRenderer.end();
         }
-    }
-
-    public void setWinHint(String winHint) {
-        this.winHint = winHint;
-        hintLabel.setText(winHint);
     }
 
     public PolygonSpriteBatch getPolygonSpriteBatch() {

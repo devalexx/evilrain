@@ -24,9 +24,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class HintWindow extends Window {
-    public Label hintLabel;
+    private Label hintLabel;
+    private int fullHintCounter = 5;
 
-    public HintWindow(Skin skin, int levelNumber) {
+    public HintWindow(Skin skin, final int levelNumber) {
         super(I18nManager.getString("LEVEL") + " " + levelNumber, skin);
         setSize(GameViewport.WIDTH / 1.5f, GameViewport.HEIGHT / 1.5f);
         setPosition(GameViewport.WIDTH / 2f - getWidth() / 2f,
@@ -34,19 +35,21 @@ public class HintWindow extends Window {
         setModal(true);
         setMovable(false);
         setKeepWithinStage(false);
-        //debug();
+        setVisible(false);
 
-        row().width(400).padTop(10);
-
-        hintLabel = new Label("", skin);
+        hintLabel = new Label(I18nManager.getString(levelNumber != 0 ? "LEVEL" + levelNumber + "_HINT" : "TEST_HINT"), skin);
         hintLabel.setAlignment(Align.center);
         hintLabel.setWrap(true);
-        add(hintLabel);
+        add(hintLabel).colspan(2).padTop(10).width(450).expand().fill().center();
 
-        row().width(400).padTop(10);
+        row();
 
         final TextButton closeButton = new TextButton(I18nManager.getString("CLOSE"), skin);
-        add(closeButton);
+        add(closeButton).width(200);
+
+        final TextButton fullHintButton = new TextButton(I18nManager.getString("FULL_HINT"), skin);
+        if(levelNumber != 0)
+            add(fullHintButton).width(200);
 
         closeButton.addListener(new ClickListener() {
             @Override
@@ -54,5 +57,21 @@ public class HintWindow extends Window {
                 setVisible(false);
             }
         });
+
+        fullHintButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if(--fullHintCounter > 0) {
+                    fullHintButton.setText(String.valueOf(fullHintCounter));
+                    return;
+                }
+
+                hintLabel.setText(I18nManager.getString("LEVEL" + levelNumber + "_FULL_HINT"));
+            }
+        });
+    }
+
+    public void setText(String str) {
+        hintLabel.setText(str);
     }
 }
